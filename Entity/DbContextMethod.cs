@@ -1,9 +1,17 @@
 
 # SaveChanges()
 // -> persist all changes (added, modified, or deleted entities) made in the context to the database
+// -> SaveChanges() applying the changes to the database
+// -> for all entity is being tracked by the Entity Framework’s change tracker
+// -> các entity có được SaveChange() cần có Id đồng nhất với database nêu không sẽ lỗi
 
-context.Blogs.Add(blog);
-context.SaveChanges();
+// Example: dù enity được lấy và update ở scope khác, SaveChanges() vẫn bắt được
+foreach(var mucluc in lstMucLucForUpdate)
+{
+    var trackedEntity = _context.MucLucs.FirstOrDefault(_ => _.Id == mucluc.Id);
+    trackedEntity.MaDV = mucluc.MaDV ?? string.Empty;
+}
+await _context.SaveChangesAsync();
 
 
 # Dispose()
@@ -25,7 +33,9 @@ finally
 
 
 # Update()
-// -> begins tracking the given entity in the "Modified" state 
+// -> begins "tracking" the given entity in the "Modified" state if entity’s primary key value is set
+// -> If the entity’s primary key value is not set (empty, null, or the default value for the specified data type), 
+// => the "Update" method considers it a new entity and sets its "EntityState" to "Added"
 // -> it will be updated in the database when SaveChanges() is called
 using (var context = new BloggingContext())
 {
@@ -34,7 +44,7 @@ using (var context = new BloggingContext())
     context.SaveChanges();
 }
 
-# Update()
+# UpdateRange()
 // -> giống "Update()" nhưng cho nhiều phần tử
 var entity1 = new MyEntity { Id = 1, Name = "Updated Name 1" };
 var entity2 = new MyEntity { Id = 2, Name = "Updated Name 2" };
@@ -46,10 +56,14 @@ context.UpdateRange(entities);
 context.UpdateRange(entity1, entity2, entity3);
 
 
-# Entry
+# Entry(entity)
+// -> returns an EntityEntry object
 // -> provides access to information and the ability to perform actions on the entity
 // ->  change the state of an entity, get the current values of an entity, get the original values of an entity, ...
 
+## ".State" property
+// -> to get or set the state of an entity
+// => change the state of an entity:
 public async Task UpdateYourEntityAsync(YourEntity yourEntity)
 {
     _context.Entry(yourEntity).State = EntityState.Modified;
@@ -59,6 +73,34 @@ public async Task UpdateYourEntityAsync(YourEntity yourEntity)
 
     await _context.SaveChangesAsync();
 }
+
+## ".CurrentValues" property: 
+// -> get or set the current values of an entity
+// => to update an entity with new values:
+var entity = context.Entities.Find(1);
+var currentValues = context.Entry(entity).CurrentValues;
+currentValues.SetValues(newValues);
+
+## ".OriginalValues" property: 
+// -> get or set the original values of an entity. 
+// => revert changes made to an entity:
+var entity = context.Entities.Find(1);
+var entry = context.Entry(entity);
+entry.CurrentValues.SetValues(entry.OriginalValues);
+entry.State = EntityState.Unchanged;
+
+## ".GetDatabaseValues" property: 
+// -> get the values of an entity as they currently exist in the database. 
+// => to refresh an entity with values from the database:
+var entity = context.Entities.Find(1);
+var databaseValues = context.Entry(entity).GetDatabaseValues();
+context.Entry(entity).CurrentValues.SetValues(databaseValues);
+
+## ".Reload()" method: 
+// -> reload an entity from the database, 
+// -> overwriting any property values with values from the database
+var entity = context.Entities.Find(1);
+context.Entry(entity).Reload();
 
 
 # Set<TEntity>()

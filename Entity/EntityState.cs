@@ -1,36 +1,39 @@
 # EntityState: “detached”, “unchanged”, “added”, “modified”, and “deleted”.
+// -> là 1 enum của Microsoft.EntityFrameworkCore
 
 // Entry method can only be used with entities that are being tracked by the context 
 using (var context = new MyDbContext())
 {
     // Create a new entity
-    var newEntity = new MyEntity { Name = "New Entity" }; // Status: detached
+    var newEntity = new MyEntity { Name = "New Entity" }; // Status: EntityState.Detached
+    // -> Detached state - not being tracked by the context
+    //  -> khi ở status là "Detached" , dù ta update, add,... thì trạng thái nó vẫn là "Detached"
 
     // Add the new entity to the context
     context.MyEntities.Add(newEntity);
-    Console.WriteLine(context.Entry(newEntity).State); // Output: Added
+    Console.WriteLine(context.Entry(newEntity).State); // Output: Added (EntityState.Added)
 
     // Save changes to insert the new entity into the database
     context.SaveChanges();
-    Console.WriteLine(context.Entry(newEntity).State); // Output: Unchanged
+    Console.WriteLine(context.Entry(newEntity).State); // Output: Unchanged (EntityState.Unchanged)
 
     // Modify a property of the new entity
     newEntity.Name = "Modified Entity";
-    Console.WriteLine(context.Entry(newEntity).State); // Output: Modified
+    Console.WriteLine(context.Entry(newEntity).State); // Output: Modified (EntityState.Modified)
 
     // Save changes to update the new entity in the database
     context.SaveChanges();
-    Console.WriteLine(context.Entry(newEntity).State); // Output: Unchanged
+    Console.WriteLine(context.Entry(newEntity).State); // Output: Unchanged (EntityState.Unchanged)
+    // "Unchanged" tức là entity đang được tracked bởi Dbcontext
 
     // Mark the new entity for deletion
     context.MyEntities.Remove(newEntity);
-    Console.WriteLine(context.Entry(newEntity).State); // Output: Deleted
+    Console.WriteLine(context.Entry(newEntity).State); // Output: Deleted (EntityState.Deleted)
 
     // Save changes to delete the new entity from the database
     context.SaveChanges();
 
-    // The new entity is now detached from the context
-    // Detached state - not being tracked by the context
+    // The newEntity is now detached from the context
 }
 
 
@@ -42,8 +45,9 @@ using (var context = new BloggingContext())
 }
 
 # AsNoTracking in Entity Framework
+// -> an extension method for the "IQueryable" interface
 // By default, EntityFramework tracks changes on entities that are queried and saves changes when calling SaveChanges() on the context
-// AsNoTracking make the entities returned by the query aren't being tracked by change Tracker,so any changes made to the entity will not be persisted to the database when call SaveChanges
+// "AsNoTracking" make the entities returned by the query aren't being tracked by change Tracker,so any changes made to the entity will not be persisted to the database when call SaveChanges
 // which means that they are in a "detached" state
 
 //  useful to retrieve data from the database for read-only purposes ; 

@@ -6,6 +6,10 @@
 * Frontend nên tạo file Mock data chung cho API, vì viết service rất lâu
 * Việc viết Mock data giúp ta hiểu được flow của frontend
 
+# Freature
+* Nên list những feature cũng như output mình đã viết
+* List ra những lỗi mình đã fix trên feature đó
+
 # Viết Service
 * Khi viết Service nên viết đầy đủ method: GetAll, GetById, Update, Create, Delete để việc test dễ dàng hơn
 * Ta có thể làm việc này bằng cách viết 1 Generic Service

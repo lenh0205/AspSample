@@ -54,7 +54,12 @@ public class Post
     public int BlogId { get; set; }
     public Blog Blog { get; set; }
 }
-// just need to configure the relationship on either the "Blog" or "Post", EF Core'll automatically config the other side of the relationship for us
+
+## Nguyên tắc:
+// just need to configure the relationship on either the "Blog" or "Post", 
+// EF Core'll automatically config the other side of the relationship for us
+
+## Case 1: Cả 2 đều có Navigation property
 modelBuilder.Entity<Blog>()
     .HasMany(b => b.Posts) // "Blog" can have many "Posts"
     .WithOne(p => p.Blog) // "Post" belongs to only one "Blog"
@@ -66,7 +71,7 @@ modelBuilder.Entity<Post>()
     .WithMany(b => b.Posts) // 1 "Blog" có nhiều "Posts"
     .HasForeignKey(p => p.BlogId);
 
-// Trong trường hợp: Blog không có navigation property "public List<Post> Posts { get; set; }"
+## Case 2: Blog không có navigation property "public List<Post> Posts { get; set; }"
 modelBuilder.Entity<Blog>()
     .HasMany<Post>()
     .WithOne(p => p.Blog)
@@ -77,7 +82,7 @@ modelBuilder.Entity<Post>()
     .WithMany()
     .HasForeignKey(p => p.BlogId);
 
-// Trong trường hợp: cả hai đều không có navigation property
+## Case 3: cả hai đều không có navigation property
 // Entity Framework Core still be able to map the relationship and generate the appropriate database schema
 modelBuilder.Entity<Blog>()
     .HasMany<Post>()
@@ -105,6 +110,18 @@ var posts = blog.Posts; // model have navigation property
 var blog = context.Blogs.Find(blogId);
 var posts = context.Posts.Where(p => p.BlogId == blog.BlogId).ToList(); // model don't have navigation property
 
+# [NotMapped] data annotation / "Ignore" fluent API  
+// specify that a property or class should not be mapped to a database table or column
+public class Product
+{
+    public int ProductId { get; set; }
+    public decimal Price { get; set; }
+    public decimal TaxRate { get; set; }
+
+    [NotMapped]
+    public decimal PriceWithTax => Price * (1 + TaxRate);
+}
+
 # LazyLoading
 // Assumpt Blog have 2 navigation properties: Posts and Author
 
@@ -118,14 +135,4 @@ var blog = context.Blogs.Include(b => b.Posts).Include(b => b.Author).Single(b =
 var posts = blog.Posts; // No database query, data is already loaded
 var author = blog.Author; // No database query, data is already loaded
 
-# [NotMapped] data annotation / "Ignore" fluent API  
-// specify that a property or class should not be mapped to a database table or column
-public class Product
-{
-    public int ProductId { get; set; }
-    public decimal Price { get; set; }
-    public decimal TaxRate { get; set; }
 
-    [NotMapped]
-    public decimal PriceWithTax => Price * (1 + TaxRate);
-}

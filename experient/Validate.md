@@ -36,13 +36,23 @@ Console.WriteLine(a == c); // True
 * **`string.IsNullOrWhiteSpace(<variable>)`** -> true if the string is null, empty, or contains only white-space characters
 
 # Checking "collection"
-* **`.Any()`**
+## Checking a List<T> is empty 
+_Nhưng vẫn cần check null của List<T> trước_
+
+* **`.Count` property** - best if using a `List<T>`, since it knows its size (luôn đc update khi list thay đổi)
+* **`.Any()` method** - best when using an `IEnumerable`, faster since it stops after checking one item
+* **`.Count()` method** - method of `IEnumerable<T>` iterate entire sequence; ta có thể cho codition vào 
 
 # Checking type of object:
 * **myObject `is` MyClass**
 * **myObject `as` MyClass** -> safely convert myObject to an object of type MyClass
 
 # safely access 
-* **access members of object**: **`?.`**
-* **provide a default value for a nullable variable**: **`??`**
-* **safely convert a string to other type**: **`.TryParse()`** (_VD: DateTime.TryParse_)
+* **_access members of object_**: **`?.`**
+* **_provide a default value for a nullable variable_**: **`??`**
+* **_safely convert a string to other type_**: **`.TryParse()`** (_VD: DateTime.TryParse_)
+
+# LinQ to SQL return null:
+* `able to return null`: .FirstOrDefault() , .SingleOrDefault() , .LastOrDefault(), .ElementAtOrDefault()
+* `only return empty list`: .ToList(), .ToArray() , .ToDictionary()
+

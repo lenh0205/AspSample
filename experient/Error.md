@@ -12,3 +12,6 @@ string? name = GetName();
 int length = name!.Length;
 ```
 
+# The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
+* lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"
+* nhưng khi tìm `Primary key` của phần tử này trong Database để update thì lại không thấy
