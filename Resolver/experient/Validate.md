@@ -1,3 +1,12 @@
+# safely access 
+* **_access members of object_**: **`?.`**
+* **_provide a default value for a nullable variable_**: **`??`**
+* **_safely convert a string to other type_**: **`.TryParse()`** (_VD: DateTime.TryParse_)
+
+# LinQ to SQL return null:
+* `able to return null`: .FirstOrDefault() , .SingleOrDefault() , .LastOrDefault(), .ElementAtOrDefault()
+* `only return empty list`: .ToList(), .ToArray() , .ToDictionary()
+
 # Checking "null"
 * **`!= null`** 
 * **`is not null`** (_`is null` hoặc `is not null` không depend on custom implementation of `!= and == operators`_)
@@ -47,12 +56,5 @@ _Nhưng vẫn cần check null của List<T> trước_
 * **myObject `is` MyClass**
 * **myObject `as` MyClass** -> safely convert myObject to an object of type MyClass
 
-# safely access 
-* **_access members of object_**: **`?.`**
-* **_provide a default value for a nullable variable_**: **`??`**
-* **_safely convert a string to other type_**: **`.TryParse()`** (_VD: DateTime.TryParse_)
 
-# LinQ to SQL return null:
-* `able to return null`: .FirstOrDefault() , .SingleOrDefault() , .LastOrDefault(), .ElementAtOrDefault()
-* `only return empty list`: .ToList(), .ToArray() , .ToDictionary()
 

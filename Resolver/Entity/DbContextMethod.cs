@@ -37,6 +37,8 @@ finally
 // -> If the entity’s primary key value is not set (empty, null, or the default value for the specified data type), 
 // => the "Update" method considers it a new entity and sets its "EntityState" to "Added"
 // -> it will be updated in the database when SaveChanges() is called
+
+// -> update multiple entities of different types to the context ("Update()" method của DbSet chỉ có thể s/d vs các entity có type của DbSet)
 using (var context = new BloggingContext())
 {
     var blog = new Blog { BlogId = 1, Url = "http://example.com/blog" };
