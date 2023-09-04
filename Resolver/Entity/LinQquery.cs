@@ -47,7 +47,7 @@ TEntity entity = _dbSet.Find(id);
 // -> call SaveChanges() on the context, no changes will be made to the database for this entity
 // -> attach an entity that is already being tracked by the context, the Attach() method will have no effect
 // -> create a new entity with the same primary key value as an existing entity; then try to attach it to the context will encounter an exception
-_dbSet.Attach(entityToDelete);
+_dbSet.Attach(entity);
 
 ## Add()
 // -> Add a new entity to the context and mark it as "Added"
@@ -70,10 +70,11 @@ var entity = _context.MyEntities.Find(id);
 entity.MyProperty = newValue;
 _context.SaveChanges();
 
-# join
+
+# Join
 // join đòi hỏi phần "on" ta cần để đúng thứ tự bảng trái trước rồi mới "equals" bảng phải
 
-// Inner Join 
+## Inner Join 
 var data = from fd in FlightDetails
            join pd in PassengersDetails on fd.Flightno equals pd.FlightNo
            select new {
@@ -83,7 +84,7 @@ var data = from fd in FlightDetails
                passengerType = pd.PassengerType
            };
 
-// Left Join: có thêm "DefaultIfEmpty()"
+## Left Join: có thêm "DefaultIfEmpty()"
 var data = from fd in FlightDetails
            join pd in PassengersDetails on fd.Flightno equals pd.FlightNo into joinedT
            from pd in joinedT.DefaultIfEmpty()

@@ -35,8 +35,13 @@ public class DanhSachHoSoController : ControllerBase
 }
 
 
-/// Generic Controller:
-[Route("api/[controller]")]
+/// <summary>
+/// Generic Controller: 
+/// </summary>
+/// <typeparam name="TKey">Primary key Type</typeparam>
+/// <typeparam name="TEntity">Entity Type</typeparam>
+/// <typeparam name="TContext">DbContext</typeparam>ller]")]
+/// Method: GetAll, GetPagination, GetById, Create, CreateRange, CreateRange, HardDelete
     [ApiController]
     public class GenericController<TKey, TEntity, TContext> : ControllerBase
         where TEntity : class

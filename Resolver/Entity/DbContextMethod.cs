@@ -65,7 +65,8 @@ context.UpdateRange(entity1, entity2, entity3);
 
 ## ".State" property
 // -> to get or set the state of an entity
-// => change the state of an entity:
+// => change the state of an entity
+// -> ta cũng có thể đổi trạng thái của entity từ "Detached" thành "Modified" (phải khác primary key)
 public async Task UpdateYourEntityAsync(YourEntity yourEntity)
 {
     _context.Entry(yourEntity).State = EntityState.Modified;
