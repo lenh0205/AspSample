@@ -1,14 +1,25 @@
-/// Architect
-// -> Controller (derive Generic Controller) use Seed Service 
-// -> Seed Service access Service property 
-// -> Service property return Service
-// -> Service has methods use Unit Of Work
-// -> Unit Of Work access Repository property 
-// -> Repository property return Repository 
-// -> Repository (derive Generic Repository) has methods solve DAL
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddRazorPages();
+
+//add services to container
+builder.Services.AddControllers()
+               .AddJsonOptions(options =>
+               {
+                   //config relationship reference json
+                   options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+                   options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+               });
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SER", Version = "v1" });
+});
 
 
-/// Startup:
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(
@@ -32,9 +43,7 @@ builder.Services
 .AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork))
 .AddScoped(typeof(ISeedService), typeof(SeedService));
 builder.Services.AddScoped<IExternalApiServices, ExternalApiServices>();
-
 var app = builder.Build();
-
 using (var serviceScope = app.Services.CreateScope())
 {
     var services = serviceScope.ServiceProvider;
@@ -47,5 +56,21 @@ using (var serviceScope = app.Services.CreateScope())
 
 }
 
+// Configure the HTTP request pipeline.
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true));
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+});
+app.UseStaticFiles();
 
+app.UseRouting();
 
+app.UseAuthorization();
+
+app.MapRazorPages();
+app.MapControllers();
+app.Run();

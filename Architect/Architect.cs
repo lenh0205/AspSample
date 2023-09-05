@@ -1,3 +1,13 @@
+/// Architect
+// -> Controller (derive Generic Controller) use Seed Service 
+// -> Seed Service access Service property 
+// -> Service property return Service
+// -> Service has methods use Unit Of Work
+// -> Unit Of Work access Repository property 
+// -> Repository property return Repository 
+// -> Repository (derive Generic Repository) has methods solve DAL
+
+
 /// <summary>
 /// Controller
 /// </summary>

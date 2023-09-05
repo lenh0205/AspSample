@@ -38,12 +38,8 @@ public interface IGenericRepository<TEntity, TContext>
     void Update(TEntity entityToUpdate);
     Task InsertAsync(TEntity entity);
     Task InsertRangeAsync(IEnumerable<TEntity> entitiesToInsert);
-    IEnumerable<TEntity> GetByIDs(IEnumerable<Guid> ids);
 }
-using Microsoft.EntityFrameworkCore;
-using SER.Infrastructure.IEntityRepositories.Base;
-using System.Linq.Expressions;
-namespace SER.Infrastructure.EntityRepositories.Base;
+
 
 // Get "List of entity": .Where(), .Include() , orderBy() , .Skip(), .Take(), .ToList()
 // Create a "Query" to get List of entity
@@ -53,6 +49,11 @@ namespace SER.Infrastructure.EntityRepositories.Base;
 // Xoá 1 Entity: .Find() , check .Entry() = Detach, .Attach(), .Remove()
 // Xoá nhiều Entity: .RemoveRange()
 // Update 1 Entity: .Attach(), .Entry() = Modified
+
+using Microsoft.EntityFrameworkCore;
+using SER.Infrastructure.IEntityRepositories.Base;
+using System.Linq.Expressions;
+namespace SER.Infrastructure.EntityRepositories.Base;
 
 public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity, TContext>
     where TEntity : class

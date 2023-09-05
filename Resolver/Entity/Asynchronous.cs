@@ -69,7 +69,7 @@ var posts = await postsTask;
 
 # Example:
 
-// Ex 1:
+// Ex 1: cho 2 method chạy parallel nếu chúng không phụ thuộc nhau
 class Program
 {
     static void Main(string[] args)
@@ -101,19 +101,10 @@ class Program
         }
     }
 }
-/* Output:
- Method 1
- Method 2
- Method 1
- Method 2
- Method 2
- Method 1
- Method 2
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1  */
+/* Output: "Method 1" và "Method 2" in ra xen kẽ nhau không theo thứ tự mỗi lần chạy
+=> "Method1" và "Method2" không chờ nhau, chạy đồng thời, không phụ thuộc
+=> để execute "Method1" xong hết rồi mới đến "Method2" thì ta thêm await trước "Method1"
+*/
 
 // Ex 2:
 class Program
@@ -148,7 +139,7 @@ class Program
 
     public static void Method2()
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 2; i++)
         {
             Console.WriteLine(" Method 2");
         }
@@ -159,20 +150,11 @@ class Program
         Console.WriteLine("Total count is " + count);
     }
 }
-/* Output:
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 2
- Method 2
- Method 2
- Method 2
-Total count is 8  */
+/* Output: "Method 1" và "Method 2" in ra xen kẽ không theo thứ tự
+nhưng "Total count is 8" luôn được in ra cuối cùng
+=> "Method2" không đợi "Method1" chạy xong
+=> "Method3" phải chờ "Method2" chạy xong (code sync), chờ "Method1" chạy xong (do await)
+  */
 
 // Ex 3:
 class Program
@@ -217,18 +199,10 @@ class Program
         Console.WriteLine("Total count is " + count);
     }
 }
-/* Output:
- Method 2
- Method 2
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
- Method 1
-Total count is 8 */
+/* Output: In ra hết "Method 2" rồi mới in ra hết "Method 1" rồi mới "Total count is 8"
+=> "Method1" phải chờ "Method2" do code sync
+=> "Method3" phải chờ "Method1" do await
+ */
 
 # Realtime
 Real-time example

@@ -1,6 +1,5 @@
 public partial class ApplicationDbContext : DbContext
 {
-
     private readonly IConfiguration _configuration;
     public ApplicationDbContext(IConfiguration configuration) => _configuration = configuration;
 
@@ -11,20 +10,22 @@ public partial class ApplicationDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"),
-                x => x.UseNetTopologySuite()); 
+            optionsBuilder.UseSqlServer(
+                _configuration.GetConnectionString("DefaultConnection"),
+                x => x.UseNetTopologySuite()
+            ); 
         }
-
-        // Thêm 1 dòng này thì "Add-Migration" sẽ tự động tạo bảng:
-        public virtual DbSet<HoSoCongViec> HoSoCongViecs { get; set; }
-
-
-        //  "configure the model" that Entity Framework uses to map your classes to the database
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
-            new HoSoCongViecConfiguration().Configure(modelBuilder.Entity<HoSoCongViec>());
-        } 
     }
+
+    // Thêm 1 dòng này thì "Add-Migration" sẽ tự động tạo bảng:
+    public virtual DbSet<HoSoCongViec> HoSoCongViecs { get; set; }
+
+
+    //  "configure the model" that Entity Framework uses to map your classes to the database
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    { 
+        new HoSoCongViecConfiguration().Configure(modelBuilder.Entity<HoSoCongViec>());
+    } 
 }
 
 public class HoSoCongViecConfiguration : IEntityTypeConfiguration<HoSoCongViec>

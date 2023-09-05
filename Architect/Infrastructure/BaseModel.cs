@@ -1,11 +1,23 @@
 using SER.Domain.Entities.SqlServerCCKL;
 using System.Text.Json.Serialization;
 
-namespace SER.ViewModel.HoSoCongViec.Requests;
+/// <summary>
+/// Base Domain Model
+/// </summary>
+public class BaseEntity
+{
+    public Guid Id { get; set; }
 
-using System.Text.Json.Serialization;
+    public int CreatedUserId { get; set; }
 
-namespace SER.ViewModel;
+    public DateTime? CreatedDate { get; set; } = DateTime.Now;
+
+    public int UpdatedUserId { get; set; }
+
+    public DateTime? UpdatedDate { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
+}
 
 
 /// <summary>
@@ -47,7 +59,6 @@ public partial class UpdatedRequest<TKey, TUser>
     public DateTime UpdatedDate { get; set; } = DateTime.Now;
 }
 
-
 /// <summary>
 /// Request View Model
 /// </summary>
@@ -75,7 +86,6 @@ public class HoSoCongViecBySearchRequest : PaginationRequest
     public int NamHinhThanh { get; set; } = 0;
     // ...
 }
-
 
 /// <summary>
 /// For Response View Model
