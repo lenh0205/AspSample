@@ -13,7 +13,7 @@
 /// </summary>
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class DanhSachHoSoController : GenericController<Guild, DanhSachHoSo, ApplicationDbContext>
+public class DanhSachHoSoController : GenericController<Guid, DanhSachHoSo, ApplicationDbContext>
 {
     private readonly ISeedService _service;
     public DanhSachHoSoController(

@@ -50,7 +50,7 @@ var mapper = config.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services
-.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>))
+.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>)) // config DI for generic object
 .AddScoped(typeof(IGenericService<,>), typeof(GenericService<,>))
 .AddScoped(typeof(IUnitOfWork<,>), typeof(UnitOfWork<,>))
 .AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork))

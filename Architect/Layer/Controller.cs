@@ -53,7 +53,6 @@ public class DanhSachHoSoController : ControllerBase
             this._service = service;
         }
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [Route("[action]")]
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -69,7 +68,6 @@ public class DanhSachHoSoController : ControllerBase
                 return BadRequest(new ResultApi(ex));
             }
         }
-        [Route("[action]")]
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -85,7 +83,6 @@ public class DanhSachHoSoController : ControllerBase
                 return BadRequest(new ResultApi(ex));
             }
         }
-        [Route("[action]")]
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -106,7 +103,6 @@ public class DanhSachHoSoController : ControllerBase
         }
 
 
-        [Route("[action]")]
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -122,7 +118,6 @@ public class DanhSachHoSoController : ControllerBase
                 return BadRequest(new ResultApi(ex));
             }
         }
-        [Route("[action]")]
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -138,7 +133,6 @@ public class DanhSachHoSoController : ControllerBase
                 return BadRequest(new ResultApi(ex));
             }
         }
-        [Route("[action]")]
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -154,7 +148,6 @@ public class DanhSachHoSoController : ControllerBase
                 return BadRequest(new ResultApi(ex));
             }
         }
-        [Route("[action]")]
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

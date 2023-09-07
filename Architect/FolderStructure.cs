@@ -1,3 +1,20 @@
+# InstallPackage:
+/*
+* Microsoft.EntityFrameworkCore
+* Microsoft.EntityFrameworkCore.SqlServer
+* Microsoft.EntityFrameworkCore.Design - for design-time cần thiết cho Migration, Reverse Engineering như "Add-Migration", "dotnet ef"
+* Microsoft.EntityFrameworkCore.Tools - "Add-Migration" , "update-database"
+
+* Newtonsoft.Json - "JsonProperty" cho "ResultApi", "JsonIgnore" cho Model; serialize, deserialize; parse, modify JSON,...
+
+* Swashbuckle.AspNetCore.SwaggerGen
+* Swashbuckle.AspNetCore.SwaggerUI
+*/
+
+# AddModel:
+// Tạo Model -> Add vào DbContext -> tạo Migration
+// Tạo Controller
+
 # FolderStructure
 // Controller
 // |-Base

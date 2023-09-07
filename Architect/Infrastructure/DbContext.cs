@@ -1,3 +1,6 @@
+/// <summary>
+/// DbContext
+/// </summary>
 public partial class ApplicationDbContext : DbContext
 {
     private readonly IConfiguration _configuration;
