@@ -31,3 +31,6 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> **Nguyên nhân** có thể là do expression used for `Contains` not a simple IEnumerable<T> variable 
 * -> tức là `T` param không phải `primitive type` 
 * -> có thể dẫn tới việc nó vẫn kéo data theo condition của Where(), nhưng Contain() sẽ xử lý trên memory gây bad perfomance
+
+# The type or namespace name 'System' could not be found
+* Ta có thể thử Reload `project`

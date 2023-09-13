@@ -24,8 +24,10 @@ public class DanhSachHoSoController : GenericController<Guid, DanhSachHoSo, Appl
         _service = service;
     }
 
-    // ỉnherit Method from "genericService" -> using generic "UnitOfWork" -> using "GenericRepository"
-    // ... write Method use "DanhSachHoSoService" from "SeedService"
+    // inherit Method from "genericService" -> using generic "UnitOfWork" -> using "GenericRepository"
+
+    // ... write individual Method use "DanhSachHoSoService" from "SeedService"
+    // -> có thể s/d "base.Create(entity);" để tái sử dụng method của genericController 
 }
 
 /// <summary>
