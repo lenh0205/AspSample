@@ -26,7 +26,7 @@ string s = "Hello Extension Methods";
 int i = s.WordCount();
 
 
-# LINQ standard query operators 
+## LINQ standard query operators: .Where(), .First(),...
 // => are extension methods 
 // => add query functionality to the existing System.Collections.IEnumerable and System.Collections.Generic.IEnumerable<T> types
 

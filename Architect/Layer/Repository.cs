@@ -5,6 +5,7 @@
 public interface IHoSoCongViecRepository : IGenericRepository<HoSoCongViec, ApplicationDbContext>
 {
     // Add Method
+    Task<(int, object?)> GetSearchBySearchGroupObject(SearchGroupObjectRequest search);
 }
 
 public class HoSoCongViecRepository : GenericRepository<HoSoCongViec, ApplicationDbContext>, IHoSoCongViecRepository
@@ -14,6 +15,14 @@ public class HoSoCongViecRepository : GenericRepository<HoSoCongViec, Applicatio
     {
     }
     // Implement Method
+    public async Task<(int, object?)> GetGroupBySearch(HoSoCongViecBySearchRequest request)
+    {
+        //...
+        
+        // IQueryable result = <our_query_command>
+        var totalRow = await result.CountAsync();
+        return new(totalRow, await result.ToListAsync());
+    }
 }
 
 

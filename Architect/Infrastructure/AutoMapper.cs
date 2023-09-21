@@ -5,10 +5,11 @@ var result = _mapper.Map<IEnumerable<HoSoCongViec>, IEnumerable<HoSoCongViecResp
 // map a single object to a single object
 var entity = _mapper.Map<HoSoCongViecCreateRequest, HoSoCongViec>(request);
 
-// maps the data from object to the entity object
+// maps the "data" from object to the entity object
 // used when already have an existing destination object and want to update its properties
 _mapper.Map(request, entity);
 
+// mapping cũng có thể dùng với 2 object có cùng type cho trường hợp ta muốn map 1 object làm Default cho object khác
 
 # MappingProfile
 public class MappingProfile : Profile {
@@ -31,6 +32,14 @@ public class MappingProfile : Profile {
                 dest => dest.LastName,  
                 opt => opt.MapFrom(/*variable*/) 
             ); // use "variable" as the value for the destination property "LastName"
+            .ForMember(
+                des => des.PhuongThuc,
+                opt =>
+                { // thoả condition thì mới map được
+                    opt.PreCondition(src => src.PhuongThucNhan != null); // chạy qua check khác null trước
+                    opt.MapFrom(src => src.PhuongThucNhan); // rồi mới biết có map hay không
+                }
+            )
 
         CreateMap<HoSoCongViec, HoSoCongViecResponse>()
             .ForMember(des => des.NgayMo, opt => opt.MapFrom(act => act.CreatedDate));

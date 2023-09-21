@@ -105,6 +105,28 @@ public class GenericService<TEntity, TContext> : IGenericService<TEntity, TConte
 
 }
 
+/// <summary>
+/// CommonService - ta định nghĩa 1 số services dùng chung cho các service khác gọi tới
+/// Các Class này ta sẽ không đăng ký trong ISeedService, mà config trong program.cs để "Injection"
+/// </summary>
+public interface ICommonServices
+{
+}
+public class CommonServices : ICommonServices
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly Microsoft.Extensions.Logging.ILogger _logger;
+    private readonly IConfiguration _configuration;
+    public CommonServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger logger, IConfiguration configuration)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _logger = logger;
+        _configuration = configuration;
+    }
+    // ....
+}
 
 /// <summary>
 /// Specific Service
@@ -116,6 +138,7 @@ public interface IHoSoCongViecService
     Task<object?> CreateEntity(HoSoCongViecCreateRequest request);
     Task<object?> UpdateEntity(HoSoCongViecUpdateRequest request);
     Task<object?> SoftDelete(Guid id);
+    Task<object?> GetSearchBySearchGroupObject(SearchGroupObjectRequest search);
 }
 
 public class HoSoCongViecService : IHoSoCongViecService
@@ -124,7 +147,7 @@ public class HoSoCongViecService : IHoSoCongViecService
     private readonly IMapper _mapper;
     private readonly Microsoft.Extensions.Logging.ILogger _logger;
     private readonly IConfiguration _configuration;
-    public HoSoCongViecService(IUnitOfWork unitOfWork, IMapper mapper, Microsoft.Extensions.Logging.ILogger logger, IConfiguration configuration)
+    public HoSoCongViecService(IUnitOfWork unitOfWork, IMapper mapper, ILogger logger, IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -227,4 +250,19 @@ public class HoSoCongViecService : IHoSoCongViecService
             throw;
         }
     }
+    
+    public async Task<object?> GetSearchBySearchGroupObject(SearchGroupObjectRequest search)
+    {
+        try
+        {
+            var entity = await _unitOfWork.HoSoCongViec.GetSearchBySearchGroupObject(search);
+            return new { TotalRow = entity.Item1, Data = entity.Item2 };
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message, $"{nameof(GetSearchBySearchGroupObject)} function error on {nameof(HoSoCongViecService)}");
+            throw;
+        }
+    }
+
 }

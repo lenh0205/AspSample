@@ -9,7 +9,7 @@
 
 
 /// <summary>
-/// Controller
+/// Controller (Apply for direct interaction with "T" model in Database)
 /// </summary>
 [ApiController]
 [Route("api/[controller]/[action]")]
@@ -37,9 +37,9 @@ public class DanhSachHoSoService : IDanhSachHoSoService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly Microsoft.Extensions.Logging.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly IConfiguration _configuration;
-    public DanhSachHoSoService(IUnitOfWork unitOfWork, IMapper mapper, Microsoft.Extensions.Logging.ILogger logger, IConfiguration configuration)
+    public DanhSachHoSoService(IUnitOfWork unitOfWork, IMapper mapper, ILogger logger, IConfiguration configuration, ICommonServices CommonServices)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -59,4 +59,21 @@ public class DanhSachHoSoRepository
     {
     }
     // Implement Method
+}
+
+
+/// <summary>
+/// Controller (Apply for "T" model of connective service)
+/// </summary>
+[ApiController]
+[Route("api/[controller]/[action]")]
+public class VanBanDiController : ControllerBase
+{
+    private readonly ISeedService _service;
+    public VanBanDiController(ISeedService service)
+    {
+        _service = service;
+    }
+
+    //....
 }
