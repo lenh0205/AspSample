@@ -19,7 +19,12 @@ var totalRow = result.Count();
 // => vì "query.Count()" returns only a single value; 
 // => còn "ToList()" phải retrieves all rows, load into memory, stored in a list (consume memory + take longer to execute)
 
-## N + 1 Problem
+## Case: Update but exclude some properties
+db.Entry(model).State = EntityState.Modified;
+db.Entry(model).Property(x => x.Token).IsModified = false;
+db.SaveChanges();
+
+# AntiPattern: N + 1 Problem
 // using wrong:
 var students = context.Students.ToList();
 foreach (var student in students)
@@ -31,7 +36,6 @@ var query = from student in context.Students
             join course in context.Courses on student.Id equals course.StudentId
             select new { Student = student, Course = course };
 var result = query.ToList();
-
 
 # Basic 
 ## Find()

@@ -1,3 +1,8 @@
+=============================================
+# Http - Đối với việc gửi data bằng request-response sẽ có giới hạn. VD gửi 23000 records lên Client thì response sẽ không chịu nổi 
+* có thể dùng Take() để giảm bớt số lượng cần lấy
+
+=============================================
 # BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
 * Access API vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
 * Lỗi này là do dùng không dùng **`async`**` cho Method Action và Service
@@ -12,7 +17,7 @@ string? name = GetName();
 int length = name!.Length;
 ```
 
-# BE - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
+# DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
 * Xảy ra khi `SaveChanges()`
 * lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"
 * nhưng khi tìm `Primary key` của phần tử này trong Database để update thì lại không thấy
@@ -34,6 +39,23 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 
 # BE - The type or namespace name 'System' could not be found
 * Ta có thể thử Reload `project`
+
+# BE - Lỗi:"Unexpected character encountered while parsing value: <. Path '', line 0, position 0."
+* có thể xảy ra khi SER chết , HelperCommon gọi SER sẽ trả về response như này
+* publish lại SER
+
+=========================================
+# FE - React can't access an object before it gets initialize
+* **Lý do**: 
+* -> viết **`2 class phụ thuộc lẫn nhau`** dẫn đến vòng lặp
+* -> class import lẫn nhau để sử dụng properties, method của nhau
+
+* **Bản chất**:
+* -> do viết sai SOLID - 1 class chứa quá nhiều logic khác nhau trong đó
+
+* **Giải pháp**:
+* -> thay vì lấy property, method từ class khác; ta lấy tạo thẳng property, method trong class này với logic y chang
+* -> cài thư viện Dependency Injection: tự động quản lý việc tạo đối tượng
 
 # FE - Network Error; AxiosError: Network Error at XMLHttpRequest.handleError hiện ngay trên UI
 * do **`try/catch`** sai cách

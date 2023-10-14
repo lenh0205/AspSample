@@ -49,8 +49,10 @@
 
 # Architect
 * **`GUI`** - MVC cho View
-* **`HelperCommon`**: lớp này để xử lý những tác vụ của DNN (DNN authen/author, ....); gọi lớp service để xử lý Business
+* **`HelperCommon`**: **Authen API**, lớp này để xử lý những tác vụ của DNN; gọi lớp service để xử lý Business
 * **`SER`**`: tách ra deploy lên service riêng -> giảm tải cho DNN; làm nhiệm vụ xử lý business (không có authen, ...); 
+
+* **Mechanism**: GUI gọi tới HelperCommon, HelperCommon gọi tới SER (_`GUI (React) không được trực tiếp gọi đến SER vì ta cần Authen API`_)
 
 ## React
 * gọi tới `http://[host_name]:[port]/GET?url=[SER_Controller]/[SER_action]`

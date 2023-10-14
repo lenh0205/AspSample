@@ -1,3 +1,32 @@
+# DataTable type
+// Để Tranfer data có dạng "DataTable" trong "request-response" ta sẽ cần Serialize nó
+// -> nếu Client-Server:
+var dt = new DataTable();
+var dtForTransfer = JsonConvert.SerializeObject(dt);
+var result = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(dt); // nếu ta cần trả về 1 Array gồm nhiều object
+// -> nếu Server-Server:
+return new {Dt = JsonConvert.SerializeObject(dt), DtReplace = JsonConvert.SerializeObject(dtreplace)}; // response
+var resultDataApi = commonApi.CallAPI_common(url, "POST", requestData);
+var dataTableApi = JsonConvert.DeserializeObject<JObject>(resultDataApi.DataResult.ToString());
+var dt = JsonConvert.DeserializeObject<DataTable>(dataTableApi["dt"].ToString());
+var dtReplace = JsonConvert.DeserializeObject<DataTable>(dataTableApi["dtReplace"].ToString());
+
+// ta cũng có thể viết 1 hàm để convert từ "DataTable" thành "Dictionary" :
+public List<Dictionary<string, object>> ConvertDataTableToList(DataTable dt)
+{
+    var rows = new List<Dictionary<string, object>>();
+    Dictionary<string, object> row;
+    foreach (DataRow dr in dt.Rows)
+    {
+        row = new Dictionary<string, object>();
+        foreach (DataColumn col in dt.Columns)
+        {
+            row.Add(col.ColumnName, dr[col]);
+        }
+        rows.Add(row);
+    }
+    return rows;
+}
 
 # object type
 // -> All types in C# inherit directly or indirectly from "object" type (alias for System.Object);

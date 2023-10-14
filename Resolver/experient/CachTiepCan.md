@@ -2,6 +2,11 @@
 * **Nghiệp vụ**: đối tượng s/d product; có mấy loại user, họ tương tác với nhau thế nào ?
 * **Database**: mình cần tương tác với những Database nào; có cần viết mới Database không
 
+# Khởi đầu 1 dự án:
+* Bóc tách thành component, estimate thời gian (reused-component, component, thời gian gắn component)
+* Tách thời gian viết Frontent, Backend
+* tính toán cấu trúc Folder Structure   
+
 ## Mock Data
 * Frontend nên tạo file Mock data chung cho API, vì viết service rất lâu
 * Việc viết Mock data giúp ta hiểu được flow của frontend

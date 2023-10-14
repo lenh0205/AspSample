@@ -27,9 +27,6 @@ MSBuild.exe MyProj.proj -property:Configuration=Debug
 # Build Logs
 * we can log `build errors, warnings, and messages` to the _console or another output device_
 
-# Use MSBuild in Visual Studio
-* 
-
 # Project file
 * MSBuild uses an XML-based project file format
 * -> that's straightforward and extensible
@@ -60,7 +57,6 @@ MSBuild.exe MyProj.proj -property:Configuration=Debug
 // "Configuration" property is defined if it hasn't yet been defined
 <Configuration  Condition=" '$(Configuration)' == '' ">DefaultValue</SomeProperty>
 ```
-
 ## Items
 * **inputs** into the `build system` and typically represent **files**
 * `Items` are grouped into **item types** based on user-defined item names
@@ -132,3 +128,39 @@ MSBuild.exe MyProj.proj -property:Configuration=Debug
 * **`PackageReference`** - used to specify **NuGet package dependencies** directly within the project file (_instead of having a separate `packages.config` file_)
 * **`Reference`** - used to include an assembly reference (_system assembly, assembly that is part of another project, ..._) in the project
 
+## Exclude Resource
+* use **None** element to specifies files and folders to exclude from the project 
+* => `files and folders` specified in this element are `not copied to the output directory` and are `not included in the assembly`
+```xml
+<!-- excludes the "Components" folder from the project: -->
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Components\**\*">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
+```
+
+* use the **Condition** attribute - allows to specify conditions under which to include or exclude resources
+```xml
+<!-- excludes the "Components" folder from the project only in the Release configuration -->
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Components\**\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Condition>'$(Configuration)' == 'Debug'</Condition>
+    </Content>
+  </ItemGroup>
+</Project>
+```

@@ -17,6 +17,7 @@ public class BaseEntity
 
 /// <summary>
 /// Base View Model
+/// contains data that is needed for a view
 /// </summary>
 public class PaginationRequest
 {
@@ -91,3 +92,8 @@ public class HoSoCongViecResponse
     public int UserId { get; set; }
     //.....
 }
+
+// DTO - are used to transfer data between "layers" and "tiers"
+
+// In software architect:
+// -> 

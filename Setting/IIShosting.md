@@ -1,7 +1,16 @@
-# hosting an ASP.NET Core application on IIS
+========================================================
+# IIS
+* **`a Windows Service`**
+* allows to **`host(or store), manage, test`** _websites / web application_ **on Windows Systems**
 
+* => IIS **does all** the processing and managing of our websites (_PHP websites, static websites, asp.net websites, java websites_)
+
+* the same function as **`Apache Server does in Linux`**
+
+=========================================================
+# Mechanism of hosting an ASP.NET Core application on IIS
 ## Overview
-* `the IIS server` acts as a _`reverse proxy`_ that forwards incoming requests to the ASP.NET Core application. 
+* `the IIS server` acts as a **`reverse proxy`** that forwards incoming requests to the ASP.NET Core application. 
 * The `application` is hosted using the **Kestrel web server**, which is included with `the .NET Core runtime`
 
 ## IIS
@@ -26,3 +35,16 @@
 * Once the **Kestrel server** is started, it listens for `incoming requests` on a `specific port`
 
 
+==============================
+# Hosting in deployment
+* Trong **Client-side rendering**, **Frontend** communicate **Backend** throght `API`
+* **Browser** 
+* -> query `data json` from **Backend**
+* -> query `html/css/js` from **Frontend**
+* => hiển thị ra trang web cho user
+
+* Khi development, tất cả thành phần **Frontend**, **Backend**, **Browser** đều nằm trên máy local của ta
+
+* Khi deploy **Backend**, **Frontend** lên cùng 1 server; `Frontend` không thể gọi `Backend` thông qua **locahost**
+* -> `Browser` chỉ nhận `html/css/js` từ `Frontend`
+* -> khi `Browser` gọi `localhost` nó sẽ hiểu là `localhost` trên máy **client**

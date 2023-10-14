@@ -31,7 +31,7 @@ public class MappingProfile : Profile {
             .ForMember(
                 dest => dest.LastName,  
                 opt => opt.MapFrom(/*variable*/) 
-            ); // use "variable" as the value for the destination property "LastName"
+            ) // use "variable" as the value for the destination property "LastName"
             .ForMember(
                 des => des.PhuongThuc,
                 opt =>
@@ -40,6 +40,27 @@ public class MappingProfile : Profile {
                     opt.MapFrom(src => src.PhuongThucNhan); // rồi mới biết có map hay không
                 }
             )
+            .ForMember( // map từ "Complex type" to "Primitive type"
+                des => des.DeptNameDto,
+                opt => opt.MapFrom(src=>src.ObjDepartment.DeptName)
+            )
+            .ForMember( // map từ "Primitive type" to "Complex type"
+                des => des.DepartmentDto, 
+                act => act.MapFrom(src => new DepartmentDto
+                    {
+                        DeptNameDto =  src.DeptName,
+                        AddressDto = src.DeptAddress,
+                        DescriptionDto = src.Description
+                    })
+            )
+            .ForMember(
+                dest => dest.UserID, 
+                opt => opt.NullSubstitute(0) 
+            ) 
+            // Nếu "UserId" của source mà null thì "UserID" của dest sẽ là 0; còn lại map bình thường
+            .ForMember(dest => dest.PhongBanXuLy, opt => opt.MapFrom(src => src.PhongBanID))
+            .ForMember(dest => dest.PhongBanXuLy, opt => opt.NullSubstitute(0)); 
+            // Nếu "PhongBanID" của source là null thì "PhongBanXuLy" của dest sẽ là 0
 
         CreateMap<HoSoCongViec, HoSoCongViecResponse>()
             .ForMember(des => des.NgayMo, opt => opt.MapFrom(act => act.CreatedDate));

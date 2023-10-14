@@ -60,7 +60,7 @@
 // |-ApiKeyMiddleware.cs
 
 // Enums
-// |-MyEnums.cs
+// |-EMyEnums.cs
 
 // Extensions
 // |-MyExtension.cs
@@ -69,3 +69,5 @@
 // |-MyService
 // |--ConnectedService.json
 // |--Reference.cs
+
+
