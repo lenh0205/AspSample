@@ -112,7 +112,6 @@
 * install `local instance` of DNN9
 
 
-
 ========================================
 # DNN Overview
 * a platform have ability to run multiple websites out of one installation, each of those sites sometimes referred to as a portal

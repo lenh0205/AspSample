@@ -57,7 +57,3 @@ return await result.ToListAsync();
 Scaffold-DbContext 'Server=192.168.1.3\\sql2k16,1436;Initial Catalog=VI_QLVB;user=vietinfo;password=Vietinfo@#@!;TrustServerCertificate=True;' Microsoft.EntityFrameworkCore.SqlServer -Tables DM_DONVI_NGUOIDUNG -Context ApplicationDbContext -OutputDir "Domain/Entities/SqlServerCCKL" -ContextDir "Infrastructure/DatabaseFirst"
 ```
 
-# Bắt đầu join 1 dự án:
-* **Nghiệp vụ**: đối tượng s/d product; có mấy loại user, họ tương tác với nhau thế nào ?
-* **Database**: mình cần tương tác với những Database nào; có cần viết mới Database không
-

@@ -4,6 +4,7 @@
 * allows to **`host(or store), manage, test`** _websites / web application_ **on Windows Systems**
 
 * => IIS **does all** the processing and managing of our websites (_PHP websites, static websites, asp.net websites, java websites_)
+* -> when a client sent a request to the server, the worker process wil be reponsible for generating the request and response
 
 * the same function as **`Apache Server does in Linux`**
 

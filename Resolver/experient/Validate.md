@@ -12,7 +12,7 @@
 * **`is not null`** (_`is null` hoặc `is not null` không depend on custom implementation of `!= and == operators`_)
 
 * **define custom == and != operators**: khi default behavior of checking for reference equality không đủ tốt 
-```
+```cs
 public class MyClass
 {
     public int Value { get; set; }
@@ -43,6 +43,21 @@ Console.WriteLine(a == c); // True
 # Checking "string"
 * **`string.IsNullOrEmpty(<variable>)`** -> true if a string is null or empty
 * **`string.IsNullOrWhiteSpace(<variable>)`** -> true if the string is null, empty, or contains only white-space characters
+
+## Avoid "Escape Sequences" in a string
+* **@** symbol - create a verbatim string literal
+* -> string is **`interpreted exactly as it is written`** (_including any **`escape characters`**_)
+* -> useful for strings that **`contain special characters`** or **`contain multiple lines`**
+```cs
+string sourceDirectory = @"c:\sourceDirectory"; 
+
+string multilineString = @"This is a
+multiline string.";
+```
+
+## Compare 2 strings
+* **StringComparison.Ordinal**
+* -> the fastest type of string comparison, but it is also the least sensitive to the culture and regional settings of the machine
 
 # Checking "collection"
 ## Checking a List<T> is empty 

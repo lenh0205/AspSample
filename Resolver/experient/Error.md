@@ -3,6 +3,10 @@
 * có thể dùng Take() để giảm bớt số lượng cần lấy
 
 =============================================
+# Hosting - Hosting xong trả về 404
+* thư mục **bin** không có gì cả
+
+=============================================
 # BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
 * Access API vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
 * Lỗi này là do dùng không dùng **`async`**` cho Method Action và Service
