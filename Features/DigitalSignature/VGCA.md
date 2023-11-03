@@ -20,6 +20,8 @@
 * -> Lấy dấu thời gian chuẩn từ Ban Cơ yếu Chính phủ; 
 * -> Hỗ trợ ký số và xác thực các định dạng tài liệu điện tử (Portable Document Format (.pdf), Text)
 
+================================================
+
 # Setting - để triển khai giải pháp 
 * **`> = .Net Framework 4.0`** platform
 * hỗ trợ các hệ điều hành Windows 7, 8, 10, Windows Server 2008, 2012
@@ -32,35 +34,6 @@
 * **`Vgcaplugin.js`** - File **thư viện hàm ký số xác thực** `tích hợp trên website`
 * **`Base64.js`** - Các **hàm chuyển đổi dữ liệu dạng text, Base64**
 
-# Các hàm Javascript được Thư viện cung cấp:
-* **exc_sign_msg()** - để thực hiện **`ký số dữ liệu web-form`**, với tham số:
-* -> `sender` là Id của button submit form 
-* -> `sender` sẽ được xử lý ở trong hàm **SignCallBack**
-
-* **SignCallBack()** để **`xử lý kết quả ký số`**
-
-* **exc_verify_msg()** để thực hiện **`xác thực nội dung web*form`**
-
-* **VerifyCallBack()** để **`xử lý kết quả xác thực`**
-
-* **exc_verify_pdf()** là hàm **`xác thực tệp pdf`** với hai tham số _`sessionId`_ và _`filename`_ để sử dụng trong `quá trình tải file PDF` về máy tính người dùng, sau đó thực hiện **`xác thực chữ ký`**
-
-* **VerifyPDFCallBack()** là hàm **`xử lý kết quả xác thực tệp PDF`**
-
-* **exc_sign_file()** là **`hàm ký số tệp PDF`** với các tham số _`sessionId, fileName`_ để sử dụng trong quá trình **`tải về file cần ký số trên server`** và **`tải lên file đã ký số lên server`** 
-* -> trong trường hợp fileName rỗng, phần mềm sẽ yêu cầu người dùng chọn đường dẫn file trên máy tính để ký số trên một cửa sổ Browse File. 
-* -> Tham số `metadata` là các thuộc tính đi kèm với tệp có kiểm List trong đó `KeyValue` là class KeyValue{ string Key; string Value;}
-
-* **SignFileCallBack()** **`xử lý kết quả ký số`** với tham số rv là một `json object` có cấu trúc:
-```js
-{ 
-    "Status": 0, // 0: ký số thành công, khác 0 ký số lỗi
-    "Message": "" //miêu tả lỗi
-    "FileName": "" //Tên file ký số
-    "FileServer": ""// đường dẫn tệp đã ký trên máy chủ do FileUPloadHandler trả về 
-}
-```
-
 # Tích hợp:
 * **Thêm các file JavaScript sau vào trang web**:
 * -> **`base64.js`**, để **chuyển đổi dữ liệu web-form cần ký số sang dạng chuỗi**
@@ -72,7 +45,8 @@
 
 * **s/d các hàm ký số và xác thực** 
 
-==============================================
+================================================
+
 # Tool ký số VGCASignService
 * là **giải pháp hỗ trợ tích hợp chữ ký số** và các **dịch vụ chứng thực chữ ký số** **trên nền tảng WEB**(_theo quy định tại Nghị đinh số 30/2020/NĐ-CP_)
 * được xây dựng dưới dạng **`phần mềm plugin cho các trình duyệt`**
@@ -161,6 +135,17 @@
 * -> chọn Chứng thư số người ký để đăn ký sử dụng 
 
 * Nhấn chọn "Đăng ký" và đợi thông báo đăng ký thành công
+
+### Đăng ký 1 cách nào đó
+* để **Cấu hình và thiết lập chữ ký số**
+* -> right-click on "V" icon; chọn `Cấu hình hệ thống` window
+* -> trong tab `kết nối mạng`, chọn **Sử dụng máy chủ proxy**, **Sử dụng cấu hình proxy mặc định** rồi "Lưu"
+* -> trong tab `Dịch vụ chứng thực`, check **Sử dụng dịch vụ cấp dấu thời gian (TSA)**, địa chỉ nhập: **http://ca.gov.vn/tsa**, check **Sử dụng dịch vụ kiểm tra chứng thư số trực tuyến** và **Cho phép kiểm tra chứng thư số người ký qua OCSP** rồi "Lưu"
+* -> trong tab `Hiển thị chữ ký trên PDF`-> quản lý mẫu chữ ký chọn `Chữ ký cá nhân` (hoặc `Tạo mẫu mới` + Loại chữ ký là `Mẫu chữ ký thường`) -> nhập `Tên mẫu chữ ký` (_nhập tuỳ ý_) -> phần `Hiển thị chữ ký` (_tuỳ chọn + right-click vào ảnh mặc định để đổi ảnh chữ ký_) -> check vào `Ký số với vị trí mặc định` (_nếu muốn chữ ký có vị trị xác định_) + chọn `trang ký` (_VD: trang cuối_) + nhấn `Thay đổi` để xác định toạ độ tương đối
+* -> trong tab `Dịch vụ tệp`: Nhập địa chỉ Module xử lý văn bản tải lên (_hình như không cần cũng được_)
+* -> trong tab `Đăng ký sử dụng`: Cắm `USB chữ ký số` vào máy tính + nhấn nút `Đăng ký` -> Chọn chứng thư số của ta + nhập **mã PIN** (mật khẩu của USB Token) -> nó hiện "phần mềm đã được đăng ký sử dụng..." là Ok
+* -> **ký số trên trình duyệt Chrome**: mở Chrome vào đường dẫn `chrome://flags/#allow-insecure-localhost`
+* -> vào mục **Allow invalid certificates for resources loaded from localhost**: chọn Enable -> rồi chọn `RELAUNCH NOW` để khởi động lại trình duyệt
 
 ## Cấu hình dịch vụ chứng thực
 * Cấu hình sử dụng dịch vụ chứng thực chữ ký số của tổ chức cung cấp dịch vụ chứng thực **`đã được thiết lập mặc định trong phần mềm`** 

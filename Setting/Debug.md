@@ -57,8 +57,15 @@
 * -> to run a web application from the command prompt: Open command prompt -> Run WebDev.WebServer
 
 ==========================================================
+# Debug "ASP.NET Core" apps hosting on IIS
+* -> Sửa lại **`Setting`** của **`Publish`** với **`Configuration`** thành **Debug** 
+* -> publish vào 1 folder 
+* -> host App với physical path tới folder đó
+* -> **Ctrl + Alt + P** để **`attach process`**     
 
-# Debug ASP.NET Web Application hosted on IIS
+==========================================================
+
+# Debug "ASP.NET Web Application" hosted on IIS
 * By attaching the **`worker process`** - **w3wp.exe** of the intended web application to Visual Studio
 
 ## Enable IIS
@@ -118,3 +125,6 @@
 
 * Trên IIS local desktop connection -> chọn **Worker Processes** option -> ta sẽ thấy cái Application Pool ta vừa tạo để chạy hosted App -> ghi nhớ **Process Id** của nó
 * Vào Visual Studio -> Debug -> Attach to Process 
+
+
+

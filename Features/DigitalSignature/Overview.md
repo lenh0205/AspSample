@@ -33,6 +33,7 @@
 * - Sự **`toàn vẹn nội dung của thông điệp dữ liệu`** kể từ khi thực hiện việc biến đổi nêu trên
 
 =================================================
+
 # Lợi ích
 * trao đổi dữ liệu thuận lợi , tối ưu thời gian, chi phí, tránh phải thực hiện các giấy tờ, thủ tục rườm rà
 * **thừa nhận về mặt pháp lý** `khi giao dịch trên môi trường điện tử`
@@ -47,32 +48,11 @@
 
 ===================================================
 
-## Nhà cung cấp dịch vụ Chữ ký số được Nhà nước cấp phép:
-* VINA – CA, FPT, Viettel, VNPT, Bkav, Nacencomn,…
-
 ## 4 loại chữ ký số được sử dụng hiện nay:
 * **Chữ ký số USB Token**
 * **Chữ ký số HSM**: được cài đặt cho các ứng dụng chữ ký số với **`yêu cầu tốc độ cao`**, đáp ứng việc xác thực và mã hóa ngay lập tức (_cho phép người dùng có thể cùng lúc thực hiện hàng nghìn chữ ký, thay vì 4 - 5 chữ ký như khi sử dụng USB Token_) 
 * **Chữ ký số SmartCard**: **`tích hợp trên sim điện thoại`** - nhanh chóng và dễ dàng thực hiện ký số ngay trên điện thoại di động của mình mọi lúc mọi nơi
 * **Chữ ký số từ xa - Remote Signature**: được sử dụng trên nền tảng công nghệ **`điện toán đám mây`**; thực hiện ký số mọi lúc mọi nơi, như trên điện thoại, laptop, máy tính bảng,.... nhưng còn một số vấn đề liên quan đến bảo mật dữ liệu
-
-===================================================
-## USB Token
-* **loại chữ ký số sử dụng chiếc USB ký số để tích hợp phần mềm** (_phổ biến nhất hiện nay_)
-* thiết bị `phần cứng (USB)` dùng để `tạo ra cặp khóa công khai và bí mật`; cũng như lưu trữ thông tin của khách hàng
-* **`Bản chất`** của USB Token là để lưu trữ và bảo vệ an toàn cho **Private Key**
-
-* Mỗi USB Token có một số **series duy nhất** gồm `8 hoặc 10 ký tự` ở `mặt dưới của Token` và được **gắn duy nhất với một khách hàng**
-
-* Khi nhấn nút trên Token một dãy các mã số ngẫu nhiên sẽ xuất hiện (gồm 6 chữ số hiện ra trên màn hình phía trên Token) và thay đổi liên tục trong một khoảng thời gian nhất định (30 giây hoặc 60 giây)
-* -> Mỗi một mã số của USB Token **`chỉ có hiệu lực duy nhất`** đối với một giao dịch tại một thời điểm nhất định và mỗi khách hàng cụ thể.
-* -> Chuỗi số được tạo ra **`theo thuật toán rất phức tạp`** mà cho đến nay chưa có trường hợp nào bẽ khóa thành công
-
-* **Cách sử dụng**:
-* -> cần cài đặt tiện ích ký số trên máy tính trước
-* -> USB sẽ được cắm trực tiếp vào máy tính
-* -> người dùng tiến hành đăng nhập vào chữ ký số của mình bằng một mã PIN bí mật
-* -> thực hiện các thao tác giao dịch
 
 =============================================
 # Lỗi "không tìm thấy chữ ký số", "chữ ký số không hợp lệ"
@@ -97,24 +77,3 @@
 
 * **Giải pháp**: thay đổi serial của USB Token trên **trang Thuế**
 
-================================================
-# Cài đặt "chữ ký số" sử dụng trên "Phần mềm Hệ thống quản lý văn bản và điều hành"
-
-## Download bộ "vgca sign web"
-* Truy cập vào trang: `https://ca.gov.vn/tai-phan-mem-`
-* Chọn bộ cài đặt  để tải bộ `Driver` tương ứng với Window OS (x32 , x64):
-* -> tải **vgca-sign-web** - Bộ công cụ ký số phục vụ liên thông (xác thực chéo) các hệ thống CA
-* -> tải driver **gca01-client-v2-x64-8.3** - Trình điều khiển thiết bị (Driver) GCA-01
-
-## Install trình điều khiển Chữ ký số (eToken Driver)
-* chạy tệp install wizard `gca01-client-v2-x64-8.3` ta vừa tải về (_khi xong sẽ xuất hiện icon "S" màu đỏ trên Taskbar_)
-* giải nén bộ `vgca-sign-web` rồi chạy file `VGCASignServiceSetup_v1.0.0` (_khi xong sẽ xuất hiện icon "V" màu đỏ trên Taskbar_)
-
-* để **Cấu hình và thiết lập chữ ký số**
-* -> right-click on "V" icon; chọn `Cấu hình hệ thống` window
-* -> trong tab `kết nối mạng`, chọn **Sử dụng máy chủ proxy**, **Sử dụng cấu hình proxy mặc định** rồi "Lưu"
-* -> trong tab `Dịch vụ chứng thực`, check **Sử dụng dịch vụ cấp dấu thời gian (TSA)**, địa chỉ nhập: **http://ca.gov.vn/tsa**, check **Sử dụng dịch vụ kiểm tra chứng thư số trực tuyến** rồi "Lưu"
-* -> trong tab `Hiển thị chữ ký trên PDF`, quản lý mẫu chữ ký chọn `Chữ ký các nhân`, rồi điền tên, `ảnh chữ ký`
-* -> trong tab `Đăng ký sử dụng`: Cắm `USB chữ ký số` vào máy tính và nhất nút "Đăng ký sử dụng"
-* -> **ký số trên trình duyệt Chrome**: mở Chrome vào đường dẫn `chrome://flags/#allow-insecure-localhost`
-* -> vào mục **Allow invalid certificates for resources loaded from localhost**: chọn Enable -> rồi chọn `RELAUNCH NOW` để khởi động lại trình duyệt

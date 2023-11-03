@@ -1,0 +1,2 @@
+
+Ta có thể add bất cứ file ".dll" (viết bằng .NET hoặc .NET Core) nào làm reference chỉ cần nó target đúng .NET với project của ta bằng cách right-click on "Reference" + Add -> nó sẽ thêm vào "Assemblies" trong "Reference"

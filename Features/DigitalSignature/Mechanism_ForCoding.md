@@ -1,3 +1,34 @@
+# Các hàm Javascript được Thư viện (Vgcaplugin.js) cung cấp:
+* **exc_sign_msg()** - để thực hiện **`ký số dữ liệu web-form`**, với tham số:
+* -> `sender` là Id của button submit form 
+* -> `sender` sẽ được xử lý ở trong hàm **SignCallBack**
+
+* **SignCallBack()** để **`xử lý kết quả ký số`**
+
+* **exc_verify_msg()** để thực hiện **`xác thực nội dung web*form`**
+
+* **VerifyCallBack()** để **`xử lý kết quả xác thực`**
+
+* **exc_verify_pdf()** là hàm **`xác thực tệp pdf`** với hai tham số _`sessionId`_ và _`filename`_ để sử dụng trong `quá trình tải file PDF` về máy tính người dùng, sau đó thực hiện **`xác thực chữ ký`**
+
+* **VerifyPDFCallBack()** là hàm **`xử lý kết quả xác thực tệp PDF`**
+
+* **exc_sign_file()** là **`hàm ký số tệp PDF`** với các tham số _`sessionId, fileName`_ để sử dụng trong quá trình **`tải về file cần ký số trên server`** và **`tải lên file đã ký số lên server`** 
+* -> trong trường hợp fileName rỗng, phần mềm sẽ yêu cầu người dùng chọn đường dẫn file trên máy tính để ký số trên một cửa sổ Browse File. 
+* -> Tham số `metadata` là các thuộc tính đi kèm với tệp có kiểm List trong đó `KeyValue` là class KeyValue{ string Key; string Value;}
+
+* **SignFileCallBack()** **`xử lý kết quả ký số`** với tham số rv là một `json object` có cấu trúc:
+```js
+{ 
+    "Status": 0, // 0: ký số thành công, khác 0 ký số lỗi
+    "Message": "" //miêu tả lỗi
+    "FileName": "" //Tên file ký số
+    "FileServer": ""// đường dẫn tệp đã ký trên máy chủ do FileUPloadHandler trả về 
+}
+```
+
+===================================================
+
 # Các tiêu chuẩn được sử dụng cho "Chữ ký điện tử"
 * **OpenPGP** được hỗ trợ bởi PGP và GnuPG, và các tiêu chuẩn **S/MIME** (_có trong Microsoft Outlook_)
 

@@ -7,8 +7,17 @@
 * thư mục **bin** không có gì cả
 
 =============================================
+# C# - Optional parameters must appear after all required parameters
+```cs
+public void GetIAccountInfo(string VanThuDonVi = "1", int? donviId, int? phongbanId);
+// sửa thành:
+public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = "1");
+```
+* Lỗi này là do để sai thứ tự param; vì "VanThuDonVi" là 1 **`Optional parameters`**, nó cần được để sau "donviId" và "phongbanId"
+
+=============================================
 # BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
-* Access API vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
+* Access API Swagger vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
 * Lỗi này là do dùng không dùng **`async`**` cho Method Action và Service
 
 # BE - Có dữ liệu trong Database nhưng không Get được
@@ -20,11 +29,6 @@
 string? name = GetName();
 int length = name!.Length;
 ```
-
-# DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
-* Xảy ra khi `SaveChanges()`
-* lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"
-* nhưng khi tìm `Primary key` của phần tử này trong Database để update thì lại không thấy
 
 # BE - Exception: could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'
 * Lỗi này là do `Entity Framework` không thể chuyển số cú pháp `LINQ` sang `SQL`
@@ -48,7 +52,13 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * có thể xảy ra khi SER chết , HelperCommon gọi SER sẽ trả về response như này
 * publish lại SER
 
-=========================================
+================================================
+# DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
+* Xảy ra khi `SaveChanges()`
+* lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"
+* nhưng khi tìm `Primary key` của phần tử này trong Database để update thì lại không thấy
+
+===============================================
 # FE - React can't access an object before it gets initialize
 * **Lý do**: 
 * -> viết **`2 class phụ thuộc lẫn nhau`** dẫn đến vòng lặp
