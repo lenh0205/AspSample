@@ -1,4 +1,3 @@
-# Caching
 
 # Reverse proxy
 

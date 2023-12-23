@@ -16,6 +16,11 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 * Lỗi này là do để sai thứ tự param; vì "VanThuDonVi" là 1 **`Optional parameters`**, nó cần được để sau "donviId" và "phongbanId"
 
 =============================================
+# Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
+* Kiểm tra lại Endpoint xem ta đặt break point đúng controller/action method chưa
+* Khả năng cao lỗi này là do **`không map được data ta truyền trong Request với Parameter của action method`**
+* -> VD: DaDoc=1 nhưng ta lại truyền DaDoc="1" ; hoặc truyền 1 field null cho unullable value
+
 # BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
 * Access API Swagger vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
 * Lỗi này là do dùng không dùng **`async`**` cho Method Action và Service
