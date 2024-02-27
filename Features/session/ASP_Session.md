@@ -7,11 +7,11 @@
 * _hay người dùng chọn đựa mặt hàng vào giỏ hàng thì phải nhớ khi chuyển đến trang thanh toán ..._
 
 # Nơi lưu trữ dữ liệu Session trên Server
-* có thể là ở `bộ nhớ Cache`, có thể là ở `CSDL SQLServer` hoặc những nguồn lưu cache khác nhau
+* có thể là ở **`bộ nhớ Cache`**, có thể là ở **`CSDL SQLServer`** hoặc những nguồn lưu cache khác nhau
 
 # Kích hoạt Session trong ASP.NET
-* -> Thêm **ISession** `service` cho phép App làm việc với Session
-* -> **`DistributedSession`** class trong App là implementation của `ISession`
+* -> Thêm **ISession** service `cho phép App làm việc với Session`
+* -> **DistributedSession** class trong App là implementation của **`ISession`**
 
 ```cs - Lưu Session trong Memory
 // Thêm Package để App sử dụng Session:
@@ -46,15 +46,15 @@ DistributedSession session = context.Session;
 # Lưu và đọc dữ liệu Session
 * các đối tượng sẽ được lưu vào Session **`dưới dạng chuỗi Json`** (_Newtonsoft.Json_) có **`key`** tương ứng
 
-```cs - lưu thông tin một khách truy cập vào trang /Product gồm dữ liệu là "số lần truy cập" và "thời điểm cuối truy cập"
+```cs - lưu user access info vào trang /Product gồm dữ liệu là "số lần truy cập" và "thời điểm cuối truy cập"
 // ProductController.cs:
 public void CountAccess(HttpContext context) 
 {
-    var session = context.Session;
+    var session = context.Session; // Get "session" object
     string key_access = "info_access";
-    string json = session.GetString(key_access); // Getter
+    string json = session.GetString(key_access); // get infor from "session" by key
 
-    // định nghĩa cấu trúc dữ liệu lưu trong Session
+    // định nghĩa cấu trúc dữ liệu sẽ lưu trong Session
     var accessInfoType = new  {
         count = 0, // số lần truy cập
         lasttime = DateTime.Now // thời điểm cuối truy cập
@@ -66,7 +66,7 @@ public void CountAccess(HttpContext context)
         lastAccessInfo = JsonConvert.DeserializeObject(json, accessInfoType.GetType());
     }
     else { 
-        lastAccessInfo  = accessInfoType; 
+        lastAccessInfo  = accessInfoType; // chưa có
     }
 
     // cập nhật thông tin:
@@ -75,9 +75,9 @@ public void CountAccess(HttpContext context)
         lasttime = DateTime.Now
     }; 
 
-    // convert accessInfoSave thành chuỗi Json và lưu lại vào Session:
+    // convert "accessInfoSave" thành chuỗi Json:
     string jsonSave = JsonConvert.SerializeObject(accessInfoSave);
-    session.SetString(key_access, jsonSave);
+    session.SetString(key_access, jsonSave); // lưu lại vào Session:
 
     // Output:
     string thongtin = $"Số lần truy cập /Product: {lastAccessInfo.count} 
@@ -178,4 +178,17 @@ protected void Page_Load(object sender, EventArgs e)
       <sessionState mode="StateServer" stateConnectionString="ConnectionString"></sessionState>  
    </system.web>  
 </configuration>
+```
+
+=========================================================
+# Access session in ASP.Net WebAPI and WebForm
+```cs
+HttpContext.Current.Session["myvariable"]
+Session["myvariable"]
+
+// They're effectively the same, in that they will access the same Session data.
+
+// The reason you can call Session in your code-behind is because ASP.Net pages by default extend the System.Web.UI.Page type. This has a Session public property. If you look at the code for this in Reflector you can see that it just calls HttpContext.Current.Session itself (through its own Context property).
+
+// In other classes you will not have access to that property, but you can use HttpContext.Current.Session to access the session data instead, as long as you're running in the context of a web application.
 ```

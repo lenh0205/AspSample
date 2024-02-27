@@ -1,5 +1,5 @@
 # In ASP.NET 
-* by Default, all the file in ASP.NET project was accessible through the browser by the right path
+* by Default, **`all files`** in ASP.NET project **`was accessible`** through the browser by **providing the right path**
 * -> less secure - malicious client can access application code files, which can contain sensitive information
 
 =============================================

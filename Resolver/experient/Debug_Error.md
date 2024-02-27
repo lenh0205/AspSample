@@ -3,8 +3,15 @@
 * có thể dùng Take() để giảm bớt số lượng cần lấy
 
 =============================================
-# Hosting - Hosting xong trả về 404
+# Deployment - Hosting xong trả về 404
 * thư mục **bin** không có gì cả
+
+# Deployment - Publish code Debug nhưng không thể Attach to Process để Debug được
+* thử xoá **`thư mục .vs và thư mục obj`** đi
+* right-click vào csproj -> Properties -> Build -> uncheck **Optimize Code**
+* vào **`Configuration Manager`**, đổi hết thành Debug
+* Vào Debug -> Options -> Debugging -> check **`Suppress JIT optim....`** và uncheck **`Enable Just My Code`**
+
 
 =============================================
 # C# - Optional parameters must appear after all required parameters
@@ -16,7 +23,7 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 * Lỗi này là do để sai thứ tự param; vì "VanThuDonVi" là 1 **`Optional parameters`**, nó cần được để sau "donviId" và "phongbanId"
 
 =============================================
-# Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
+# BE - Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
 * Kiểm tra lại Endpoint xem ta đặt break point đúng controller/action method chưa
 * Khả năng cao lỗi này là do **`không map được data ta truyền trong Request với Parameter của action method`**
 * -> VD: DaDoc=1 nhưng ta lại truyền DaDoc="1" ; hoặc truyền 1 field null cho unullable value

@@ -1,5 +1,4 @@
-
-* Fundamentally, API can be broke down into either Request-Response APIs and Event-Driven APIs
+> Fundamentally, API can be broke down into either **`Request-Response APIs`** and **`Event-Driven APIs`**
 
 # Request-Response APIs
 * there're 3 commonly used standards:
