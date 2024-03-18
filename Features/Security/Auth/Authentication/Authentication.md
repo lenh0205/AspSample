@@ -11,8 +11,6 @@
 * lấy **password** vừa nhập + **salt** vừa lấy từ database cộng lại; rồi dùng **hash function** để tạo ra 1 mã băm
 * **`so sánh mã băm này với mã băm trong database`** -> khớp thì mật khẩu chỉnh xác
 
-# Hashing (bcrypt)
-
 # the idea of "Session":
 * **`HTTP is a stateless protocol`** 
 * -> if we login the first time; send email and password to Server to Authenticate
