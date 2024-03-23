@@ -3,15 +3,29 @@
 * có thể dùng Take() để giảm bớt số lượng cần lấy
 
 =============================================
-# Deployment - Hosting xong trả về 404
+# Setting - Hosting xong trả về 404
 * thư mục **bin** không có gì cả
 
-# Deployment - Publish code Debug nhưng không thể Attach to Process để Debug được
+# Setting - Publish code Debug nhưng không thể Attach to Process để Debug được
 * thử xoá **`thư mục .vs và thư mục obj`** đi
 * right-click vào csproj -> Properties -> Build -> uncheck **Optimize Code**
 * vào **`Configuration Manager`**, đổi hết thành Debug
 * Vào Debug -> Options -> Debugging -> check **`Suppress JIT optim....`** và uncheck **`Enable Just My Code`**
 
+# Setting - Connected Service: add Service Reference (add WCF lỗi) lỗi "the system can not find the path specified error"
+* Trong trường hợp ta `add Service Reference`, rồi pass URL của WCF rồi bấm "Go" để tìm kiếm và tìm thấy service; nhưng khi bấm "OK" thì báo lỗi
+* Rất có khả năng project đang thiếu thư mục **Connected Services** (hoặc **`Service References`** tuỳ version) để chứa các service; ta chỉ cần tạo thư mục rồi add lại là được 
+* ngoài ra, ta có thể thử bỏ check **`Reuse types in referenced assemblies`** trong **Advanced** setting
+
+# Setting - Connected Service - không thể khởi tạo instance của WCF service - Lỗi: Could not find default endpoint element that references contract 
+* Lỗi này xảy ra đối với **`ASP.NET`**, là do ta đã add **`Connected Service`** nhưng **chưa thêm cấu hình vào web.config**
+```xml
+<client>
+    <endpoint address="http://192.168.1.31:9017/QLVB_LienThong/ThongKeLienThongService.svc" binding="basicHttpBinding" bindingConfiguration="basicHttpService" contract="ThongKeLienThongService.IThongKeLienThongService" name="basicHttpService" />
+    
+	<endpoint address="http://192.168.1.12:9017/QLVB/QLVB_DanhMucService.svc" binding="basicHttpBinding" bindingConfiguration="basicHttpService" contract="QLVB_DanhMucService.IQLVB_DanhMucService" name="basicHttpService" />
+</client>
+```
 
 =============================================
 # C# - Optional parameters must appear after all required parameters
@@ -43,7 +57,7 @@ int length = name!.Length;
 ```
 
 # BE - Exception: could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'
-* Lỗi này là do `Entity Framework` không thể chuyển số cú pháp `LINQ` sang `SQL`
+* Lỗi này là do `Entity Framework` không thể chuyển 1 số cú pháp `LINQ` sang `SQL`
 
 * Rất có thể là do trong câu `.Where()` chứa những **`Extension method`** không thể tranfer
 * -> như: **`Custom Extension method`**, `.Any()`, `.ToString()`, `DateTime.Add()`, ...
@@ -61,8 +75,14 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * Ta có thể thử Reload `project`
 
 # BE - Lỗi:"Unexpected character encountered while parsing value: <. Path '', line 0, position 0."
-* có thể xảy ra khi SER chết , HelperCommon gọi SER sẽ trả về response như này
-* publish lại SER
+* **reason**: có thể xảy ra khi SER chết , HelperCommon gọi SER sẽ trả về response như này
+* **Solution**: publish lại SER
+
+# BE - Khi Debug 1 method ta không thể "Step in" vào method đó mắc dù public đúng method cũng như truyền đúng hết tham số - báo lỗi "Could not load file or assembly ... Version=..."
+* **Confustion**: ta đặt break point ngay dòng đầu 1 dòng chắc không thể lỗi nhưng nó vẫn không nhảy vô được
+* **reason**: rất có thể đâu đó trong phần thân hàm, đang chứa 1 **`Assembly`** (1 class mà ta reference đến) không thuộc **`.NET Core`** mà thuộc của **`.NET Framework`**
+* -> vậy nên Assembly này sẽ load những Assembly con target đến **`.NET Framework 3.5`**, trong khi những Assembly con đó trong **`ASP.NET Core`** lại target đến **`.NET Framework 4.7`** chẳng hạn
+* **Solution**: đầu tiên ta nên xoá Assembly đó trong ASP.NET Core project đi, ta có thể đưa logic lên HelperCommon để xử lý
 
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);

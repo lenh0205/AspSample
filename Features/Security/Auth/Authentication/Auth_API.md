@@ -14,11 +14,11 @@
 * the Authentication API is served over **HTTPS**. All URLs have the following base: **`https://{yourDomain}`**
 
 ## Authentication methods
-* OAuth2 Access Token
-* Client ID and Client Assertion (confidential applications)
-* Client ID and Client Secret (confidential applications)
-* Client ID (public applications)
-* mTLS Authentication (confidential applications)
+* -> **`OAuth2 Access Token`**
+* -> **`Client ID and Client Assertion (confidential applications)`**
+* -> **`Client ID and Client Secret (confidential applications)`**
+* -> **`Client ID (public applications)`**
+* -> **`mTLS Authentication (confidential applications)`**
 
 ### OAuth2 Access Token
 * -> send a **`valid Access Token`** in the **Authorization header**, using the **`Bearer authentication scheme`**

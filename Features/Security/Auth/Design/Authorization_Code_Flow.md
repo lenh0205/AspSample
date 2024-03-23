@@ -5,7 +5,7 @@
 * -> this flow **`can only be used`** for **confidential applications** (such as **`Regular Web Applications`**) 
 * -> because the **`application's authentication methods`** are included in the exchange and **must be kept secure**
 
-## How Authorization Code Flow works
+## How "Authorization Code Flow" works
 * -> User selects Login within application.
 * -> Auth0's SDK redirects user to Auth0 Authorization Server (/authorize endpoint)
 * -> Auth0 Authorization Server redirects user to login and authorization prompt.

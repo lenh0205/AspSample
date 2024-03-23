@@ -26,7 +26,7 @@
 
 ## PKCE / Implicit Flow with Form Post - Is the Client a Single-Page App?
 * -> if the **Client is a Single-Page App (SPA)**, an application **`running in a browser`** using a **`scripting language`** like JavaScript
-* -> there are two grant options: the **`Authorization Code Flow with Proof Key for Code Exchange (PKCE)`** and **`the Implicit Flow with Form Post`**
+* -> there are two **grant options**: the **`Authorization Code Flow with Proof Key for Code Exchange (PKCE)`** and **`the Implicit Flow with Form Post`**
 * -> for most cases, it's **recommended** using the **`Authorization Code Flow with PKCE`** because **the Access Token is not exposed on the client side**, and this flow can **return Refresh Tokens**
 * -> if our SPA **doesn't need an Access Token**, we can use the **`Implicit Flow with Form Post`**
 
