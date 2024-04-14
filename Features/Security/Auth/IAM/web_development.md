@@ -1,36 +1,39 @@
+> session có tồn tại sau khi người dùng đóng Browser không; và cookie có phải mặc định sẽ bị xoá khi user đóng trình duyệt ?
+> đối với authen, session-based authen sẽ sử dụng cookie, còn Token-based sẽ sử dụng Token ID
 
+=============================================================
 # Integrate IAM in Web Development
 * -> IAM solution is a **`gatekeeper to the resources`** we provide **`to customers`** **`as web applications, APIs, ...`** 
 * -> the gatekeeper initiates **`authorization`** as outlined in **OAuth 2.0**
-* -> the addition of the **`OpenID Connect layer`** adds **authentication** to secure our users’ digital identities and our product
+* -> the addition of the **OpenID Connect layer** adds **`authentication`** to secure our users’ digital identities and our product
 
-* _the Identity platform we choose_ 
-* -> have to supports **`different application types and frameworks`**. Whether our application is a regular web app, a mobile app, or a machine-to-machine app
-* -> supporting **`secure protocols`**
-* -> allows us to **`customize login services`** to fit our business, our technology, and our customer base 
-* -> connect our **`user data store`**, manage those users, choose an authorization grant, and establish authentication factors for a seamless, scalable product with an impactful user experience
+## Choosing Identity platform  
+* -> have to supports **different application types and frameworks (_whether our application is **`a regular web app, a mobile app, or a machine-to-machine app`**_)
+* -> supporting **secure protocols**
+* -> allows us to **customize login services** to **`fit our business, our technology, and our customer base`**
+* -> connect our **user data store**, **`manage those users, choose an authorization grant, and establish authentication factors`** for a seamless, scalable product with an impactful user experience
 
 ## Authenticate
 * -> the **`vehicle of authentication`** is the **login form**, or **`the intermediary`** to allow our users access to our application
 * -> users provide **pre-determined credentials** (_such as username or password_), in the **`login form`** to verify their digital identities
 
 ### the "Login form" 
-* -> **`Passwordless`** login with **`biometrics`**
-* -> choice of **`multi-factor authentication methods`** from email, voice, or Duo
-* -> **`Single Sign-on (SSO)`** capabilities
-* -> **`Localization`** support
+* -> **Passwordless** login with **`biometrics`**
+* -> choice of **multi-factor authentication methods** from **`email, voice, or Duo`**
+* -> **Single Sign-on (SSO)** capabilities
+* -> **Localization** support
 
-### Connect to "user" store
+### Connect to "user store"
 * -> _once we have a login form_, we can **`connect our user store to the Identity platform`**
 * -> we can connect an **`existing database`**, or use a social, legal, or enterprise **`identity provider`** (_such as X or Azure Active Directory_)
-* -> new users can sign up with the connection you have configured
+* -> new users can sign up with the connection we have configured
 
 ### Set up Protocol
 * -> _once we have a login form and user store connection_, we can set **`protocols that work behind the scenes`** when users log in to our application
 * -> the **`most common protocols`** are associated with **the OAuth 2.0 and OpenID Connect (OIDC) specs**
 * -> **`another protocol`** to **`securely transmit information`** during log in comes in the form of **Tokens**
-* -> **`Tokens`** from the **`Authorization Server`**, the Authentication API, transmit information between entities
-* -> _When a user logs in and access is approved_, the Authentication API sends an **access token**, an **ID token**, or both depending on the authentication grant we are **`using to create a session`**
+* -> **`Tokens`** from the **`Authorization Server`**, the Authentication API transmit information between entities
+* -> _When a user logs in and access is approved_, the Authentication API sends an **access token**, an **ID token**, or **`both`** depending on the authentication grant we are **`using to create a session`**
 * -> **Access tokens** contain information about what **`scopes, or permissions, the requestor`** has in our application 
 * -> while **ID tokens** have **`requestor information`** (_such as user metadata to better the user experience_)
 
@@ -44,14 +47,14 @@
 * -> **`WS-Fed`** is used with **`Microsoft products`**
 
 ## Manage users
-* -> managing user profiles and access can be time-consuming
+* -> managing **`user profiles and access`** can be time-consuming
 * -> we need easily automate CRUD operations and query user profiles using the Management API
 * -> we're must able to categorize our users into categories to arrange our customer-base to fit our management style
 
 ### Levels of Access
 * _our business model may include **levels of access** for our users_ 
 * -> we may want **`a subsection of users to have read-only permissions`** and another **`subsection with the ability to edit`**
-* -> the Identity platform allows you to implement **role-based access control**
+* => the Identity platform allows us to implement **role-based access control**
 * => we can **create roles**, **assign roles** to users, and **define permissions**
 
 ### Limit lifetime of Session

@@ -8,6 +8,23 @@
 > https://auth0.com/docs/get-started/identity-fundamentals/identity-and-access-management 
 > Auth0 chính là 1 IAM platform
 
+> liệu OAuth là Authorization hay delegation Authorization ? '
+> theo t thấy thì cũng không quan trọng Resource Server có thuộc cùng 1 organization với Client application hay không, cứ "Authorize" là sẽ cần OAuth
+> cái khác là nếu chúng chung 1 hệ thống thì ta có thể trong Access Token ta chỉ cần gửi UserID , backend sẽ tìm kiếm trong database User này có permission phù hợp để truy cập API không
+> nếu khác hệ thống, thì Client Application cần được User xác nhận uỷ quyền những permission nhất định; hay nói cách khác Scope của Client Application hệ thống này chỉ là tập con của Scope User hệ thống khác
+> vậy trong trường hợp này Client không thể chỉ gửi mỗi UserID để truy cập đến Resource của hệ thống khác
+> cách đầu tiên có thể nghỉ tới là khi issue 1 Access Token, Authorization Server sẽ cho nó 1 cái ID và lưu nó vào database tương ứng với Scope của nó; backend khi cần kiểm tra chỉ cần tìm đến data này 
+> câu hỏi là làm như thế này có hơi khó không ? việc tích hợp với authentication flow có dễ không ? dữ liệu trong database có thể bị người khác sửa đổi không ?
+> cách 2 là gửi thêm Scope trong Access Token, kiểm tra xem data trong Access Token có thật được tạo bởi Authorization Server bằng secret key; nếu đúng thì ta không cần nghi ngờ Scope của Client Application
+> vì lúc issue Access Token, Authorization Server đã kiểm tra Privilege của User với Scope được request bởi Client rồi; cách này có vẻ dễ hơn vì chỉ cần kiểm tra tính valid của token rồi lấy data từ nó để sử dụng là được        
+> mặc dù Access Token không nhất thiết phải là JWT, nhưng ta nên nhớ JWT là self-contained - tức là nó đã chứa đầy đủ thông tin cần thiết để có thể thực hiện nhiệm vụ 
+
+> Vậy thì bước consent có cần thực hiện trên Client Application của cùng 1 organization không ? vì mặc định khi User đăng nhập trên đúng Client của mình thì Server phải cấp đầy đủ Privilege của User rồi
+> ta biết rằng màn hình consent sẽ hiện những Scope mà Client yêu cần
+> nếu consent luôn cần thiết thì đổi với những Client cùng organize với Resource Server ta chỉ cần hiện đầy đủ Privilege của User để User xác nhận là được 
+
+> Tại sao nên có Authorization Server riêng với Resource Server ?
+
 ===========================================================
 # Identity Glossary - các thuật ngữ identity thường dùng
 * https://auth0.com/docs/glossary  
@@ -40,7 +57,7 @@
 * -> they are two separate processes: **authentication** proves a **`user’s identity`**, while **authorization** grants or denies the **`user’s access to certain resources`** 
 
 ## What does "IAM" do?
-* _Identity and access management gives us control over user validation and resource access:_ 
+* _Identity and access management gives us control over `user validation` and `resource access`:_ 
 * -> **How users become a part of your system ?**
 * -> **What user information to store ?**
 * -> **How users can prove their identity ?**
@@ -48,21 +65,23 @@
 * -> **The experience of proving identity ?**
 * -> **Who can and cannot access different resources ?**
 
-## IAM itegration
-* we integrate IAM with our **`application, API, device, data store, or other technology`**
+## IAM integration
+* _we will integrate IAM with our **`application, API, device, data store, or other technology`**_
 
-* _this integration can be very simple_
+* _this integration can be very `simple`_
 ```r - For example:
 // our web application might "rely entirely on Facebook for authentication", and have an "all-or-nothing authorization policy"
-// our app performs a simple check: if a user isn’t currently logged in to Facebook in the current browser, we direct them to do so. Once authenticated, all users can access everything in our app.
+// our app performs a simple check: if a user isn’t currently logged in to Facebook in the current browser, we direct them to do so
+// once authenticated, all users can access everything in our app.
 ```
 
-* _but in practical, it need more complex IAM solution to meet the needs of your users, organization, industry, or compliance standards; most systems require some combination of these capabilities:_
-* -> **Seamless signup and login experiences** - smooth and professional login and signup experiences occur **`within your app, with our brand’s look and language`** 
-* -> **Multiple sources of user identities** - Users expect to be able to **`log in using a variety of identity providers`** like social (such as Google or Linkedin), enterprise (such as Microsoft Active Directory), ....
+* _but in practical, it need more `complex IAM solution` to meet the **`needs of your users, organization, industry, or compliance standards`**_
+* _most systems require some combination of these capabilities:_
+* -> **Seamless signup and login experiences** - smooth and professional login and signup experiences occur **`within our app, with our brand’s look and language`** 
+* -> **Multiple sources of user identities** - Users expect to be able to **`log in using a variety of identity providers`** like social (Google, Linkedin, ...), enterprise (Microsoft Active Directory), ....
 * -> **Multi-factor authentication (MFA)** - in an age when **`passwords are often stolen`**, requiring **`additional proof of identity`** is the new standard (_Fingerprint authentication and one-time passwords are examples of common authentication methods_)
 * -> **Step-up authentication** - access to **`advanced capabilities and sensitive information`** require stronger proof of identity than everyday tasks and data; it requires additional identity verification for selected areas and features
-* -> **Attack protection** - rreventing **`bots and bad actors`** from breaking into our system is fundamental to cybersecurity
+* -> **Attack protection** - preventing **`bots and bad actors`** from breaking into our system is fundamental to cybersecurity
 * -> **Role-based access control (RBAC)** - as **`the number of users grows`**, managing the access of each individual quickly becomes impractical. With RBAC, people who have the **`same role have the same access to resources`**
 
 ## How does IAM work? 
@@ -93,7 +112,7 @@
 * other identity providers include **`social media`** (_such as Facebook or LinkedIn_), **`enterprise`** (_such as Microsoft Active Directory_), and **`legal identity providers`** (_such as Swedish BankID_)
 
 ## Authentication factors
-* -> Authentication factors are **`methods for proving a user’s identity`**
+* -> _Authentication factors_ are **`methods for proving a user’s identity`**
 * -> IAM systems require one or many authentication factors to verify identity
 
 * _commonly fall into these basic types:_
@@ -110,7 +129,7 @@
 * _these **`IAM industry standards`** are considered the most secure, reliable, and practical to implement:_
 
 ### OAuth 2.0
-* -> OAuth 2.0 is **`a delegation protocol`** for **`accessing APIs`** and is the **industry-standard protocol for IAM** 
+* -> OAuth 2.0 is **a delegation protocol** for **`accessing APIs`** and is the **industry-standard protocol for IAM** 
 * -> **`an open authorization protocol`**, OAuth 2.0 lets an app **access resources hosted by other web apps** on behalf of a user **without ever sharing the user’s credentials**
 * -> it’s the standard that allows **`third-party developers`** to **`rely on large social platforms`** (_like Facebook, Google, and Twitter_) for **login**
 
@@ -131,7 +150,7 @@
 
 ### Web Services Federation (WS-Fed)
 * -> Developed by Microsoft and used extensively in their applications
-* -> this standard defines the way **`security tokens`** can be **`transported between different entities`** to **`exchange identity and authorization information`**
+* -> this standard defines the way **security tokens** can be **transported between different entities** to **`exchange identity and authorization information`**
 
 ## Why use an IAM platform?
 * -> User expectations, customer requirements, and compliance standards introduce significant technical challenges

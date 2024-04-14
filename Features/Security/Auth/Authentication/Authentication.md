@@ -12,18 +12,14 @@
 * **`so sánh mã băm này với mã băm trong database`** -> khớp thì mật khẩu chỉnh xác
 
 # the idea of "Session":
-* **`HTTP is a stateless protocol`** 
-* -> if we login the first time; send email and password to Server to Authenticate
-* -> if we click a link to go to page need Authen, we have to login again
-* Because `Web Server` has no way to remember who you are
+* -> **HTTP is a stateless protocol** (_if we login the first time; send email and password to Server to Authenticate; if we click a link to go to page need Authen, we have to login again_)
+* -> **`Web Server has no way to remember who you are`**
 
-* Vậy nên ta cần Web Server when we authenticate tell the Browser to remember who we are
+* => vậy nên ta cần Web Server tell the Browser to remember who we are when we authenticate 
 * => that way, the browser every time request a new page can talk back to Server "who I am"
 
 ## Cookies
-* this works behind the scene is via **Cookies**
-* -> **`just a string`** (_not files,..._)
-* -> get pass in a request
+* this works behind the scene is via **Cookies** - **`just a string`** (_not files,..._), get pass in a request
 
 ## HTTP Request:
 * have 2 component: 

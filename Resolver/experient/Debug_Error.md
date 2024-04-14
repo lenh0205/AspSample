@@ -27,6 +27,9 @@
 </client>
 ```
 
+# Setting - the current Visual studio version does not support targeting .NET 8.0. Either target .NET 7.0 or lower, or use Visual Studio version 17.8 or higher
+* -> ta chỉ cần cài **`.NET 8.0 SDK`** (bản **`x64`**) 
+
 =============================================
 # C# - Optional parameters must appear after all required parameters
 ```cs
@@ -84,11 +87,37 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> vậy nên Assembly này sẽ load những Assembly con target đến **`.NET Framework 3.5`**, trong khi những Assembly con đó trong **`ASP.NET Core`** lại target đến **`.NET Framework 4.7`** chẳng hạn
 * **Solution**: đầu tiên ta nên xoá Assembly đó trong ASP.NET Core project đi, ta có thể đưa logic lên HelperCommon để xử lý
 
+# BE - InvalidOperationException: The view 'Index' was not found. The following locations were searched: /Views/Home/Index.cshtml
+* -> Lỗi này là do program không tìm thấy file view nó cần ở đường dẫn **`/Views/Home/Index.cshtml`**, mặc dù ta thấy đường dẫn này có tồn tại trong project
+* -> ta cần add thêm service **services.AddControllersWithViews().AddRazorRuntimeCompilation();** (install package **`Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation`**)
+
+* _nếu vẫn không được thì ta có thể thử:_
+* -> vô file .csproj để bỏ  dòng <RazorCompileOnBuild>false</RazorCompileOnBuild> và dòng<Content Remove="Views\Home\Index.cshtml" />
+* -> include lại file view vô project; 
+* -> vào properties của file view, chuyển "Build Action" thành "Content"
+
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
 * Xảy ra khi `SaveChanges()`
 * lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"
 * nhưng khi tìm `Primary key` của phần tử này trong Database để update thì lại không thấy
+
+# DB - Không "Add-Migration" được
+* **Thiếu thư viện**: Entity Framework Core (`Design, SQL Server, Tool`)
+* `Tất cả Project trong Solution` đểu phải **build success** hết (nếu có project bị lỗi có thể Remove nó)
+* Kiểm tra **ConnectionString**
+
+# DB - Migration bị lỗi do không đồng nhất với database
+```
+Ví dụ Migration cần drop 1 Table nhưng Table đó không tồn tại trong Database
+```
+
+* Đầu tiên check xem `migration` trong **`thư mục Migration`** và **`dbo._EFMigrationsHistory`** có đồng nhất với nhau không
+
+* Cần thiết thì xoá Migration trong **thư mục Migration** đi
+
+* **`Rollback Migration`** EntityFramework Core: **update-database -Migration <migration ta muốn>**
+(_với EntityFramework là: `update-database -TargetMigration <migration ta muốn>`_)
 
 ===============================================
 # FE - React can't access an object before it gets initialize

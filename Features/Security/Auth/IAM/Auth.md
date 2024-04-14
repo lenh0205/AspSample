@@ -2,7 +2,7 @@
 
 ## Authentication
 * -> determines **`whether users are who they claim to be`**
-* -> challenges the user to **validate credentials** (for example, through passwords, answers to security questions, or facial recognition)
+* -> challenges the user to **validate credentials** (_for example: through passwords, answers to security questions, or facial recognition_)
 * -> usually done **`before authorization`**
 * -> generally, transmits info through an **ID Token**
 * -> generally governed by the **OIDC - OpenID Connect protocol**
@@ -12,7 +12,7 @@ Employees in a company are required to authenticate through the network before a
 ```
 
 ## Authorization
-* -> determines what users can and cannot access
+* -> determines what users **`can and cannot access`**
 * -> verifies whether **`access is allowed`** through **policies and rules**
 * -> usually done **`after successful authentication`**
 * -> generally, transmits info through an **Access Token**
