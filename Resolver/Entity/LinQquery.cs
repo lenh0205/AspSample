@@ -24,6 +24,8 @@ db.Entry(model).State = EntityState.Modified;
 db.Entry(model).Property(x => x.Token).IsModified = false;
 db.SaveChanges();
 
+//=======================================================================================================================
+
 # AntiPattern: N + 1 Problem
 // using wrong:
 var students = context.Students.ToList();
@@ -36,6 +38,8 @@ var query = from student in context.Students
             join course in context.Courses on student.Id equals course.StudentId
             select new { Student = student, Course = course };
 var result = query.ToList();
+
+//=======================================================================================================================
 
 # Basic 
 ## Find()
@@ -74,6 +78,7 @@ var entity = _context.MyEntities.Find(id);
 entity.MyProperty = newValue;
 _context.SaveChanges();
 
+//=======================================================================================================================
 
 # Join
 // join đòi hỏi phần "on" ta cần để đúng thứ tự bảng trái trước rồi mới "equals" bảng phải
@@ -103,6 +108,44 @@ var data = from fd in FlightDetails
 // Nếu ta join 2 bảng này với "Table1.columnA = Table2.columnB"
 // Ta sẽ có 1 result với 6 record
 
+### DefaultIfEmpty()
+// trả về 1 collection mới với 1 phần tử có giá trị mặc định nếu collection gốc rỗng; còn không thì trả về collection gốc
+IList<string> emptyList = new List<string>();
+var newList1 = emptyList.DefaultIfEmpty(); 
+Console.WriteLine("Count: {0}" , newList1.Count()); // 1
+Console.WriteLine("Value: {0}" , newList1.ElementAt(0)); // null
+
+List<Pet> pets = new List<Pet>{ new Pet { Name="Barley", Age=8 }, new Pet { Name="Boots", Age=4 } };
+foreach (Pet pet in pets.DefaultIfEmpty())
+{
+    Console.WriteLine(pet.Name);
+}
+/*
+ Barley
+ Boots
+*/
+
+//=======================================================================================================================
+
+# OrderyBy()
+// -> trả về 1 IOrderedEnumerable
+
+// thường thì ta sẽ sort theo 1 trường trong bảng
+var orderByDescendingResult = from s in studentList orderby s.StudentName descending select s; 
+var studentsInDescOrder = studentList.OrderByDescending(s => s.StudentName); 
+
+// Custom Logic for Sort
+// VD: sort lại danh sách học sinh theo đúng thứ tự danh sách tên trường học
+var school = new List<string> { "School1", "School2", "School3" };
+var studentInfos = await query.ToListAsync();
+studentInfos = studentInfos.OrderBy(x => school.IndexOf(x.SchoolName)).ToList();
+
+// Multiple Sorting
+var orderByResult = from s in studentList orderby s.StudentName, s.Age select new { s.StudentName, s.Age };
+var movies = _db.Movies.OrderBy(c => c.Category).ThenByDescending(n => n.Name)
+
+//=======================================================================================================================
+
 # SubExpression
 var result = from donVi in hoSo_donVi.DefaultIfEmpty()
             let danhSachHoSo = qDanhSachHoSo.Where(x => x.HoSoCongViecID == hoSoCongViec.Id).FirstOrDefault()
@@ -118,6 +161,7 @@ var result = from donVi in hoSo_donVi.DefaultIfEmpty()
 // Mặc dù trong dòng "let" có "FirstOrDefault()" nhưng nó sẽ không execute
 // Nó sẽ chỉ execute đến khi ta gọi "await result.ToListAsync()"
 
+//=======================================================================================================================
 
 # CombineListEntity
 ## Concat:

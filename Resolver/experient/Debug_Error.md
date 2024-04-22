@@ -30,6 +30,10 @@
 # Setting - the current Visual studio version does not support targeting .NET 8.0. Either target .NET 7.0 or lower, or use Visual Studio version 17.8 or higher
 * -> ta chỉ cần cài **`.NET 8.0 SDK`** (bản **`x64`**) 
 
+# Setting - ta chạy App của ta bằng Visual Studio sử dụng 'SSL' nên bị trình duyệt chặn
+* Trình duyệt sẽ báo: _`Your Connection is not private`: Attackers might be trying to steal your information from `localhost`_
+* ta sẽ sửa lại cấu hình Chrome -> truy cập đường link **`chrome://flags/`** -> check vào **Allow invalid certificates for resources loaded from localhost**
+
 =============================================
 # C# - Optional parameters must appear after all required parameters
 ```cs
