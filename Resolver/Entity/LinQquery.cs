@@ -1,5 +1,8 @@
 # Performance
 ## Case: Filter trước khi join bảng tốt hơn ra join bảng ra kết quả rồi mới filter
+// có vẻ là việc mình join các bảng trước thành 1 queryable trước; 
+// rồi phần filter cho từng bảng mình đặt hết lên cùng 1 cái queryable đó
+// -> thì sẽ dễ control cũng như preditable hơn
 
 ## Case: ta có 2 model list: 1 từ database, 1 từ memory; cần lặp 1 thằng để update từng entity
 // -> Ta nên "ToList()" cái list từ database; sau đó lặp qua nó
@@ -81,9 +84,20 @@ _context.SaveChanges();
 //=======================================================================================================================
 
 # Join
-// join đòi hỏi phần "on" ta cần để đúng thứ tự bảng trái trước rồi mới "equals" bảng phải
+// -> để cần biết lúc nào thì chọn giữa "Left Join" à "Inner Join" thì ta cần nhớ là ta đang muốn lấy ra cái gì
+// -> VD: UI ta cần hiển thị grid tất cả "HoSo" thì ta sẽ s/d "Left Join", và không quan tâm 1 số cột thiếu giá trị
+// -> còn "Inner Join" thì ta sẽ hiển thị grid danh sách "HoSo" mà các cột đều đầy đủ thông tin
+// -> Note: đối với "Left Join" cũng không hẳn là thiếu giá trị, ta có thể cho những cột đó giá trị mặc định
+// -> Note: join đòi hỏi phần "on" ta cần để đúng thứ tự bảng trái trước rồi mới "equals" bảng phải
+
+// https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/join-clause?redirectedfrom=MSDN
+// https://learn.microsoft.com/en-us/dotnet/csharp/linq/standard-query-operators/join-operations
+// https://stackoverflow.com/questions/3855881/linq-into-keyword-confusion
+// https://www.c-sharpcorner.com/PageNotFound.aspx?aspxerrorpath=/article/uses-of-into-and-let-in-linq/
 
 ## Inner Join 
+// -> produces a "flat sequence"
+
 var data = from fd in FlightDetails
            join pd in PassengersDetails on fd.Flightno equals pd.FlightNo
            select new {
@@ -108,6 +122,38 @@ var data = from fd in FlightDetails
 // Nếu ta join 2 bảng này với "Table1.columnA = Table2.columnB"
 // Ta sẽ có 1 result với 6 record
 
+## Group Join - a "join" clause with an "into" expression
+// -> produces a "hierarchical result sequence"
+
+var innerGroupJoinQuery =
+    from category in categories
+    join prod in products on category.ID equals prod.CategoryID into prodGroup
+    select new { CategoryName = category.Name, Products = prodGroup };
+
+## Join relationship Table:
+// Trong trường hợp Bảng 1 có Record thoã mãn "Where()", nhưng Bảng 2 không tồn tại Record link đến Bảng 1; 
+// nhưng ta vẫn luôn lấy ra những dữ liệu thoã mãn, còn dữ liệu không thoả mãn thì ta cho giá trị mặc định
+```cs
+var qHoSoCongViec = _context.HoSoCongViecs.Where(x => !x.IsDeleted).AsQueryable();
+var qDanhSachHoSo = _context.DanhSachHoSos.Include(x => x.HoSoCongViec).AsQueryable();
+
+qDanhSachHoSo = qDanhSachHoSo.Where(_ => _.LoaiDanhSachHoSo == request.LoaiDanhSachHoSo);
+if (request.NguoiLapId > 0) qHoSoCongViec = qHoSoCongViec.Where(_ => _.NguoiLapId == request.NguoiLapId);
+
+var result = from hoSoCongViec in qHoSoCongViec
+                join hoSo in qDanhSachHoSo on hoSoCongViec.Id equals hoSo.HoSoCongViecID into hoSoGroup
+                from hoSo in hoSoGroup.DefaultIfEmpty()
+                join user in _context.UserMasters on hoSo.HoSoCongViec.NguoiLapId equals user.UserMasterId into hoSo_user
+                from user in hoSo_user.DefaultIfEmpty()
+                select new
+                {
+                    hoSoCongViec.Id,
+                    Status = hoSo.Status ?? HoSoStatus.KhoiTao,
+                };
+
+return await result.ToListAsync();
+```
+
 ### DefaultIfEmpty()
 // trả về 1 collection mới với 1 phần tử có giá trị mặc định nếu collection gốc rỗng; còn không thì trả về collection gốc
 IList<string> emptyList = new List<string>();
@@ -124,6 +170,50 @@ foreach (Pet pet in pets.DefaultIfEmpty())
  Barley
  Boots
 */
+
+//=======================================================================================================================
+# GroupBy
+// trả về IEnumerable<Grouping>
+
+// khi ta query ra 1 list bao gồm nhiều Row mà có 1 hoặc nhiều field nào đó giống nhau 
+// -> thì để tránh nó ta có 2 cách là "DistinceBy()" hoặc "GroupBy()"
+// -> nhưng "DistinceBy(x => x.Field)" sẽ làm mất đi các Row có field chỉ định giống nhau và chỉ trả về 1 Row với đầy đủ field
+// -> còn "GroupBy(x => new { x.Field1, x.Field2 })" cũng sẽ làm mất đi các Row có field chỉ định giống nhau và trả về 1 Row với chỉ field ta đã chỉ định
+// => nhưng "GroupBy()" có thể giúp ta thực hiện những "Aggregate function" trong từng group
+
+// khi ".Select()" ta sẽ cần truy cập các field thông qua ".Key."
+
+## with Aggregate function
+foreach
+(
+    var line in data
+        .GroupBy(info => info.metric)
+        .Select(group => new { Metric = group.Key, Count = group.Count() })
+        .OrderBy(x => x.Metric)
+)
+{
+     Console.WriteLine("{0} {1}", line.Metric, line.Count);
+}
+
+var consolidatedChildren = from c in children
+                            group c by new { c.School, c.Friend, c.FavoriteColor, } into gcs
+                            select new ConsolidatedChild()
+                            {
+                                School = gcs.Key.School,
+                                Friend = gcs.Key.Friend,
+                                FavoriteColor = gcs.Key.FavoriteColor,
+                                Children = gcs.ToList(),
+                            };
+var consolidatedChildren = children
+                            .GroupBy(c => new{ c.School, c.Friend, c.FavoriteColor, })
+                            .Select(gcs => new ConsolidatedChild()
+                            {
+                                School = gcs.Key.School,
+                                Friend = gcs.Key.Friend,
+                                FavoriteColor = gcs.Key.FavoriteColor,
+                                Children = gcs.ToList(),
+                            });
+
 
 //=======================================================================================================================
 

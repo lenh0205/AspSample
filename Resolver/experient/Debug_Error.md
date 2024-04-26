@@ -100,6 +100,10 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> include lại file view vô project; 
 * -> vào properties của file view, chuyển "Build Action" thành "Content"
 
+# BE - chỉnh sửa nội dung 1 số file như ".cshtml" nhưng lúc chạy project thì lại không được cập nhật mà vẫn sử dụng bản cũ
+* -> lỗi này rất có thể là do **`caching`** của file "/obj/Debug/net7.0/.AssemblyInfoInputs.cache"
+* -> ta có thể thử unload rồi reload project
+
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
 * Xảy ra khi `SaveChanges()`
