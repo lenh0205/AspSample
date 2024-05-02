@@ -84,16 +84,25 @@ _context.SaveChanges();
 //=======================================================================================================================
 
 # Join
+// -> the join methods provided in the LINQ framework are "Join" and "GroupJoin" 
+// -> these methods perform "equijoins", or joins that match two data sources based on equality of their keys
+
+## OOP
+// -> in object-oriented programming, "joining" could mean a correlation between objects that isn't modeled
+// -> such as the "backwards direction" of a "one-way relationship"
+// => useful for associating elements from different source sequences that have no direct relationship in the object model
+// the only requirement is that the elements in each source share some value that can be compared for equality
+
+## one-way relationship
+// -> for example, a 'Student' class that has a property of type 'Department' that represents the major,
+// -> but the 'Department' class doesn't have a property that is a collection of 'Student' objects
+// => so if we have a list of Department objects and we want to find all the students in each department, we could use a join operation to find them
+
 // -> để cần biết lúc nào thì chọn giữa "Left Join" à "Inner Join" thì ta cần nhớ là ta đang muốn lấy ra cái gì
 // -> VD: UI ta cần hiển thị grid tất cả "HoSo" thì ta sẽ s/d "Left Join", và không quan tâm 1 số cột thiếu giá trị
 // -> còn "Inner Join" thì ta sẽ hiển thị grid danh sách "HoSo" mà các cột đều đầy đủ thông tin
 // -> Note: đối với "Left Join" cũng không hẳn là thiếu giá trị, ta có thể cho những cột đó giá trị mặc định
 // -> Note: join đòi hỏi phần "on" ta cần để đúng thứ tự bảng trái trước rồi mới "equals" bảng phải
-
-// https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/join-clause?redirectedfrom=MSDN
-// https://learn.microsoft.com/en-us/dotnet/csharp/linq/standard-query-operators/join-operations
-// https://stackoverflow.com/questions/3855881/linq-into-keyword-confusion
-// https://www.c-sharpcorner.com/PageNotFound.aspx?aspxerrorpath=/article/uses-of-into-and-let-in-linq/
 
 ## Inner Join 
 // -> produces a "flat sequence"

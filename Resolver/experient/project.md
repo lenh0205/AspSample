@@ -27,7 +27,8 @@ public void ClientUpload() {}
 
 ### Security
 * **`__RequestVerificationToken_L3RwdGh1ZHVj0`** 
-* -> anti forgery token (**prevent CSRF attack**) guarantees that the poster is the one who gets the form; 
+* -> this is called the **Request Verification** mechanism in ASP.NET Razor Pages 
+* -> anti forgery token (**prevent CSRF attack**) guarantees that the poster is the one who gets the form
 * -> prevents from anybody to **`forge a link and have it activated by a powered user`**
 
 ## Session in Dnn
