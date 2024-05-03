@@ -18,3 +18,8 @@
 
 # Frontend
 * Web Worker
+
+# HandleException in Response 
+https://stackoverflow.com/questions/10732644/best-practice-to-return-errors-in-asp-net-web-api
+https://weblogs.asp.net/fredriknormen/asp-net-web-api-exception-handling
+https://learn.microsoft.com/en-us/archive/blogs/youssefm/error-handling-in-asp-net-webapi

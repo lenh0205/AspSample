@@ -5,3 +5,10 @@
 * **IHttpActionResult** - call **`ExecuteAsync`** to create an **`HttpResponseMessage`**, then convert to an HTTP response message
 * **Some other type** - write the **`serialized return value`** into the **`response body`**; return 200 (OK)
 * chi tiết: _https://learn.microsoft.com/en-us/aspnet/web-api/overview/getting-started-with-aspnet-web-api/action-results_
+
+```C#
+HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+httpResponseMessage.Content = new ByteArrayContent(bytes.ToArray());
+httpResponseMessage.Content.Headers...;
+httpResponseMessage.StatusCode = HttpStatusCode.OK;
+```

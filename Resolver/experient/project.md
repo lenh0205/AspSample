@@ -1,7 +1,20 @@
-# Dnn Authentication
+# GUI.dnn
+* -> file này để ta khai báo các module
+* -> nó sẽ cho ta biết module tên gì ? nó sẽ sử dụng Controller cũng như Action nào ?
 
-## Authentication config
-```xml - web.config
+```xml - VD
+<package name="QLVB.ThongKeVBNoiBo" type="Module" version="00.00.01">
+    <controlSrc>QLVB.GUI.Controllers/ThongKe/VBNoiBo.mvc</controlSrc>
+</package>
+<!-- nghĩa là module "QLVB.ThongKeVBNoiBo" sử dụng action "VBNoiBo" của "ThongKeController" trong namespace "QLVB.GUI.Controllers"  -->
+```
+
+Để truy cập đến 1 View trong GUI MVC có 2 cách:
+* -> sử dụng URL tạo bởi DNN cho từng item trong navigation menu: cách này đòi hỏi ta phải có "cookie" header (_VD: http://localhost/qlvbdnn/VanBanDen/DanhSachVanBanDen_)
+* -> sử dụng URL do ta cấu hình trong "RouterMapper.cs": cách này đỏi hỏi ta phải truyền ModuleId và TabID (_VD: http://localhost/qlvbdnn/DesktopModules/MVC/QLVB.GUI/DanhSachVanBanDen/DanhSach_)
+
+# Authen
+```xml - web.config của DNN
 <authentication mode="Forms">
     <forms name=".DOTNETNUKE" protection="All" timeout="60" cookieless="UseCookies" />
 </authentication>
@@ -9,7 +22,7 @@
 * -> vậy nên khi viết API trong HelperCommon, nó sẽ mặc định cần **`authentication`** 
 * -> đòi hỏi request đến API đó cần có **`Cookie`** tên **`.DOTNETNUKE`**
 * -> để viết 1 **`Anonymous API`** không cần Authentication, ta chỉ cần gắn **[AllowAnonymous]** attribute:
-```cs
+```cs - VD:
 [AllowAnonymous]
 [HttpPost]
 public void ClientUpload() {}

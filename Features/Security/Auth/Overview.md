@@ -60,8 +60,8 @@
 ================================================
 # HttpOnly - store "Session" in a "Cookie" 
 * _HttpOnly_ is **`extremely important`**
-* session *`gets sent along to the server`**; **only HTTP request have access to this session Id**
-* -> **`Client can't access this cookie at all`** (**can't access it by javascript**)
+* session **`gets sent along to the server`**; **only HTTP request have access to this session Id**
+* -> **`Client can't access this cookie at all`** - **can't access it by javascript** (_không thể dùng javascript để get ra cookie đó chứ đừng nói đến sữa_)
 * -> you can't actually accidentally leak this data
 * -> nobody that has access to javascript on your site has access to this
 

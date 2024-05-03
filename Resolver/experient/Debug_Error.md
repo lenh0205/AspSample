@@ -97,12 +97,23 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 
 * _nếu vẫn không được thì ta có thể thử:_
 * -> vô file .csproj để bỏ  dòng <RazorCompileOnBuild>false</RazorCompileOnBuild> và dòng<Content Remove="Views\Home\Index.cshtml" />
+* -> vào properties của file view, chuyển "Build Action" thành **`Content`**
 * -> include lại file view vô project; 
 * -> vào properties của file view, chuyển "Build Action" thành "Content"
 
 # BE - chỉnh sửa nội dung 1 số file như ".cshtml" nhưng lúc chạy project thì lại không được cập nhật mà vẫn sử dụng bản cũ
 * -> lỗi này rất có thể là do **`caching`** của file "/obj/Debug/net7.0/.AssemblyInfoInputs.cache"
 * -> ta có thể thử unload rồi reload project
+
+# BE - MVC - InvalidOperationException: The following sections have been defined but have not been rendered by the page at '/myPath' : 'Scripts'. To ignore an unrendered section call IgnoreSection('sectionName')
+* -> Lỗi này là do "myPath.cs" đang thiếu **`script section`**
+* -> rất có thể do "view" có định nghĩa "section" nhưng layout của chúng lại chưa có
+
+```cs - VD:
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}
+```
 
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
