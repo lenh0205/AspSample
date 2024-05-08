@@ -95,7 +95,7 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> vậy nên Assembly này sẽ load những Assembly con target đến **`.NET Framework 3.5`**, trong khi những Assembly con đó trong **`ASP.NET Core`** lại target đến **`.NET Framework 4.7`** chẳng hạn
 * **Solution**: đầu tiên ta nên xoá Assembly đó trong ASP.NET Core project đi, ta có thể đưa logic lên HelperCommon để xử lý
 
-# BE - InvalidOperationException: The view 'Index' was not found. The following locations were searched: /Views/Home/Index.cshtml
+# BE - MVC - InvalidOperationException: The view 'Index' was not found. The following locations were searched: /Views/Home/Index.cshtml
 * -> Lỗi này là do program không tìm thấy file view nó cần ở đường dẫn **`/Views/Home/Index.cshtml`**, mặc dù ta thấy đường dẫn này có tồn tại trong project
 * -> ta cần add thêm service **services.AddControllersWithViews().AddRazorRuntimeCompilation();** (install package **`Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation`**)
 
@@ -105,7 +105,7 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> include lại file view vô project; 
 * -> vào properties của file view, chuyển "Build Action" thành "Content"
 
-# BE - chỉnh sửa nội dung 1 số file như ".cshtml" nhưng lúc chạy project thì lại không được cập nhật mà vẫn sử dụng bản cũ
+# BE - MVC - chỉnh sửa nội dung 1 số file như ".cshtml" nhưng lúc chạy project thì lại không được cập nhật mà vẫn sử dụng bản cũ
 * -> lỗi này rất có thể là do **`caching`** của file "/obj/Debug/net7.0/.AssemblyInfoInputs.cache"
 * -> ta có thể thử unload rồi reload project
 
