@@ -50,7 +50,6 @@ public class FileController : ControllerBase
 }
 ```
 
-
 ## Sending and Receiving "a file" with "additional data" using "HttpClient"
 
 ```c# - Client send request
@@ -514,4 +513,32 @@ public async Task DownloadFileById(int Id)
         throw;
     }
 }
+```
+
+=============================================================
+# Preview 1 file PDF before actually download it
+```cs
+[HttpGet]
+public HttpResponseMessage PreviewPdfFile(string filePath)
+{
+    var decodedFilePath = HttpUtility.UrlDecode(filePath);
+
+    var response = Request.CreateResponse();
+    response.Content = new StreamContent(File.OpenRead(decodedFilePath));
+    response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+    response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline");
+    response.Content.Headers.ContentDisposition.FileName = "myFile.pdf";
+    response.StatusCode = HttpStatusCode.OK;
+    return response;
+}
+```
+```js
+const link = document.createElement('a'); // Create an anchor tag
+link.href = "http://localhost:3000/ApiController/PreviewPdfFile?filePath=myfilepath";
+link.target = "_blank";
+link.rel = "noopener noreferrer";
+document.body.appendChild(link);
+link.click();
+
+document.body.removeChild(link); // Remove the link from the document body
 ```

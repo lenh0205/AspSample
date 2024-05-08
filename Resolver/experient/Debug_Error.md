@@ -43,7 +43,11 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 ```
 * Lỗi này là do để sai thứ tự param; vì "VanThuDonVi" là 1 **`Optional parameters`**, nó cần được để sau "donviId" và "phongbanId"
 
-=============================================
+# C# - Object reference not set to an instance of an object
+* -> trong trường hợp là bind data vào tham số của 1 Method không được, thì kiểm tra lại trong function nó có truy cập giá trị của các biến bằng **`.Value`**, có thì bỏ nó đi
+* -> có thể thử viết lại Method đó tối giản hơn, Ví dụ: gọi nó trực tiếp thay vì thông qua 1 Service hay 1 instance nào đó, đổi parameter sang dạng đơn giản hơn 
+
+==============================================================
 # BE - Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
 * Kiểm tra lại Endpoint xem ta đặt break point đúng controller/action method chưa
 * Khả năng cao lỗi này là do **`không map được data ta truyền trong Request với Parameter của action method`**
@@ -114,6 +118,10 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
     @await RenderSectionAsync("Scripts", required: false)
 }
 ```
+
+# BE - ASP.NET - Cannot access a disposed object
+* -> rất có thể là trong 1 Scope request-reponse, logic trước đó đã **`.Dispose()`** hoặc **`.Close()`** đi 1 connection hoặc instance; nên logic sau cần sử dụng **`instance`** đó thì không có
+* -> ta có thể **`DI kiểu Scope`**; hoặc với mỗi logic ta lại tạo instance sau đó dispose nó 
 
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);

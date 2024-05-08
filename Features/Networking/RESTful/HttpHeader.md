@@ -1,17 +1,7 @@
 # Response Header
 
 ## Content-Type: 
-
-### application/octet-stream
-* -> commonly used for **arbitrary binary data** (_RFC 2046_) that **doesn't have a specific file format**
-* -> to **`indicating to the client`** that the **`data being transferred`** is in the **`form of a stream`**
-* -> _nó chung là để chỉ dẫn cho Client biết cần interpret the data as a stream_
-* => nó chỉ phù hợp khi ta có mục đích / dự tính **`lưu những entities vào disk`** 
-* => tức là, the only thing one can **`safely do with application/octet-stream`** is to **save it to file** and **hope someone else knows what it's for**
-
-```c#
-httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-```
+* _Vào `MIME.md` để tìm hiểu kĩ hơn_
 
 ## Content-Disposition
 * -> ta có thể kết hợp **`Content-Disposition`** header với **`Content-Type`** (khác với ) như là: _image/png, text/html_ 

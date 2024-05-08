@@ -180,29 +180,29 @@ public class MvcApplication : System.Web.HttpApplication
 
 ```cs - added one line of code to the AccountController to ensure the user’s identity was added to session variables when the user logs in
 [Authorize]
-    [InitializeSimpleMembership]
-    public class AccountController : Controller
+[InitializeSimpleMembership]
+public class AccountController : Controller
+{
+    
+    /* skipped quite a few actions here */
+    
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public ActionResult Login(LoginModel model, string returnUrl)
     {
-      
-      /* skipped quite a few actions here */
-      
-      [HttpPost]
-      [AllowAnonymous]
-      [ValidateAntiForgeryToken]
-      public ActionResult Login(LoginModel model, string returnUrl)
-      {
-          if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
-          {
-              //store the user's identity in the session
-              Session["UserName"] = model.UserName;                
-              return RedirectToLocal(returnUrl);
-          }
+        if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
+        {
+            //store the user's identity in the session
+            Session["UserName"] = model.UserName;                
+            return RedirectToLocal(returnUrl);
+        }
 
-          ModelState.AddModelError("", "The user name or password provided is incorrect.");
-          return View(model);
-      }
-      
-      /* skipped quite a few actions here */
-        
+        ModelState.AddModelError("", "The user name or password provided is incorrect.");
+        return View(model);
     }
+    
+    /* skipped quite a few actions here */
+    
+}
 ```

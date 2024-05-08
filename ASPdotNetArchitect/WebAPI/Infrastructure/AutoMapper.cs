@@ -69,6 +69,54 @@ public class MappingProfile : Profile {
     }
 }
 
+## Configure multiple map Profile
+// tức là tạo ra nhiều class derived from "Profile" class của AutoMapper
+var config = new MapperConfiguration(cfg => {
+    cfg.AllowNullCollections = true;
+    cfg.AddProfile<UserInfoProfile>();
+    cfg.AddProfile<TepDinhKemProfile>();
+});
+
+## Mapper Extension
+public static class MapperExtension
+{
+    public static List<ComboDataSourceResponse> MapListToListCbo<TSource>(this IMapper mapper, TSource? lstSource)
+    {
+        if (lstSource == null) return new List<ComboDataSourceResponse>();
+        return mapper.Map<TSource, List<ComboDataSourceResponse>>(lstSource);
+    }
+}
+
+## Profile Extension
+public static class ProfileExtension
+{
+    public static void CreateMapToComboReponse<TSource>(
+            this Profile profile,
+            Expression<Func<TSource, object>> idSelector,
+            Expression<Func<TSource, object>> nameSelector
+        )
+    {
+        profile.CreateMap<TSource, ComboDataSourceResponse>()
+            .ForMember(
+                des => des.DisplayId,
+                opt => opt.MapFrom(idSelector)
+            )
+            .ForMember(
+                des => des.DisplayName,
+                opt => opt.MapFrom(nameSelector)
+            );
+    }
+}
+
+public class ComboBoxProfile : Profile
+{
+    public ComboBoxProfile()
+    {
+        this.CreateMapToComboReponse<Dictionary<string, object>>(src => src["BoSoID"], src => src["TenBoSo"]);
+        this.CreateMapToComboReponse<DM_LOAIVANBAN>(src => src.LoaiVanBanID, src => src.TenLoaiVanBan);
+    }
+}
+
 # CustomValueResolver
 // -> implements the "IValueResolver<TSource, TDestination, TDestMember>"
 // -> provides custom logic:
