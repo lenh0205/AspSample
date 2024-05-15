@@ -1,5 +1,4 @@
 > https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing/
-https://stackoverflow.com/questions/9270023/how-to-determine-if-an-exception-is-of-a-particular-type
 https://stackify.com/csharp-exception-handling-best-practices/
 https://dev.to/ephilips/better-error-handling-in-c-with-result-types-4aan
 
