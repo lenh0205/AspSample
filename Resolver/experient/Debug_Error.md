@@ -1,6 +1,7 @@
 =============================================
 # Http - Đối với việc gửi data bằng request-response sẽ có giới hạn. VD gửi 23000 records lên Client thì response sẽ không chịu nổi 
 * có thể dùng Take() để giảm bớt số lượng cần lấy
+* filter bớt những trường không cần thiết, chỉ để 1 trường làm identity và 1 trường để hiển thị là đủ
 
 =============================================
 # Setting - Hosting xong trả về 404
@@ -154,6 +155,8 @@ Ví dụ Migration cần drop 1 Table nhưng Table đó không tồn tại trong
 * **Lý do**: 
 * -> viết **`2 class phụ thuộc lẫn nhau`** dẫn đến vòng lặp
 * -> class import lẫn nhau để sử dụng properties, method của nhau
+
+* -> hoặc là do bị **block scope** vì sử dụng 1 biến trước khi được khai báo với **`let, const`**
 
 * **Bản chất**:
 * -> do viết sai SOLID - 1 class chứa quá nhiều logic khác nhau trong đó

@@ -1,268 +1,268 @@
-> https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing/
-https://stackify.com/csharp-exception-handling-best-practices/
-https://dev.to/ephilips/better-error-handling-in-c-with-result-types-4aan
 
-# "Endpoint Routing" feature of ASP.NET Core 3.0
+# Routing in ASP.NET Core
+* -> process of **mapping** a **request URL path** (_such as /Orders/1_) to some **handler that generates a response**
+* -> this is primarily used with the **MVC middleware** for **`mapping requests to controllers and actions`**, but it is used in other areas too
+* -> includes functionality for the reverse process: **generating URLs** that will **`invoke a specific handler`** with a given set of parameters
 
-## Prior to "Endpoint Routing" - the ASP.NET Core MVC middleware
-* -> before the **`routing resolution for an ASP.NET Core application`** was done in the **`ASP.NET Core MVC middleware`** **at the end of the HTTP request processing pipeline (middleware pipeline)** 
+====================================================
+# In ASP.NET Core 2.1
 
-* -> means that **route information** (_Ex: controller, action, ... would be executed_), **was not available to middleware** that **`processed the request before the MVC middleware`**
-* -> it's _particularly useful to have this route information_ available in a **`CORS`** or **`authorization`** middleware to use the information as a factor in the authorization process 
+## implement routing
+* -> **`routing`** was handled by implementing the **"IRouter" interface** to **`map incoming URLs to handlers`**
+* -> however, rather than implementing the interface directly, we would typically rely on the **"MvcMiddleware" implementation** added to **`the end of middleware pipeline`**
+* -> _once a request reached the `MvcMiddleware`_, routing was applied to **`determine which controller and action`** the incoming request URL path corresponded to
 
-* -> _Endpoint routing_ also allows to **decouple the route matching logic** from the **`MVC middleware`** and have its **`own middleware`**
-* -> it allows the **MVC middleware** to focus on its responsibility of **`dispatching the request to the particular controller action method`** that is **`resolved`** by the **endpoint routing middleware**
+## MVC filters
+* -> **`request`** then went through **various MVC filters** before **`executing the handler`**
 
-## The Endpoint Routing middleware
-* -> allow **the route resolution to happen earlier** in the pipeline in **`a separate endpoint routing middleware`**
-* => this middleware can be **`placed at any point in the pipeline`**, after which **other middleware in the pipeline can access the resolved route data**
+* -> these filters formed another **pipeline**, **`similar to the middleware pipeline`** 
+* -> in some cases had to **duplicate the behaviour of certain middleware**
 
-## ASP.NET Core 3.0
-* -> the **`ASP.NET Core 2.2`** adds a **new endpoint route resolution middleware**, but **keeps the endpoint dispatch in the MVC middleware** at the end of the pipeline
-* -> in **`ASP.NET Core 3.0`**, this will change - the **`endpoint dispatch`** will happen in a separate **Endpoint Dispatch middleware** that will **`replace the MVC middleware`**
+* -> **a canonical example** of this is **`CORS policies`** 
+* -> in order to **enforce different CORS policies** per **`MVC action`**, as well as other **`branches`** of middleware pipeline
+* -> a **`certain amount of duplication`** was required internally
 
-=================================================================
-# Main concepts of "Enpoint Routing"
+## Branching Middleware Pipeline - .Map()
+* -> **Branching** the **`middleware pipeline`** was often used for **pseudo-routing**
 
-## Endpoint Route Resolution
-* -> the concept of **looking at the incoming request** and **mapping the request to an endpoint** using **`route mappings`**
-* -> **`an endpoint`** represents the **controller action** that **`the incoming request resolves to`**, along with **other metadata** **`attached to the route`** that matches the request 
+* -> **`using extension methods`** like **Map()** in our middleware pipeline
+* -> would allow us to **conditionally execute some middleware** when the incoming path had a **`given prefix`**
 
-* -> _the job of the route resolution middleware_ is to **construct "Endpoint" object** using the **`route information`** from **`the route that it resolves based on the route mappings`**
-* -> the middleware then **places "Endpoint" object into the http context** 
-* => where _other middleware the `come after the endpoint routing middleware` in the pipeline_ **can access the Endpoint object** and **use the route information within**
-
-## Endpoint Dispatch
-* -> the process of **invoking the controller action method** that **`corresponds to the endpoint`** that was **`resolved by the "Endpoint Routing Middleware"`**
-
-* -> the **Endpoint Dispatch Middleware** is the **`last middleware in the pipeline`**
-* ->  that **`grabs the "Endpoint" object from the http context`** and **`dispatches to particular controller action`** that the **resolved endpoint** specifies
-* -> in ASP.NET Core 3.0, the **MVC middleware is removed**; instead the **`endpoint dispatch`** happens **at the end of the middleware pipeline by default** 
-* _tức là ở ASP.NET Core 3.0 preview, "resolved endpoint" is implicitly dispatched at the end of the pipeline, no no explicit call to a "Endpoint Dispatcher Middleware"_
-
-* -> because the MVC middleware is removed, the **route map configuration** that is usually passed to the **`MVC middleware`** may instead passed to the **`Endpoint Route Resolution middleware`**
-* -> but no, the ASP.NET Core have a a **new endpoint routing middleware** that is **`placed at the end of the pipeline`** to **make the endpoint dispatch explicit again** (_instead of default implicit_)
-* -> the **`route map configuration`** will be passed to this new middleware (_in `ASP.NET Core 3.0 final`_) instead of the Endpoint route resolution middleware (_in `ASP.NET Core 3.0 preview`_)
-
-## Endpoint Route Mapping
-* -> when we **`define route middleware`**, we can optionally **`pass in a lambda function`**
-* -> that contains **route mappings that override the default route mapping** that **`ASP.NET Core MVC middleware extension method`** specifies 
-
-* -> **Route mappings** are used by the **`route resolution process`** to **`match the incoming request parameters`** to **`a route specified in the route map`**
-* -> _in ASP.NET 3.0 final_, the **`route mapping configuration lambda`** is being moved from the **Route Resolution Middleware** to the **Endpoint Dispatcher middleware**
-
-* -> its important to note that the **`endpoint resolution`** happens during **`runtime request handling`** **after the route mapping is setup during application startup configuration**
-* -> therefore, the **`route resolution middleware has access to the route mappings during request handling`** **regardless of which middleware the route map configuration is passed to**
-
-=================================================================
-# Accessing the resolved endpoint
-* -> **any Middleware** after the **`endpoint route resolution middleware`** will be **`able to access the resolved endpoint`** through the **HttpContext** (_the **IEndpointFeature**_)
-
-```c# - Example: in our custom middleware
-
-app.Use((context, next) =>
+* _Ex: the following "Configure()" method from a "Startup.cs" class **`branches the pipeline`**_
+* _so that when the incoming path is "/ping", the **`terminal middleware executes`** (written inline using Run())_
+```cs
+public void Configure(IApplicationBuilder app)
 {
-    var endpointFeature = context.Features[typeof(Microsoft.AspNetCore.Http.Features.IEndpointFeature)]
-                                           as Microsoft.AspNetCore.Http.Features.IEndpointFeature;
+    app.UseStaticFiles();
 
-    Microsoft.AspNetCore.Http.Endpoint endpoint = endpointFeature?.Endpoint;
+    app.UseCors();
 
-    //Note: endpoint will be null, if there was no
-    //route match found for the request by the endpoint route resolver middleware
-    if (endpoint != null)
+    // branch
+    app.Map("/ping", 
+        app2 => app2.Run(async context =>
+        {
+            await context.Response.WriteAsync("Pong");
+        })
+    );
+
+    app.UseMvcWithDefaultRoute();
+}
+```
+
+* -> in this case, the **`Run() method`** is a **terminal middleware**, because it **`returns a response`**
+* -> but in a sense, **`the whole Map branch`** corresponds to **`an endpoint`** of the application
+* -> especially as we're not doing anything else in the `app2 branch` of the pipeline
+
+## Problem
+* -> the problem is that **`this endpoint`** is a bit of **a second-class citizen** when compared to the **`endpoints in the MvcMiddleware`** (i.e. controller actions)
+* -> **extracting values** from the incoming route are a pain and we have to **manually implement any authorization requirements** ourself
+
+* -> another problem is that there's **`no way to know`** which **branch will be run until we're already on it**
+* -> For example, **`when the request reaches the UseCors() middleware`** from the above example it would be **useful to know which branch/endpoint is going to be executed** 
+* -> maybe the "/ping endpoint" allows cross-origin requests, while the "MVC middleware" doesn't
+* (_ở đây ta cần hiểu "biết được endpoint nào" tức là "biết được endpoint cũng như metadata được config của nó thông qua attribute,... lên nó"_)
+
+## Introduce 'EndpointRouting' in ASP.NET
+* -> in **`ASP.NET Core 2.2`**, Microsoft introduced the **`endpoint routing`** as the **new routing mechanism for MVC controllers**
+* -> this implementation was essentially **internal to the MvcMiddleware**, so on the face of it, it wouldn't solve the issues described above
+* -> _however, the intention was always to **trial** the implementation there and to expand it to be the **`primary routing mechanism in ASP.NET Core 3.0`**_
+
+* -> the _Endpoint routing_ separates the **`routing of a request (selecting which handler to run)`** from the **`actual execution of the handler`**
+* -> this means you can know ahead of time **`which handler will execute`**, and **`our middleware can react accordingly`**
+* => this is aided by the new ability to **attach extra metadata to our endpoints**, such as **`authorization requirements`** or **`CORS policies`**
+
+============================================================
+
+# In ASP.NET Core 3.0
+* -> in ASP.NET Core 3.0, it use endpoint routing, so the **`routing`** step is **`separate from the invocation of the endpoint`**
+* -> in practical terms that means we have two pieces of middleware: **`EndpointRoutingMiddleware`**, **`EndpointMiddleware`**
+
+## Endpoint Routing middleware
+* -> **EndpointRoutingMiddleware** that does the actual routing - **`calculating which endpoint will be invoked`** for a given request URL path.
+* -> **EndpointMiddleware** that **`invokes the endpoint`**
+
+* -> these are **added at two distinct points** in the middleware pipeline, as they serve **`two distinct roles`**
+* -> we want the **`routing middleware to be early in the pipeline`**, so that subsequent middleware has access to the information about the endpoint that will be executed
+* -> **`the invocation of the endpoint should happen at the end`** of the pipeline
+
+## Extension method
+* the **UseRouting()** extension method 
+* -> **`adds the EndpointRoutingMiddleware`** to the pipeline
+
+* the **UseEndpoints()** extension method 
+* -> **`adds the EndpointMiddleware`** to the pipeline
+* -> also where **`register all the endpoints`** for our application (in the example above, we register our MVC controllers only).
+
+## Middleware pipeline order
+* => generally best practice to place the **static files middleware** **`before the Routing middleware`** to avoids the overhead of routing when requesting static files
+
+* => it's important that you place the **Authentication** and **Authorization** middleware **`between UseRouting and UseEndPoints`**
+
+* -> **any middleware that appears after the UseRouting()** call will **`know which endpoint will run eventually`** 
+
+* -> **any middleware that appears before the UseRouting()** call **`won't know which endpoint will run eventually`**
+
+## Usage Example:
+
+```cs - config routing in ASP.NET Core 2.0
+// Example: create a custom middleware that return FileVersion of application
+// => CORS middleware (added using UseCors()) can't know which endpoint will ultimately be executed
+
+public void Configure(IApplicationBuilder app)
+{
+    app.UseStaticFiles();
+
+    app.UseCors();
+
+    // request prefixed with /version (e.g. /version or /version/test)
+    // always get the same response, the version of the app
+    app.Map("/version", versionApp => versionApp.UseMiddleware<VersionMiddleware>()); 
+
+    // request with any other path
+    app.UseMvcWithDefaultRoute();
+}
+
+public class VersionMiddleware
+{
+    readonly RequestDelegate _next;
+    static readonly Assembly _entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+    static readonly string _version = FileVersionInfo.GetVersionInfo(_entryAssembly.Location).FileVersion;
+
+    public VersionMiddleware(RequestDelegate next)
     {
-        var routePattern = (endpoint as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern
-                                                                                   ?.RawText;
-
-        Console.WriteLine("Name: " + endpoint.DisplayName);
-        Console.WriteLine($"Route Pattern: {routePattern}");
-        Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
+        _next = next;
     }
-    return next();
-});
+
+    public async Task Invoke(HttpContext context)
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.WriteAsync(_version);
+        
+        //we're all done, so don't invoke next middleware
+    }
+}
 ```
 
-==================================================================
+```cs - config routing in ASP.NET Core 3.0
+// Move the registration of the "/version" endpoint into the UseEndpoints() call
 
-# Endpoint routing configuration
-* -> create the middleware pipeline **`Endpoint Route Resolver middleware`**, **`Endpoint Dispatcher middleware`** and **`Endpoint Route Mapping lambda`**
-* -> setup in the **Startup.Configure** method of the **Startup.cs** file of **ASP.NET Core** project
-
-* _there're configuration changed between versions, a general form of `endpoint routing middleware configuration` pseudo code base on 3 concept:_
-```c#
-//psuedocode that passes route map to endpoint resolver middleware
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+public void Configure(IApplicationBuilder app)
 {
-    //middleware configured before the UseEndpointRouteResolverMiddleware middleware
-    //that does not have access to the endpoint object
-    app.UseBeforeEndpointResolutionMiddleware();
+    app.UseStaticFiles();
 
-    // ------> the 'Endpoint Route Resolver Middleware'
-    // middleware that inspects the incoming request, have access to "route mappings" 
-    // resolves a match to the route map
-    // construct "endpoint" object with route parameters and set into the "httpcontext"
-    app.UseEndpointRouteResolverMiddleware()
+    // Add the EndpointRoutingMiddleware
+    app.UseRouting();
 
-    // middleware after configured after the UseEndpointRouteResolverMiddleware middleware
-    // that can access to the "endpoint" object via HttpContext
-    app.UseAfterEndpointResolutionMiddleware();
+    // All middleware from here onwards know which endpoint will be invoked
+    app.UseCors();
 
-    // ------> the 'Endpoint Dispatch Middleware'
-    // the middleware at the end of the pipeline that dispatches the controler action method
-    // will replace the current MVC middleware
-    // can access the resolved endpoint object via HttpContext
-    app.UseEndpointDispatcherMiddleware(routes =>
+    // Execute the endpoint selected by the routing middleware
+   app.UseEndpoints(endpoints =>
     {
-        //This is the route mapping configuration passed to the endpoint resolver middleware
-        routes.MapControllers();
+        // Add a new endpoint that uses the VersionMiddleware
+        endpoints.Map("/version", endpoints.CreateApplicationBuilder()
+            .UseMiddleware<VersionMiddleware>()
+            .Build())
+            .WithDisplayName("Version number");
+
+        // register MVC controllers
+        endpoints.MapDefaultControllerRoute();
     });
 }
 ```
 
-## Endpoint routing in version 2.2
-```c# -  create a Web API project using version 2.2 of the .NET Core SDK
+===========================================================
 
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+# "Endpoint Routing" important points
+* -> a **RequestDelegate** is building using the **`IApplicationBuilder()`**
+* -> there's **`no longer match based on a route prefix`**, but on the **complete route**
+* -> be able to **set an informational name** for the **`endpoint`** (_Version number_)
+* -> be able to **attach additional metadata to the endpoint**
+
+## Benefit
+* -> can **`attach metadata to endpoints`** so intermediate middleware (e.g. Authorization, CORS) can **know what will be eventually executed**
+* -> can **use routing templates in your non-MVC endpoints**, so we get **`route-token parsing features`** that were **`previously limited to MVC`**
+* -> more easily **generate URLs to non-MVC endpoints**
+
+## RequestDelegate
+* -> now, the **`Map() method`** here requires **a RequestDelegate** instead of **an Action<IApplicationBuilder>**
+
+* -> the downside to this is that visually it's much harder to see what's going on (_nói chung là khó đọc hơn do cú pháp rườm rà, dài dòng hơn_)
+* -> we can work around easily by creating a small **`extension method`**
+```cs
+public static class VersionEndpointRouteBuilderExtensions
 {
-    if (env.IsDevelopment())
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
-
-    // by default, endpoint routing is not added; MVC middleware also handles the route resolution
-    // added Endpoint Routing - Endpoint Resolution Middleware, that will resolve the 'Endpoint' object
-    // use the 'route mappings' configured by the 'MVC middleware'
-    // all middlewares after this middleware will have access to the 'resolved Endpoint object'
-    app.UseEndpointRouting(); 
-
-    app.UseHttpsRedirection();
-
-    //our custom middlware
-    app.Use((context, next) =>
+    public static IEndpointConventionBuilder MapVersion(this IEndpointRouteBuilder endpoints, string pattern)
     {
-        // if we enabled 'endpoint routing' we can inspect the resolved endpoint object
-        var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-        var endpoint = endpointFeature?.Endpoint;
+        var pipeline = endpoints.CreateApplicationBuilder()
+            .UseMiddleware<VersionMiddleware>()
+            .Build();
 
-        //note: endpoint will be null, if there was no resolved route 
-        // or the resolver was not able to match the request to a mapped route
-        if (endpoint != null)
-        {
-            var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
-                                                          ?.RawText;
+        return endpoints.Map(pattern, pipeline).WithDisplayName("Version number");
+    }
+}
 
-            Console.WriteLine("Name: " + endpoint.DisplayName);
-            Console.WriteLine($"Route Pattern: {routePattern}");
-            Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
-        }
-        return next();
+// than the config will be:
+public void Configure(IApplicationBuilder app)
+{
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseCors();
+
+    // Execute the endpoint selected by the routing middleware
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapVersion("/version");
+        endpoints.MapDefaultControllerRoute();
     });
-
-    // the MVC middleware - acts as the 'endpoint dispatcher middleware'
-    // internally configures the "default route mapping" at startup configuration time
-    // dispatches the controller action during request handling
-    app.UseMvc();
 }
 ```
 
-## Endpoint routing in ASP.NET Version 3 preview 3
-* -> in this version, the **Endpoint Routing** will **`become a full fledged citizen of ASP.NET Core`**; 
-* -> and we will finally have **separation** between the **`MVC controller action dispatcher`** and the **`Route Resolution middleware`**
+## Complete route behavior
+* -> in **`ASP.NET Core 2.x`**, the custom middleware branch would execute for any requests that have a specific **prefix**
+* -> with **`endpoint routing`**, we're not specifying a prefix for the URL, we're specifying the whole **pattern**
+* -> that means we can have **`route parameters`** in all of our endpoint routes
+* _this is more powerful than the previous version, but we need to be aware of it_
 
-```cs - endpoint startup configuration 
+```r - VD:
+## ASP.NET Core 2.x
+// -> a "/version" segment prefix will match "/version", "/version/123", "/version/test/oops", ...
 
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-    if (env.IsDevelopment())
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
-
-    app.UseHttpsRedirection();
-
-    // configures "Endpoint Route Resolution middleware" to resolve the incoming request endpoint
-    // takes a anonymous "lambda function" that configures the "route mappings" 
-    app.UseRouting(routes =>
-    {
-        routes.MapControllers(); // configures the default MVC routes
-    });
-
-    // have access the httpcontext "Endpoint" object set by the "endpoint routing middleware"
-    app.UseAuthorization();
-
-    //our custom middleware
-    app.Use((context, next) =>
-    {
-        var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-        var endpoint = endpointFeature?.Endpoint;
-
-        //note: endpoint will be null, if there was no
-        //route match found for the request by the endpoint route resolver middleware
-        if (endpoint != null)
-        {
-            var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
-                                                          ?.RawText;
-
-            Console.WriteLine("Name: " + endpoint.DisplayName);
-            Console.WriteLine($"Route Pattern: {routePattern}");
-            Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
-        }
-        return next();
-    });
-
-    // At the end of pipeline after all other middleware configuration 
-    // no need to have a dispatcher middleware or any MVC middleware
-    // the resolved endpoint is "implicitly dispatched" to a controller action at the end of pipeline
-    // if an endpoint was not able to be resolved, a 404 not found is returned at the end of pipeline
-}
+## Endpoint Routing
+endpoints.MapVersion("/version/{id:int?}");
+// -> match both "/version" and "/version/123" URLs, but not "/version/test/oops"
 ```
 
-## Endpoint routing in ASP.NET 3.0 final
-* -> **make "Endpoint Routing" more explicit** by adding back in the call to **`Endpoint Dispatcher middleware`** configuration
-* -> also **moving back the "route mapping" configuration option** to the **`dispatcher middleware configuration method`**
+## Attach Metadata
+* -> one import feature of endpoints is the ability to **`attach metadata`** to them, then **other middleware can interrogate it**
+* -> some casual information like **`authorization policies`**, **`CORS policies`**
+
+* -> when **`a request to the endpoint arrives`**, 
+* -> the **`routing middleware`** **selects the suitable endpoint**, and **makes its metadata available for subsequent middleware** in the pipeline
+* -> the according middleware can see that there are associated metadata (_policies,..._) and act, **`before the endpoint is executed`**
 
 ```cs
 public void Configure(IApplicationBuilder app)
 {
-    // Configure Session.
-    app.UseSession();
-
-    // Add static files to the request pipeline
     app.UseStaticFiles();
 
-    // Add the endpoint routing matcher middleware to the request pipeline
-    // still have access to the mappings to resolve the endpoint at request handling time
-    // although it's passed to the "UseEndpoints middleware" during startup configuration
     app.UseRouting();
 
-    // Add cookie-based authentication to the request pipeline
+    app.UseCors();
     app.UseAuthentication();
-
-    // Add the authorization middleware to the request pipeline
     app.UseAuthorization();
 
-    // an explicit endpoint dispatch method provides the "endpoint dispatch implementation"
-    // add endpoints to the request pipeline
     app.UseEndpoints(endpoints =>
     {
-        // "route mapping configuration lambda" have been moved
-        // from the "UseRouting" middleware to the new "UseEndpoints" middleware
-        endpoints.MapControllerRoute(
-            name: "areaRoute",
-            pattern: "{area:exists}/{controller}/{action}",
-            defaults: new { action = "Index" });
-
-        endpoints.MapControllerRoute(
-            name: "default",
-            pattern: "{controller}/{action}/{id?}",
-            defaults: new { controller = "Home", action = "Index" });
-
-        endpoints.MapControllerRoute(
-            name: "api",
-            pattern: "{controller}/{id?}");
+        // add "AllowAllHosts" CORS policy and "AdminOnly" and "authorization policy"
+        // to the "/version" endpoint
+        endpoints.MapVersion("/version")
+            .RequireCors("AllowAllHosts")
+            .RequireAuthorization("AdminOnly");
+    
+        endpoints.MapDefaultControllerRoute();
     });
 }
 ```
-
-=============================================================
-# Adding "Endpoint routing middleware" to the DI container
