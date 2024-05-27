@@ -1,8 +1,11 @@
-=================================================================
 https://stackoverflow.com/questions/2200241/in-c-sharp-how-do-i-define-my-own-exceptions
 https://winterdom.com/2007/01/16/makeexceptionclassesserializable
+https://www.hanselman.com/blog/good-exception-management-rules-of-thumb
 https://asp-blogs.azurewebsites.net/erobillard/129134
 https://www.tutorialsteacher.com/csharp/custom-exception-csharp
+https://stackoverflow.com/questions/38630076/asp-net-core-web-api-exception-handling
+
+=================================================================
 
 # Custom Exception
 ```cs
@@ -40,6 +43,24 @@ catch (Exception ex) {
     // do something
 }
 ```
+
+=================================================================
+# Make Exception Classes Serializable
+* -> it's really hard to debug a SerializationExceptions because an instance of a **`poorly written exception class`** crossed an AppDomain boundary
+* _there're some exception class that's `impossible to serialize`, but this usually because of the `lazyness on the developer's part`_
+
+## Note - for 
+* -> `Exceptions` are **not serializable by default**; it is our responsability to ensure our **`custom exception class is serializable`**
+* -> by mark the exception type with the **[Serializable] attribute**
+
+* -> _but marking an exception class with [Serializable] is not enough_, **System.Exception** implements **`ISerializable`**, so it forces us to do so as well
+* -> we can add an **empty protected serialization constructor** that simply delegates to the base class:
+```cs
+protected MyException(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt)
+```
+
+
+
 =================================================================
 ```cs - create a managed exception to handle action in ASP.NET Core WebApi
 /// <summary>

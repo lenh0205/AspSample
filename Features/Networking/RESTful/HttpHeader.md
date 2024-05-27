@@ -6,6 +6,7 @@
 ## Content-Disposition
 * -> ta có thể kết hợp **`Content-Disposition`** header với **`Content-Type`** (khác với ) như là: _image/png, text/html_ 
 * -> most browsers recognise **inline** to mean we want the entity **`displayed if possible`** but if it's **a type the browser knows how to display**
+
 * _tức là muốn Browser cho phép người dùng preview 1 file .pdf trước khi download, thì **`Content-Type`** cần là "application/pdf" chứ không thể là "application/octet-stream" được_
 * -> ta cũng có thể thêm **filename** 1 phần của header; browsers will use as the suggestion if the **`user tries to save`** (_but users can always override that_)
 
