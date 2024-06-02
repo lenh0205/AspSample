@@ -98,3 +98,26 @@ var response = JsonConvert.DeserializeObject<Response>(data);
 ```
 
 ===================================================================
+# Check if an Exception is of a particular type
+```cs
+catch(DbUpdateException ex)
+{
+  if(ex.InnerException is UpdateException)
+  {
+    // do what you want with ex.InnerException...
+  }
+}
+catch(Exception ex)
+{
+  if(ex is DbUpdateException)
+  {
+    // do what you want with ex.InnerException...
+  }
+}
+
+// In C# 6
+catch(DbUpdateException ex) when (ex.InnerException is UpdateException)
+{
+    // do what you want with ex.InnerException...
+}
+```
