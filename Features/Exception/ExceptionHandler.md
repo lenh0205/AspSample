@@ -4,10 +4,12 @@
 * -> **centralize error handling logic** (_keep `code clean and organized`_) - ensuring that all unhandled exceptions are processed in **`a uniform manner`**
 * -> when an exception is thrown in the application, it is **`passed to the exception middleware`**
 * -> which can then perform any **necessary logging** or **error handling** before **`sending a response to the client`**
-* => ensure that our **`application continues to function smoothly`** - allow to **gracefully recover from errors** and **avoid crashes**, **better debugging** in the face of unanticipated errors
 
+* => ensure that our **`application continues to function smoothly`** - allow to **gracefully recover from errors** and **avoid crashes**, **better debugging** in the face of unanticipated errors
 * => by using exception middleware to **`display custom error pages`**, it **provide a better user experience** when errors occur
 * => in many case, we don't want to **expose the original exception message**; and also get **localized** (_i.e. users gets `messages based on their language`_) 
+
+* _without the middleware, to handle exceptions effectively, it required to include `try-catch block` in every action within each controller; might also in our business logic, services, application layer, ..._
 
 ========================================================
 # Materials
@@ -32,6 +34,8 @@ namespace ExceptionHandlingProject.Models
     }
 }
 ```
+
+### 
 
 ## Crafting a Centralized API Response Format
 * -> however, sometimes it's essential to establish **a standardized API response format** - used for **`both APIs and error handling`**
