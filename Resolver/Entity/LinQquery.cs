@@ -380,6 +380,15 @@ var consolidatedChildren = children
                                 Children = gcs.ToList(),
                             });
 
+// case phức tạp:  
+// -> nhóm những record có trường "TenFile" giống nhau trong 1 list "lstTepDinhKem1", 
+// -> lấy aggregate max value của từng nhóm, 
+// -> đồng thời lấy "DinhKemID" của record chứ max value đó
+ var lstTepDinhKem1 = lstTepDinhKem.GroupBy(x => x.TenFile, (key, xs) => new { 
+        TenFile = key,
+        PhienBan = xs.Max(xs => xs.PhienBan),
+        DinhKemID = xs.OrderByDescending(x => x.PhienBan).First().DinhKemID,
+ }).ToList();
 
 //=======================================================================================================================
 

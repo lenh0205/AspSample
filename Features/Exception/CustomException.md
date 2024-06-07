@@ -9,7 +9,9 @@ https://learn.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetc
 # Inherit: "System.Exception" or "System.ApplicationException"
 https://asp-blogs.azurewebsites.net/erobillard/129134s
 
-* -> The .Net framework includes ApplicationException class since .Net v1.0. It was designed to use as a base class for the custom exception class. However, Microsoft now recommends Exception class to create a custom exception class. You should not throw an ApplicationException exception in your code, and you should not catch an ApplicationException exception unless you intend to re-throw the original exception.
+* -> The **`.NET Framework`** includes **ApplicationException** class since `.Net v1.0` - it was **`designed to use as a base class for the custom exception class`**
+* -> however, Microsoft now recommends **Exception** class to **`create a custom exception class`**
+* => we **should not throw or catch an 'ApplicationException' exception** in our code, unless we **`intend to re-throw the original exception`**
 
 =================================================================
 # Make Exception Classes Serializable

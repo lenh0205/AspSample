@@ -35,8 +35,6 @@ namespace ExceptionHandlingProject.Models
 }
 ```
 
-### 
-
 ## Crafting a Centralized API Response Format
 * -> however, sometimes it's essential to establish **a standardized API response format** - used for **`both APIs and error handling`**
 
@@ -123,6 +121,7 @@ public class HomeController : ControllerBase
 
 ## Adding Custom Middleware to the Pipeline
 * -> make _custom middleware_ becomes **`an integral part of the request handling flow`**
+
 ```cs
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -298,9 +297,33 @@ public sealed class MyCustomException : Exception
 ```
 
 ========================================================
-# Global Exception Handlers in .NET Core
+# Global Exception Handler in ASP.NET Core 8
+* -> implement **IExceptionHandler** interface
+* -> we can _inject logger and other dependencies in constructor_
+* -> in **TryHandleAsync** method, **return true** if **`exception is handled`** and **return false** to be **`passed to the next handler`**
+* -> once we have **`IExceptionHandler implementation`**, register it to middleware with **.AddExceptionHandler()** and **.UseExceptionHandler()**
+
+* -> as **order is important**, so add it before **`UseStaticFiles, MapControllers, UseMvc, UseRouting (in .Net Core 3)`**
+* -> we can add **`multiple IExceptionHandler implementations`**, they will be **`called in the order of registration`**
+
+```cs - Example:
+class MyExceptionHandler : IExceptionHandler
+{
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext context, 
+        Exception exception, 
+        CancellationToken cancellation)
+    {
+        // Your response object
+        var error = new { message = exception.Message };
+        await context.Response.WriteAsJsonAsync(error, cancellation);
+        return true;
+    }
+}
+```
 
 ```cs
+// ASP.NET Core 5
 public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
 {
     app.UseExceptionHandler(errorApp =>
@@ -309,11 +332,24 @@ public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
             context.Response.StatusCode = 500; // Internal Server Error
             var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-            logger.LogError(exceptionHandlerPathFeature.Error, "Unhandled exception.");
-            // Respond with error details or a generic message
+            var exception = exceptionHandlerPathFeature.Error;
+
+            logger.LogError(exception, "Unhandled exception.");
+            await context.Response.WriteAsJsonAsync(new { error = exception.Message });
         });
     });
 }
+
+// Order version
+app.UseExceptionHandler(a => a.Run(async context =>
+{
+    var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+    var exception = exceptionHandlerPathFeature.Error;
+    
+    var result = JsonConvert.SerializeObject(new { error = exception.Message });
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsync(result);
+}));
 ```
 
 ========================================================
@@ -338,7 +374,7 @@ public class GlobalErrorHandler : IErrorHandler
 // In Startup.cs
 services.AddSingleton<IErrorHandler, GlobalErrorHandler>();
 
-// In your application code
+// In application code
 public class MyService
 {
     private readonly IErrorHandler _errorHandler;
