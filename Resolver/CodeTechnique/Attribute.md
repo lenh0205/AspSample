@@ -9,7 +9,7 @@
 // if the csc.exe compiler discovers an item being annotated with the [obsolete] attribute, it will display a compiler warning in the IDE error list
 ```
 
-============================================================
+==========================================================================
 # Creating custom validation "Attribute" 
 * -> in case there are some requirements to validate the input for but **`built-in attributes did not work`**
 * -> create metadata that we can **`use in the data model to validate data fields`**
@@ -159,7 +159,7 @@ public bool CreateEmployee()
 }
 ```
 
-==========================================================
+==========================================================================
 # Predefined Attributes
 * -> defined by Microsoft as a part of .NET FCL
 * -> many of them receive **`special support from the C# compiler`**
@@ -180,4 +180,8 @@ public bool CreateEmployee()
 * -> set the probable targets with the **AttributeUsage** attribute
 * -> implement the **`class constructor`** and **`write-accessible properties`**
 
+==========================================================================
+# Common Attribute
 
+## [ApiExplorerSettings] attribute
+* -> the **[ApiExplorerSettings(IgnoreApi = true)]** excludes the error handler action from the app's **OpenAPI** (_Ex: `Swagger`_) specification

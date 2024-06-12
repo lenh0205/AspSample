@@ -89,6 +89,7 @@ _context.SaveChanges();
 // -> these methods perform "equijoins", or joins that match two data sources based on equality of their keys
 
 
+
 ## Choosing "Join" type: the join methods provided in the LINQ framework are "Join" and "GroupJoin"
 // in relational database terms, "Join" implements an "inner join"
 // "GroupJoin" method has no direct equivalent in relational database terms
@@ -380,15 +381,36 @@ var consolidatedChildren = children
                                 Children = gcs.ToList(),
                             });
 
-// case phức tạp:  
-// -> nhóm những record có trường "TenFile" giống nhau trong 1 list "lstTepDinhKem1", 
-// -> lấy aggregate max value của từng nhóm, 
-// -> đồng thời lấy "DinhKemID" của record chứ max value đó
+// ----->
+
+// -----> case phức tạp:  
+// -> nhóm những record có trường "TenFile" giống nhau trong list "lstTepDinhKem", 
+// -> lấy aggregate max value "PhienBan" của từng nhóm, 
+// -> đồng thời lấy "DinhKemID" của record chứa max value đó
  var lstTepDinhKem1 = lstTepDinhKem.GroupBy(x => x.TenFile, (key, xs) => new { 
         TenFile = key,
         PhienBan = xs.Max(xs => xs.PhienBan),
         DinhKemID = xs.OrderByDescending(x => x.PhienBan).First().DinhKemID,
  }).ToList();
+
+ // hoặc
+ var maxes = list.GroupBy(x => x.id2, (id, xs) => xs.Max(x => x.value));
+ // hoặc
+var maxes = from x in list
+            group x.value by x.id2 into values
+            select new 
+            {
+                id = values.Key
+                Max = values.Max();
+            }
+ // hoặc
+ var maxes = list.GroupBy(x => x.id2, x => x.value).Select(values => values.Max());
+ // hoặc
+ var maxes = list.GroupBy(x => x.id2,     // Key selector
+                         x => x.value,   // Element selector
+                         (key, values) => values.Max()); // Result selector
+// hoặc
+var maxes = list.GroupBy(x => x.id2).Select(xs => xs.Select(x => x.value).Max())
 
 //=======================================================================================================================
 

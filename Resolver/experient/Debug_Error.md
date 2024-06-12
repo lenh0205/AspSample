@@ -49,7 +49,7 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 * -> có thể thử viết lại Method đó tối giản hơn, Ví dụ: gọi nó trực tiếp thay vì thông qua 1 Service hay 1 instance nào đó, đổi parameter sang dạng đơn giản hơn 
 
 ==============================================================
-# BE - Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
+# BE - Run Debug - Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
 * Kiểm tra lại Endpoint xem ta đặt break point đúng controller/action method chưa
 * Khả năng cao lỗi này là do **`không map được data ta truyền trong Request với Parameter của action method`**
 * -> VD: DaDoc=1 nhưng ta lại truyền DaDoc="1" ; hoặc truyền 1 field null cho unullable value
@@ -84,7 +84,7 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> có thể dẫn tới việc nó vẫn kéo data theo condition của Where(), nhưng Contain() sẽ xử lý trên memory gây bad perfomance
 
 # BE - The type or namespace name 'System' could not be found
-* Ta có thể thử Reload `project`
+* Ta có thể thử Unload rồi Reload `project`
 
 # BE - Lỗi:"Unexpected character encountered while parsing value: <. Path '', line 0, position 0."
 * **reason**: có thể xảy ra khi SER chết , HelperCommon gọi SER sẽ trả về response như này
@@ -126,6 +126,26 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 # BE - ASP.NET - Cannot access a disposed object
 * -> rất có thể là trong 1 Scope request-reponse, logic trước đó đã **`.Dispose()`** hoặc **`.Close()`** đi 1 connection hoặc instance; nên logic sau cần sử dụng **`instance`** đó thì không có
 * -> ta có thể **`DI kiểu Scope`**; hoặc với mỗi logic ta lại tạo instance sau đó dispose nó 
+
+# BE - Build - build xong thì báo lỗi "The type or namespace name '...' could not be found"
+* -> ta cần kiểm tra xem **`target đến đúng folder ta muốn build chưa`** (right-click .csproj -> properties -> Build -> check đường dẫn của cả Build và Release)
+
+# BE - Attach Process - Có lỗi nhưng không rõ ràng
+* -> Xảy ra lỗi khi 1 service bên trong project khi attach process IIS, nhưng **`không biết lỗi gì vì exception không cụ thể`**
+* -> ta có thể **`tạo 1 project Web App .NET framework mới`** rồi bỏ service vào chạy thử , nó sẽ cho ta lỗi rõ ràng hơn
+
+# BE - Tranfer data - missing some fields in object
+* -> khả nằng là do **`tạo 1 class inherit 1 class từ WCF và thêm 1 số field`**, rồi dùng nó làm response thì trả về bị thiếu những field ta tự thêm vào
+* -> đây là do quá trình **`serialize dữ liệu để response thì những trường này bị mất`** (_ta có thể dùng JsonConvert.SerializeObject() để kiểm chứng_)
+-> ta nên **`tạo ra 1 class hoàn toàn mới`**
+
+# BE - System.IO - 'File.Exist' trả về false mặc dù đường dẫn có tồn tại
+* -> nếu hiện tại code này đang nằm trên **`.NET Framework`**, thì ta thử đưa nó sang **`.NET Core`** xem có chạy không 
+* -> có thể vấn đề nằm ở sự khác biệt ở **`32-bit`** và **`64-bit`** architect, ta có thể vào _properties -> Build -> đổi thành **anyCPU**_
+* -> hoặc cũng có thể là do vấn đề về **permission**, ta chỉ vần **`chạy Visual Studio ở Administration`** là được
+
+# BE - TypeDescriptor.GetProperties(typeof(T)) trả về 1 list với Count = 0 hoặc nhỏ hơn thực tế
+* -> rất có thể khi định nghĩa class, ta quên pass **{ get; set; }** cho **`property`**
 
 ================================================
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);

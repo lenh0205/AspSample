@@ -1,17 +1,11 @@
 ===================================================================
-# Define an Enum
+# Parse an unvalid DateTime to valid DateTime
 ```cs
-/// <summary>
-/// EMyEnums.cs
-/// </summary>
-public enum EMyEnums
-{
-    All = 0,
-    ChoXuLy = 1,
-    DaXuLy = 2,
-    SapDenHan = 3,
-    QuaHan = 4,
-}
+string date = "20121004";
+
+string result = DateTime
+                  .ParseExact(date, "yyyyMMdd",CultureInfo.InvariantCulture)
+                  .ToString("yyyy-MM-dd");
 ```
 
 ===================================================================
@@ -119,5 +113,21 @@ catch(Exception ex)
 catch(DbUpdateException ex) when (ex.InnerException is UpdateException)
 {
     // do what you want with ex.InnerException...
+}
+```
+
+===================================================================
+# Define an Enum
+```cs
+/// <summary>
+/// EMyEnums.cs
+/// </summary>
+public enum EMyEnums
+{
+    All = 0,
+    ChoXuLy = 1,
+    DaXuLy = 2,
+    SapDenHan = 3,
+    QuaHan = 4,
 }
 ```

@@ -40,3 +40,9 @@ https://learn.microsoft.com/en-us/archive/blogs/youssefm/error-handling-in-asp-n
 
 # file .bat
 https://stackoverflow.com/questions/755382/i-want-to-delete-all-bin-and-obj-folders-to-force-all-projects-to-rebuild-everyt
+
+# linq practice
+https://learn.microsoft.com/en-us/samples/dotnet/try-samples/101-linq-samples/
+https://bytehide.com/blog/linq-csharp
+https://github.com/indieza/Software-University/blob/master/C%23%20Advanced/21.%20Exercise%201/08.%20CSharp-Advanced-LINQ-Exercises/08.%20CSharp-Advanced-LINQ-Exercises.docx
+https://www.syncfusion.com/blogs/post/best-linq-to-entities-queries
