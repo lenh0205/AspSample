@@ -170,6 +170,14 @@ Ví dụ Migration cần drop 1 Table nhưng Table đó không tồn tại trong
 * **`Rollback Migration`** EntityFramework Core: **update-database -Migration <migration ta muốn>**
 (_với EntityFramework là: `update-database -TargetMigration <migration ta muốn>`_)
 
+# DB - SQL - An expression of non-boolean type specified in a context where a condition is expected
+* -> lỗi này có thể là do dùng **isnull() chung với AND**; ta nên dùng **`IS NULL / IS NOT NULL`** để trả về boolean (Ex: assume `phont IS NULL` then `Isnull(phont, 1)` will return 1, so the statement will look like `cont.contactid = '29' AND 1 AND ...`)
+
+* -> ngoài ra có thể lỗi này còn có thể do  forgot to add **"ON" condition** when specifying **`join clause`**; *
+* -> lưu ý nếu có **multiple joins** thì **`the last join will get highlighted with the error message`** (_mặc dù có thể không phải chính nó gây ra lỗi_)
+
+* -> hoặc cũng có thể là ta đang **`mixing relational expressions with scalar operators (OR)`**
+
 ===============================================
 # FE - React can't access an object before it gets initialize
 * **Lý do**: 

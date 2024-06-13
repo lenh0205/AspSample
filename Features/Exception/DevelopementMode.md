@@ -117,7 +117,6 @@ builder.Services.AddControllers(options =>
 ```
 
 ===========================================================================
-
 # 'Validation failure' error response
 * -> for **`web API controllers`**, MVC responds with a **`'ValidationProblemDetails' response type`** **when model validation fails**
 * -> MVC uses the **results of 'InvalidModelStateResponseFactory'** to **`construct the error response`** for **`a validation failure`**
@@ -141,6 +140,7 @@ builder.Services.AddControllers()
     .AddXmlSerializerFormatters();
 ```
 
+===========================================================================
 # Client error response
 * -> an **error result** is defined as **`a result with an HTTP status code of 400 or higher`**
 * -> _for web API controllers_, MVC **`transforms an error result`** to produce a **ProblemDetails**
@@ -152,7 +152,11 @@ builder.Services.AddControllers()
 * -> Ex: _a problem details object can have the following members: `type`, `title`, `status`, `detail`, `instance`
 
 ## Default problem details response
-```cs
+* -> **`a "problem details" response`** **is (only) generated** when the "/api/values2/divide" endpoint is called with a zero denominator (_tức là chỉ khi ta trả về `BadRequest()` with no argument_)
+
+* _tức là nếu có 1 unhandled exception hoặc no matching endpoint,... thì nó không trả về `Prolem Detail`_
+
+```cs -  returns "BadRequest" when the input is invalid
 [Route("api/[controller]/[action]")]
 [ApiController]
 public class Values2Controller : ControllerBase
@@ -169,7 +173,8 @@ public class Values2Controller : ControllerBase
     }
 }
 ```
-```json - a "problem details" response is generated when the "/api/values2/divide" endpoint is called with a zero denominator
+
+```json - 
 {
   "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
   "title": "Bad Request",
@@ -179,9 +184,10 @@ public class Values2Controller : ControllerBase
 ```
 
 ## Problem details service
-* -> ASP.NET Core supports **`creating Problem Details for HTTP APIs`** using the **IProblemDetailsService**
+* -> ASP.NET Core supports **`creating 'Problem Details' for HTTP APIs`** using the **IProblemDetailsService**
+* -> we can configures it in **`program.cs`**, and the app to **`generate a "problem details response"`** for **all HTTP client** and **server error responses that don't have body content yet**
 
-```cs - configures the app to generate a "problem details response" for all HTTP client and server error responses that don't have body content yet
+```cs - Configuration
 ar builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -199,4 +205,116 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.Run();
+```
+
+* _với ví dụ bên trên, `a problem details response` is generated when **an invalid input is supplied**, **the URI has no matching endpoint**, **an unhandled exception occurs**_
+
+* -> to **disable the automatic creation of 'ProblemDetails' for error status codes**, we can set **SuppressMapClientErrors** property is **`set to true`**
+```cs
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressMapClientErrors = true;
+    });
+```
+* _when an API controller returns `BadRequest`, an HTTP 400 response status is `returned with no response body`_ 
+* _SuppressMapClientErrors prevents a ProblemDetails response from being created, even when calling `WriteAsync` for an API Controller endpoint_
+
+## Customize problem details with 'CustomizeProblemDetails'
+```cs - Configuration
+builder.Services.AddControllers();
+
+builder.Services.AddProblemDetails(options =>
+        // uses 'ProblemDetailsOptions' to set 'CustomizeProblemDetails'
+        options.CustomizeProblemDetails = (context) =>
+        {
+            var mathErrorFeature = context.HttpContext.Features.Get<MathErrorFeature>();
+            if (mathErrorFeature is not null)
+            {
+                (string Detail, string Type) details = mathErrorFeature.MathError switch
+                {
+                    MathErrorType.DivisionByZeroError => (
+                        "Divison by zero is not defined.",
+                        "https://wikipedia.org/wiki/Division_by_zero"
+                    ),
+                    _ => (
+                        "Negative or complex numbers are not valid input.",
+                        "https://wikipedia.org/wiki/Square_root"
+                    )
+                };
+
+                context.ProblemDetails.Type = details.Type;
+                context.ProblemDetails.Title = "Bad Input";
+                context.ProblemDetails.Detail = details.Detail;
+            }
+        }
+    );
+```
+
+```cs - Controller Action
+[HttpGet("{radicand}")]
+public IActionResult Squareroot(double radicand)
+{
+    if (radicand < 0)
+    {
+        var errorType = new MathErrorFeature
+        {
+            MathError = MathErrorType.NegativeRadicandError
+        };
+        HttpContext.Features.Set(errorType);
+        return BadRequest();
+    }
+
+    return Ok(Math.Sqrt(radicand));
+}
+
+// Custom Http Request Feature
+class MathErrorFeature
+{
+    public MathErrorType MathError { get; set; }
+}
+
+// Custom math errors
+enum MathErrorType
+{
+    DivisionByZeroError,
+    NegativeRadicandError
+}
+```
+
+* -> _với ví dụ trên thì `a problem details response is generated` when **`The "/divide" endpoint is called with a zero denominator`** or **the URI has no matching endpoint**_
+
+* _the `problem details response body` contains the following when either "squareroot" endpoint is called with a radicand less than zero:_
+```json
+{
+  "type": "https://en.wikipedia.org/wiki/Square_root",
+  "title": "Bad Input",
+  "status": 400,
+  "detail": "Negative or complex numbers are not allowed."
+}
+```
+
+## Implement 'ProblemDetailsFactory'
+* -> MVC uses **ProblemDetailsFactory** to **`produce all instances`** of **ProblemDetails** and **ValidationProblemDetails**
+* -> this factory is used for: **`Client error responses`**, **`Validation failure error responses`**, **ControllerBase.Problem** and **ControllerBase.ValidationProblem**
+
+* -> to customize the problem details response, register **`a custom implementation`** of **ProblemDetailsFactory** in Program.cs:
+```cs
+builder.Services.AddControllers();
+builder.Services.AddTransient<ProblemDetailsFactory, SampleProblemDetailsFactory>();
+```
+
+## Use 'ApiBehaviorOptions.ClientErrorMapping'
+* -> use the **`ClientErrorMapping`** property to configure the contents of the **`ProblemDetails`** response. 
+
+```cs - For example:
+// the following code updates the "Link" property for 404 responses:
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
+            "https://httpstatuses.com/404";
+    });
 ```
