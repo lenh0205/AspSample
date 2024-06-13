@@ -96,7 +96,7 @@ public class ControllerA1: Controller
 ```
 
 ## Note:
-* -> so the **`combination of MVC and CORS middleware`** in handling CORS may cause **`unexpected results`**
+* -> the **`combination of MVC and CORS middleware`** in handling CORS may cause **`unexpected results`**
 * -> the _CORS middleware_ **add the CORS headers to request** regardless of whether or not we're asking it not to by **`using the [DisableCors] attribute`**
 * -> the CORS middleware has no idea that this MVC concept (a filter) even exists
 * -> ta có thể lựa chọn bỏ **UseCors()** và apply CORS cụ thể cho Controller/Action với **EnableCors attribute**; hoặc sử dụng **UseCors()** và apply policy cho toàn bộ request
