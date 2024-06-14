@@ -4,7 +4,9 @@
 * => sự khác biệt giữa _`Convert.ToDateTime`, `DateTime.Parse`, `DateTime.TryParse`_ nằm ở việc xử lý đối với **string input value is `null`** và **string input value is `invalid`**
 * => sự khác biệt giữa _`DateTime.Parse`, `DateTime.ParseExact`_ nằm ở việc _DateTime.ParseExact_ cho phép ta truyền pattern của "datetime string value" giúp việc **parse những invalid format trở nên khả thi**
 
-## Ví dụ các valid date mà chắc chắn là parse thành công
+## Valid datetime format in any case
+* -> Format should be **MM-dd-yyyy**
+
 ```r
 // "1/1/2010"
 // "01/10/2015"
@@ -47,7 +49,7 @@ DateTime dateTime = DateTime.Parse(dateString);
 * -> if the **`string value is not null`**, then it **internally calls 'DateTime.Parse()'** to give the result
 * -> if the **`string value is null`**, then it **gives 'DateTime.MinValue' as "1/1/0001 12:00:00 AM"**
 
-* => tức là nó khác với **`DateTime.Parse()`** ở chỗ là nó **không throw Exception nếu string value null**, còn lại thì vẫn **`throw Exception với invalid string format`**
+* => tức là nó khác với **`DateTime.Parse()`** ở chỗ là nó **không throw Exception nếu string value null**, cũng như **`không có tham số 'DataTimeSyles'`**
 
 ```cs
 // "en-US" is cultural information about the United States of America
@@ -76,8 +78,9 @@ DateTime dateTime12 = Convert.ToDateTime(dateString);
 * -> **styles** - defines the **`formatting options`** that customize string parsing for some date and time parsing methods
 * -> **result** - **`holds the DateTime value after parsing`**
 
-* -> TryParse() **`always tries to parse the string value datetime`** (_tức là **không throw Exception** in any cases_) and **return a boolean value** - indicating whether the conversion succeeded or failed
+* -> _DateTime.TryParse()_ **không throw Exception** in any cases (**`always tries to parse the string value datetime`**) and **return a boolean value** (_indicating whether the conversion succeeded or failed_)
 * -> if **`the conversion fails (invalid format)`** or **`the string value is null`**, it **out a MinValue(1/1/0001 12:00:00 AM)**
+
 ```cs
 string dateString = null;
 DateTime dateTime; // 1/1/0001 12:00:00 AM
