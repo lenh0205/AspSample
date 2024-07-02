@@ -1,9 +1,9 @@
-=============================================
+==============================================================
 # Http - Đối với việc gửi data bằng request-response sẽ có giới hạn. VD gửi 23000 records lên Client thì response sẽ không chịu nổi 
 * có thể dùng Take() để giảm bớt số lượng cần lấy
 * filter bớt những trường không cần thiết, chỉ để 1 trường làm identity và 1 trường để hiển thị là đủ
 
-=============================================
+==============================================================
 # Setting - Hosting xong trả về 404
 * thư mục **bin** không có gì cả
 
@@ -35,7 +35,7 @@
 * Trình duyệt sẽ báo: _`Your Connection is not private`: Attackers might be trying to steal your information from `localhost`_
 * ta sẽ sửa lại cấu hình Chrome -> truy cập đường link **`chrome://flags/`** -> check vào **Allow invalid certificates for resources loaded from localhost**
 
-=============================================
+==============================================================
 # C# - Optional parameters must appear after all required parameters
 ```cs
 public void GetIAccountInfo(string VanThuDonVi = "1", int? donviId, int? phongbanId);
@@ -56,7 +56,7 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 
 # BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
 * Access API Swagger vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
-* Lỗi này là do dùng không dùng **`async`**` cho Method Action và Service
+* Lỗi này là do không dùng **`async`**` cho Method Action và Service
 
 # BE - Có dữ liệu trong Database nhưng không Get được
 * Do các Item có field **`IsDeleted=True`**
@@ -147,7 +147,11 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 # BE - TypeDescriptor.GetProperties(typeof(T)) trả về 1 list với Count = 0 hoặc nhỏ hơn thực tế
 * -> rất có thể khi định nghĩa class, ta quên pass **{ get; set; }** cho **`property`**
 
-================================================
+# BE - Lỗi xảy ra trên production mà local chạy bình thường
+* -> ta sẽ cần so sánh **`các tham số đầu vào cũng như đầu ra`** của câu lệnh SQL được thực thi trên production với local bằng **SQL Server Profiler**
+
+==============================================================
+
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
 * Xảy ra khi `SaveChanges()`
 * lỗi này là do ta đánh dấu 1 phần tử đang được track bởi context là "Modified"

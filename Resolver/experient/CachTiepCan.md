@@ -1,3 +1,8 @@
+# Khi gặp 1 lỗi có liên quan đến việc lấy dữ liệu
+* -> bước đầu tiên cần làm là **`bắt được chính xác câu lệnh SQL đã thực thi lên database`**, nếu database là _SQL Server_ thì ta có thể dung phần mềm **SQL Server Profiler**
+* -> kiểm tra tham số đầu vào, cũng như đầu ra của câu SQL
+
+=======================================================================
 # Bắt đầu join 1 dự án:
 * **Nghiệp vụ**: đối tượng s/d product; có mấy loại user, họ tương tác với nhau thế nào ?
 * **Database**: mình cần tương tác với những Database nào; có cần viết mới Database không
@@ -19,7 +24,7 @@
 * Khi viết Service nên viết đầy đủ method: GetAll, GetById, Update, Create, Delete để việc test dễ dàng hơn  
 * Ta có thể làm việc này bằng cách viết 1 Generic Service và kế thừa nó (trừ connected service)
 
-===========================================
+=======================================================================
 # Refactor code từ WebForm sang React; từ .NET Framework sang .NET Core:
 
 ## Step 1: Trước khi đọc logic code cần ""sắp xếp cấu trúc code" nếu cấu trúc code cũ chưa hợp lý
@@ -45,12 +50,6 @@
 * Đối với 1 trang **`control`** có nhiều `text field` và `datagrid` gắn với nhau, ta sẽ cần phân thích 1 `Flow` đầy đủ: binding data, binding text field lần đầu, quản lý State giữa text field và DataGrid,...
 * Vẽ `Flow` của code hiện tại ra -> Phân tích
 * Vẽ `Flow` của code mới ra
-
-
-
-
-
-
 
 ## Refactor từ "Server-side rendering" sang "Client-side rendering"
 * Ta nên xem xét dữ liệu trả về

@@ -84,3 +84,31 @@ private void DoLogoff()
 ```cs
 Response.Write("user " & DotNetNuke.Entities.Users.UserController.Instance.GetCurrentUserInfo().Username); 
 ```
+
+=====================================================================
+# Logging in DNN
+* -> https://www.dnnsoftware.com/wiki/log4net-in-dotnetnuke
+* -> sử dụng **log4net**, cấu hình (bao gồm đường dẫn, ...) ta có thể xem trong **`web.config`** file
+
+```xml 
+<log4net>
+    <appender name="RollingFile" type="log4net.Appender.RollingFileAppender">
+        <file value="Portals/_default/Logs/" />
+        <datePattern value="yyyy.MM.dd'.log.resources'" />
+        <rollingStyle value="Date" />
+        <staticLogFileName value="false" />
+        <appendToFile value="true" />
+        <maximumFileSize value="1MB" />
+        <maxSizeRollBackups value="5" />
+        <lockingModel type="log4net.Appender.FileAppender+MinimalLock"/>
+        <layout type="log4net.Layout.PatternLayout">
+        <conversionPattern value="%date [%property{log4net:HostName}][Thread:%thread][%level] %logger - %message%newline" />
+        <locationInfo value="true" />
+        </layout>
+    </appender>
+    <root>
+        <level value="ERROR" />
+        <appender-ref ref="RollingFile" />
+    </root>
+</log4net>
+```
