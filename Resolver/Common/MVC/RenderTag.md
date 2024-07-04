@@ -1,28 +1,4 @@
 ===================================================================================
-# Layout
-* -> define a **common template** - **`inherit a consistent look and feel`** across all the views/pages of ASP.NET MVC application
-* -> the **_ViewStart.cshtml** within the `Views` folder for defining the **default Layout page** for our ASP.NET MVC application
-
-```js - Basic structure of Layout page
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <title>@ViewBag.Title</title>
-        @Styles.Render("~/Content/css")
-        @Scripts.Render("~/bundles/modernizr")
-    </head>
-    <body>
-        @RenderBody()
-
-        @Scripts.Render("~/bundles/jquery")
-        @RenderSection("scripts", required: false)
-    </body>
-</html>
-```
-
-===================================================================================
 # Styles.Render 
 * -> used to **render a bundle of CSS files** defined within **BundleConfig.cs** files
 * -> by **`creates style tags for the CSS bundle`**
@@ -32,7 +8,7 @@
 * -> by **`create script tags for the Script bundle`**
 
 # Note:
-* -> _`Styles.Render` and `Scripts.Render`_ **generates `multiple` style and script tags for each item** in the CSS bundle and Script bundle when **optimizations are disabled**
+* -> _`Styles.Render` and `Scripts.Render`_ generates multiple style and script tags **for `each item` in the CSS bundle and Script bundle** when **optimizations are disabled**
 * -> when **optimizations are enabled**, _`Styles.Render` and `Scripts.Render`_ **generates a `single` style and script tag to a version-stamped URL** which **`represents the entire bundle for CSS and Scripts`**
 
 * -> **`to enable/disable optimizations`** by setting the **EnableOptimizations** property of the **BundleTable** class to true/false within **`Global.asax.cs file`**:
