@@ -1,3 +1,8 @@
+# Note:
+* var ModuleId, TabId để ở \GUI\Views\Shared\_Layout.cshtml
+* logic call API để ở \GUI\Scripts\service.js
+
+===============================================================
 # GUI.dnn
 * -> file này để ta khai báo các module
 * -> nó sẽ cho ta biết module tên gì ? nó sẽ sử dụng Controller cũng như Action nào ?
