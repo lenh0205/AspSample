@@ -1,3 +1,4 @@
+=========================================================================
 # Partial view:
 * -> a **Razor markup (.cshtml) file** that **`render HTML output within another markup file`** (_views are rendered within another view_)
 * -> it's not a complete view, but instead used for **the `reusability` of the HTML markup** (other **`views`** or **`layout`**)
@@ -8,13 +9,15 @@
 * -> _there are different ways of rendering partial view in MVC Razor: **RenderPartial**, **RenderAction**, **Partial**, **Action**_
 
 =========================================================================
-# Html.Partial
+# Partial View Usage
+
+## Html.Partial
 * -> accept **`view name`** as parameter and returns **MVCHtmlString** object - a **`specialized HTML-encoded string`** that can be directly rendered in the view
 * -> also **can be assigned to a variable** and **`manipulate if required`** (_really rare_) before rendering
 
 ```cs
 // Razor syntax
-@Html.Partial("ViewName") // directly rendered in the view
+@Html.Partial("ViewName") // directly rendered in the view in this position (where they get called)
 @Html.Partial("ViewName", Model) // pass a model to the Partial view 
 
 // WebView syntax
@@ -25,33 +28,82 @@
 @{ string htmlData = @Html.Partial("ViewName").ToString(); }
 ```
 
-# Html.RenderPartial 
-* -> **`returns void`** 
-* -> **HTML output of partial view will be written `directly` to the `HTTP response stream`**; so it better performance compare to **`Html.Partial`**
+## Html.RenderPartial 
+* -> is a method of the **HtmlHelper** class that **`returns void`** 
+* -> **HTML output of partial view will be written `directly` to the `HTTP response stream`**
+* => so it **better performance** compare to **`Html.Partial`** because  the view content is not buffered in memory
 
 ```cs
-@{ Html.RenderPartial("ViewName"); }
+@{ Html.RenderPartial("ViewName"); } // directly rendered in the view in this position (where they get called)
 @{ Html.RenderPartial("ViewName", Model) } // pass a model to the Partial view 
 ```
 
-# Html.Action
-* -> Invokes the specified child action method and returns the result as an HTML string
+## Html.Action
+* -> **invokes the specified child `action method`** and returns the result as an HTML string
+* _về cơ bản thì có 3 thành phần tương tác, `Html.Action` call an `action method` return a `partial view`_
 
 ```cs
-@Html.Action("Action", "Controller", new { param = "value"} )
+// Index.cshtml
+@Html.Action("Show", "About", new { param = "value"} )
+
+// AboutController.cs
+[ChildActionOnly] // cannot call using URL
+public ActionResult Show(string param)
+{
+    var data = _db.Users.Find(param);
+    return PartialView("_RenderActionMenu",data);
+}
+
+// Views/Shared/_RenderActionMenu.cshtml
+@model List<MVC5_HelloWorld.Models.User>
+<td>@Model.Username</td>
+<td>@Model.Password</td>
 ```
 
 ```cs
 @{string result = @Html.Action("Action", "Controller", new { param = "value"} ).ToString();}
 ```
 
-# Html.RenderAction
-* -> **invokes** a specified **`child action method`** and **`renders the result inline in the parent view`**
+## Html.RenderAction
+* -> is a method of the **Controller** class **invokes** a specified **`child action method`** and **`renders the result inline in the parent view`**
 * -> the _Action Method_ must be marked with the **[ChildActionOnly]** attribute and return the **`PartialViewResult`** using the **PartialView()** method
 * -> _it is faster than the Action method since its result is directly written to the HTTP response stream_
 
 ```cs
 @{Html.RenderAction("Action", "Controller", new { param = "value"} ).ToString();}
+```
+
+=========================================================================
+# RenderAction vs RenderPartial
+
+## RenderPartial
+* -> the _renderPartial_ method is useful when the **`displaying data in the partial view`** is **already in the corresponding view model**
+* _tức là `parent view` sẽ cần được pass model mà `partial view` cần_
+
+* -> usually used when output **could be considered part of the calling view** but separating it out into another view
+* _tức là những `partial view` được render bới `RenderPartial` thường trực tiếp là 1 phần của `calling view` (cả về mặt UI lẫn data) nhưng được tách riêng ra để tái sử dụng_
+
+## RenderAction
+* -> the partial view rendered using **`RenderAction`** on the other hand could **`contain a completely different model with no need for this to be passed in to our parent view`**
+* -> usually used when the thing that needs to be rendered **isn’t the responsibility of the calling view or controller**
+* _tức là ví dụ ta muốn render 1 view `Person`, nhưng trong đó có 1 list `Project` thì ta nên sử dụng `ProjectController` thay vì `PersonController` vì the concern of `display Project` belong to `ProjectController`_
+
+=========================================================================
+# RenderPage vs Html.RenderPartial
+
+## Html.RenderPartial
+* -> Html.RenderPartial follow **standard rules for view lookup** (_Ex: check current directory, then check the "Shared" directory_), so we only to provide it the **`view name`** to lookup
+```cs
+Html.RenderPartial("MyView")
+```
+
+## RenderPage
+* -> renders the **`specified view`** **identified by `path` and `file name`** (_rather than by view name_) 
+* -> also **`writes its output directly to the response stream`** (_like Html.RenderPartial()_)
+* -> we can pass data by second parameter   
+
+```cs
+RenderPage("MyView.cshtml") // need to explicit the file name
 ```
 
 =========================================================================
