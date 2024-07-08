@@ -45,7 +45,11 @@
 ## @RenderPage
 * -> a page use it to **`render other pages that exist in our application`**
 * -> **first parameter** refers to the **`file's physical location`**
-* -> **second parameter** (optional) is an array of objects/models that can be passed into the view
+* -> **second parameter** (optional) is **`an array of objects/models`** that can be passed into the view
+* -> it seems to always **`use the current view's model`** as the model for view render by RenderPage
+
+* -> if we are using **`MVC Area RenderPage`**, by default it will look into the **View** and **Shared** folder of the **`Area`**
+* -> so if we want to point it to **the common View folder in the root**, then we have to mention the path (_Ex: `@RenderPage("~/Views/Shared/ViewFile.cshtml")`_)
 
 ```js 
 // create 2 partial views under the "Views/Shared" folder (to make it as shared): Shared/_Header.cshtml, Shared/_Footer.cshtml
