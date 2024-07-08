@@ -150,6 +150,10 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 # BE - Lỗi xảy ra trên production mà local chạy bình thường
 * -> ta sẽ cần so sánh **`các tham số đầu vào cũng như đầu ra`** của câu lệnh SQL được thực thi trên production với local bằng **SQL Server Profiler**
 
+# BE - API - # Error: Actions require unique method/path combination for Swagger
+* -> trong controller thay [Route("api/[controller]")] bằng [Route("api/[controller]/[action]")] ???
+* -> hoặc define explicit route for action: [Route("GetById")]
+
 ==============================================================
 
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
