@@ -100,3 +100,5 @@ Html.ActionLink(linkText:="About", controllerName:="About", actionName:="Index")
 * -> we may make mistak in providing URL
 * -> _i **`changing configuration in Global.asax.cs`** can cause our **`link broken at runtime`**; to avoid this we have to **change all anchor tags manually**_
 
+===================================================================================
+# Html.BeginForm() - render HTML form tag

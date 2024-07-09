@@ -1,6 +1,7 @@
 ===========================================================================
 # Supported Features
 * https://www.tutorialsteacher.com/mvc/asp.net-mvc-version-history
+* -> những chức năng được hỗ trợ trong việc `viết HTML markup cùng server-side code`: **HTML Helper**, **Ajax Helper**, ....
 
 ===========================================================================
 # Basic ASP.NET MVC 5 Folder Structure
