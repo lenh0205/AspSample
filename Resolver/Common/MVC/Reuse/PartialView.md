@@ -122,6 +122,17 @@ RenderPage("MyView.cshtml") // need to explicit the file name
 ```
 
 =========================================================================
+# Render Partial View Using jQuery
+* -> sometimes we need to **`load a partial view`** (_Ex: a login box within a popup_) on **run time** 
+* -> then we can **use `jQuery` to make an AJAX request** and render a Partial View into view
+
+```js - to load a partial view within a div
+<script type="text/jscript"> 
+    $('#divpopup').load('/shared/_ProductCategory'); 
+</script> 
+```
+
+=========================================================================
 # Implement: cut the Menu / nagigation bar in _Layout.cshtml into a partial view
 
 ## Create a partial view
@@ -199,15 +210,4 @@ public class HomeController : Controller
         return PartialView("_MenuBar");
     }
 }
-```
-
-=========================================================================
-# Render Partial View Using jQuery
-* -> sometimes we need to **`load a partial view`** (_Ex: a login box within a popup_) on **run time** 
-* -> then we can **use `jQuery` to make an AJAX request** and render a Partial View into view
-
-```js - to load a partial view within a div
-<script type="text/jscript"> 
-    $('#divpopup').load('/shared/_ProductCategory'); 
-</script> 
 ```

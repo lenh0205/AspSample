@@ -28,7 +28,7 @@
 
 ===================================================================================
 # Using Layout
-* _specific the layout view for child view in `_ViewStart.cshtml`, in `child view` itself, or in an `action method`_
+* _specific the layout view for child view in **`_ViewStart.cshtml`**, in **`child view`** itself, or in an **`action method`**_
 
 ## ViewStart
 * _xem `~/Features/Common/Default_Behavior.md` để hiểu thêm_

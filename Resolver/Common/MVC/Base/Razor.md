@@ -18,8 +18,56 @@
 
 # Razor View Engine
 * -> to **compile a view with a mix of HTML tags and server-side code (C#)** - maximizes the speed of writing code
-* -> the razor view uses **@** character to **`include the server-side code`** instead of the traditional **<% %>** of ASP
 * -> the **`C# Razor view`** is **.cshtml** file
+
+* -> the razor view uses **@** character to **`include the server-side code inline`** instead of the traditional **<% %>** of ASP
+* -> use **@{ ... }** code block for **`multi-statement`**
+* -> use **@:** or **<text>/<text>** to **`display texts within code block`**
+* -> so to **`declare a variable`** - we need to declare it in code block **@ { ... }** and use that variable in HTML by **@**
+* -> use **@model** to use model object anywhere in the view
+* -> other like: **@if { ... } else { ... }**, **@for (...) {...}**
+
+```cs - server-side code
+<h2>@DateTime.Now.ToShortDateString()</h2>
+
+@{
+    var date = DateTime.Now.ToShortDateString();
+    var message = "Hello World";
+}
+<h2>Today's date is: @date </h2>
+<h3>@message</h3>
+
+@{
+    var date = DateTime.Now.ToShortDateString();
+    string message = "Hello World!";
+    @:Today's date is: @date <br />
+    @message                               
+}
+```
+```cs - if-else condition
+@if(DateTime.IsLeapYear(DateTime.Now.Year) )
+{
+    @DateTime.Now.Year @:is a leap year.
+}
+else { 
+    @DateTime.Now.Year @:is not a leap year.
+}
+```
+```cs - for loop
+@for (int i = 0; i < 5; i++) { 
+    @i.ToString() <br />
+}
+```
+```cs - model
+@model Student
+
+<h2>Student Detail:</h2>
+<ul>
+    <li>Student Id: @Model.StudentId</li>
+    <li>Student Name: @Model.StudentName</li>
+    <li>Age: @Model.Age</li>
+</ul>
+```
 
 # Integrate Model, View, Controller
 * -> the **View()** method is **`defined in the BaseController class`**, which **automatically binds a model object to a view**
@@ -46,6 +94,8 @@ public class StudentController : Controller
 public class Student
 {
     public int StudentId { get; set; }
+
+    [Display( Name="Name")]
     public string StudentName { get; set; }
     public int Age { get; set; }
 }
