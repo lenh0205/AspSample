@@ -177,4 +177,100 @@ public enum Gender
 //      value="1" />
 ```
 
+# Password
+* -> **generate a password field <input type="password"> element** in a razor view
+* _using **`Html.PasswordFor()`** and **`Html.Password()`**_
+
+```cs
+public class User
+{
+    public int UserId { get; set; }
+    public string Password { get; set; }
+}
+
+@model User
+@Html.PasswordFor(m => m.Password)
+// Output: <input id="Password" name="Password" type="password" value="" />
+
+@model User
+@Html.Password("Password")
+// <input 
+//      id="Password" 
+//      name="Password" 
+//      type="password" 
+//      value="" />
+```
+
+# Display HTML String
+* -> **generate html `string literal` for the model object property** in razor view 
+* -> using **`Html.DisplayFor()`** and **`Display()`**
+
+```cs
+public class Student
+{
+    public int StudentId { get; set; }
+    public string StudentName { get; set; }
+    public int Age { get; set; }
+}
+
+@model Student
+@Html.DisplayFor(m => m.StudentName)
+// Output: "Steve"
+// -> it generates a html string with the "StudentName" value - Steve
+
+@Html.Display("StudentName")
+// Output: "Steve"
+```
+
+# Label
+* -> **generate HTML <label> element ** - using **`Html.LabelFor()`** and **`Label()` for a specified property of model object**
+```cs
+public class Student
+{
+    public int StudentId { get; set; }
+    [Display(Name="Name")]
+    public string StudentName { get; set; }
+    public int Age { get; set; }
+}
+
+@model Student
+@Html.LabelFor(m => m.StudentName)
+// Output: <label for="StudentName">Name</label>
+
+@Html.Label("StudentName","Student Name")
+// Output: <label for="StudentName">Student Name</label>
+```
+
+# Editor (input element)
+* -> **generates HTML `input` elements based on the datatype**
+* -> using **`Html.EditorFor()`** or **`Html.Editor()`**
+
+```cs
+public class Student
+{
+    public int StudentId { get; set; }
+    [Display(Name="Name")]
+    public string StudentName { get; set; }
+    public int Age { get; set; }
+    public bool isNewlyEnrolled { get; set; }
+    public string Password { get; set; }
+    public DateTime DoB { get; set; }
+}
+
+@model Student
+StudentId:      @Html.EditorFor(m => m.StudentId) <br />
+Student Name:   @Html.EditorFor(m => m.StudentName) <br />
+Age:            @Html.EditorFor(m => m.Age)<br />
+Password:       @Html.EditorFor(m => m.Password)<br />
+isNewlyEnrolled: @Html.EditorFor(m => m.isNewlyEnrolled)<br />
+DoB:            @Html.EditorFor(m => m.DoB)
+// StudentId:      <input data-val="true" data-val-number="The field StudentId must be a number." data-val-required="The StudentId field is required." id="StudentId" name="StudentId" type="number" value="" /> 
+// Student Name:   <input id="StudentName" name="StudentName" type="text" value="" />
+// Age:            <input data-val="true" data-val-number="The field Age must be a number." data-val-required="The Age field is required." id="Age" name="Age" type="number" value="" />
+// Password:       <input id="Password" name="Password" type="text" value="" />
+// isNewlyEnrolled:<input class="check-box" data-val="true" data-val-required="The isNewlyEnrolled field is required." id="isNewlyEnrolled" name="isNewlyEnrolled" type="checkbox" value="true" />
+// <input name="isNewlyEnrolled" type="hidden" value="false" />
+// DoB:            <input data-val="true" data-val-date="The field DoB must be a date." data-val-required="The DoB field is required." id="DoB" name="DoB" type="datetime" value="" />
+```
+
 ================================================================================
