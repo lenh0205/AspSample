@@ -50,8 +50,9 @@
 ```
 
 ## Html.Action
-* -> **invokes the specified child `action method`** and returns the result as an HTML string
-* _về cơ bản thì có 3 thành phần tương tác, `Html.Action` call an `action method` return a `partial view`_
+* -> **invokes the specified `child action method`** (_marked with the **[ChildActionOnly]** attribute_) 
+* -> return the **PartialViewResult** (_derived from **`ActionResult`**_) using the **PartialView()** method, which will final result in an HTML string
+* _về cơ bản thì có 3 thành phần tương tác: `Html.Action` call an `action method` return a `partial view`_
 
 ```cs
 // Index.cshtml
@@ -69,10 +70,7 @@ public ActionResult Show(string param)
 @model List<MVC5_HelloWorld.Models.User>
 <td>@Model.Username</td>
 <td>@Model.Password</td>
-```
-
-```cs
-@{string result = @Html.Action("Action", "Controller", new { param = "value"} ).ToString();}
+@{ string result = @Html.Action("Action", "Controller", new { param = "value"} ).ToString(); }
 ```
 
 ## Html.RenderAction

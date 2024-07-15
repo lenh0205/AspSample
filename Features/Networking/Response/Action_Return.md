@@ -47,3 +47,5 @@ ________________________________________________________________________________
 | HttpUnauthorizedResult | Represents HTTP 403 response              |	                      |
 |------------------------|-------------------------------------------|------------------------|
 ```
+
+# https://tedu.com.vn/lap-trinh-aspnet-core/action-result-trong-aspnet-core-237.html

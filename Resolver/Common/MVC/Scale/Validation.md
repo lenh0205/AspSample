@@ -42,27 +42,6 @@
 * -> the **`ValidationSummary()`** **displays a list of all the error messages** for all the fields
 * => in this way, we can display the default validation message when we submit a form
 
-### ValidationMessageFor
-* **`a strongly typed extension method`** 
-* -> **`first parameter`** - a lambda expression to **specify a property** for which we want to show an error message
-* -> **`second parameter`** is for **custom error message** if any
-* -> **`third parameter`** is for **HTML attributes** such as CSS, style, ...
-
-*  when the user submits a form without entering a StudentName then ASP.NET MVC uses the data- attribute of HTML5 for the validation and the default validation message will be injected when validation error occurs, as shown below.
-
-```cs
-@model Student  
-@Html.EditorFor(m => m.StudentName) <br />
-@Html.ValidationMessageFor(m => m.StudentName, "", new { @class = "text-danger" })
-```
-```html - result
-<input id="StudentName" name="StudentName" type="text" value="" />
-<span class="field-validation-valid text-danger" data-valmsg-for="StudentName" data-valmsg-replace="true"></span>
-```
-
-* __
-
-
 ## Example
 ```cs - Example
 // -> users can not save empty "StudentName" or "Age" value
@@ -147,3 +126,127 @@ public class StudentController : Controller
     @Html.ActionLink("Back to List", "Index")
 </div>
 ```
+
+=================================================================
+## ValidationMessageFor
+* **`a strongly typed extension method`** 
+* -> **`first parameter`** - a lambda expression to **specify a property** for which we want to show an error message
+* -> **`second parameter`** is for **custom error message** if any
+* -> **`third parameter`** is for **HTML attributes** such as CSS, style, ...
+
+*  -> when the user **`submits a form that violate the validation`** then ASP.NET MVC **uses the `data-` attribute** of HTML5 for the validation 
+* -> and the **default validation message will be injected** when validation error occurs
+
+```cs
+@model Student  
+@Html.EditorFor(m => m.StudentName) <br />
+@Html.ValidationMessageFor(m => m.StudentName, "", new { @class = "text-danger" })
+```
+```html - result
+<input id="StudentName" name="StudentName" type="text" value="" />
+<span class="field-validation-valid text-danger" data-valmsg-for="StudentName" data-valmsg-replace="true"></span>
+```
+
+```html - when the user submits a form without entering a "StudentName"
+<span 
+    class="field-validation-error text-danger" 
+    data-valmsg-for="StudentName" 
+    data-valmsg-replace="true"
+>
+    The StudentName field is required
+</span>
+```
+
+## Custom Error Message
+* -> display custom error messages **`instead of the default error message`**
+* -> we can **`provide a custom error message`** either in **ErrorMessage parameter of the data annotation attribute** or in the **ValidationMessageFor()** method
+
+```cs - ErrorMessage
+public class Student
+{
+    public int StudentId { get; set; }
+    [Required(ErrorMessage="Please enter student name.")]
+    public string StudentName { get; set; }
+    public int Age { get; set; }
+}
+```
+
+```cs - specify a message in the "ValidationMessage()" method
+@model Student  
+    
+@Html.Editor("StudentName") <br />
+@Html.ValidationMessageFor(m => m.StudentName, "Please enter student name.", new { @class = "text-danger" })
+```
+
+=================================================================
+# 'ValidationSummary' Extension
+* -> **displays a summary of all validation errors** on a web page as **`an unordered list element`**, it can also be used to **`display custom error messages`**
+* -> the **`ValidationMessageFor`** displays an error message for **an individual field**, whereas the **`ValidationSummary`** displays **all the error messages**
+* _tức là hiển thị tất cả error message của tất cả fields tại vị trí `Html.ValidationSummary` được gọi_
+
+* -> if the **`first parameter`** is false, so it will **display the field level errors as a summary**
+* -> the **`second parameter`** is for the **message**
+* -> the **`third parameter`** is for **HTML attributes**  
+
+* -> we **`added a custom error message`** using the **ModelState.AddModelError()** method
+* -> the **`ValidationSummary()`** method will **automatically display all the error messages added into the ModelState**
+
+```cs
+public class Student
+{
+    public int StudentId { get; set; }
+    [Required]
+    public string StudentName { get; set; }
+    [Range(10, 20)]
+    public int Age { get; set; }
+}
+```
+
+```cs - uses the "ValidationSummary()" method to display all the error messages
+@model Student  
+@Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+@Html.HiddenFor(model => model.StudentId)    
+
+@Html.EditorFor(m => m.StudentName) <br />
+@Html.EditorFor(m => m.Age) <br />
+
+// Nếu ta submit form without populate "Age" and "Name" control, nó sẽ hiện message trên UI:
+// The Name field is required
+// The Age field is required
+```
+
+```cs
+public class StudentController : Controller
+{
+    public ActionResult Edit(int id)
+    {
+        var stud = ... get the data from the DB using Entity Framework
+
+        return View(stud);
+    }
+
+    [HttpPost]
+    public ActionResult Edit(Student std)
+    {
+        if (ModelState.IsValid) { //checking model state
+            
+            //check whether name is already exists in the database or not
+            bool nameAlreadyExists = * check database *       
+        
+            if(nameAlreadyExists)
+            {
+                //adding error message to ModelState
+                ModelState.AddModelError("name", "Student Name Already Exists.");
+    
+                return View(std);
+            }
+            
+            return RedirectToAction("Index");
+        }
+
+        return View(std);
+    }
+}
+```
+
