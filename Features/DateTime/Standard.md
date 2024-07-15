@@ -1,5 +1,5 @@
 =======================================================================
-> Đọc cái này: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
+> Phân tích cài này: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
 
 ## "Standard date and time format string" and "Custom date and time format string"
 * -> _`a standard date and time format string`_ uses a single character as the **format specifier** to define the text representation of **`a 'DateTime' or a 'DateTimeOffset' value`**
