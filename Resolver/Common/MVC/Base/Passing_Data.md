@@ -1,4 +1,45 @@
 =========================================================================
+# Model 
+
+```cs
+// Models
+namespace HelloWorld.Models
+{
+    public class MessageModel 
+    {
+        public string Welcome { get; set; }
+    }
+}
+
+// HomeController
+public ActionResult Index()
+{
+    var message = new MessageModel();
+    message.Welcome = "welcome to the world";
+    return View(message);
+}
+
+// ~/Views/Home/Index.cshtml
+@{
+    Layout = null;
+}
+@model HelloWorld.Models.MessageModel // this one
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width-device-width"/>
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        @Model.Welcome
+    </div>
+</body>
+</html>
+```
+
+=========================================================================
 # ViewBag
 * -> used to **transfer temporary data** (_which is **`not included in the model`**_) from the **controller to the view, not visa-versa** 
 * -> it is a **dynamic** type - so we can **assign any number of properties and values to ViewBag** (_if we assign the `same property multiple times`, it will only **`consider last value assigned`**_)

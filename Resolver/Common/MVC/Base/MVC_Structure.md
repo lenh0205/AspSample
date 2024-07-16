@@ -12,7 +12,8 @@
 
 ## App_Start
 * -> contain **class files that will be executed when the application starts**
-* -> typically, these would be **`config files`** - **by default of MVC 5** are **`BundleConfig.cs`**, **`FilterConfig.cs`**, **`RouteConfig.cs`**; or some others common like **`AuthConfig`**, ... 
+* -> typically, these would be **config files** 
+* -> **by default of MVC 5** are **`BundleConfig.cs`**, **`FilterConfig.cs`**, **`RouteConfig.cs`**; or some others common like **`AuthConfig`**, ... 
 
 ## Content
 * -> contains **static files** like **`CSS files, images, and icons files`**
@@ -47,14 +48,15 @@
 * -> allows us to **write code that runs in response to application-level events** 
 * -> such as **Application_BeginRequest**, **application_start**, **application_error**, **session_start**, **session_end**, ...
 
-## Packages.config
+## packages.config
 * -> **`is managed by NuGet`** to **track what packages and versions** we have **`installed in the application`**
+* _nó cho phép khi chuyển sang 1 project khác, khi build nó sẽ tự động lấy những `dll` định nghĩa trong file packages.config_
 
 ## Web.config
 * -> contains **application-level configurations**
 
 ===========================================================================
-# Routing
+# Routing - RouteConfig.cs
 * -> Routing is about **maps URL to physical file or class**
 * -> Routing process includes defining **`configured routes of an application`** - the **URL pattern** and **handler** information
 * -> these config will be stored in **RouteTable** and will be **used by the Routing engine** to **`determine appropriate handler class or file`** for an **`incoming request`**
