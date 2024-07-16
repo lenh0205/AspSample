@@ -1,3 +1,18 @@
+====================================================================
+# Requirement
+* -> để parse **`string`** thành **`DateTime`** object đòi hỏi ta cần **specific information about how the dates and times are represented as text**
+* _`different cultures` use different orders for day, month, and year_
+* _some `time representations` use a 24-hour clock, others specify "AM" and "PM"_
+* _some applications `need only the date`; others need only the time; still others need to specify both the date and time_ 
+
+* _so there are 3 subtasks to `correctly converting text into a DateTime`:_
+* -> must **specify the expected format** of the text representing a date and time
+* -> can **specify the culture** for the format of a date time.
+* -> can **specify how missing components** in the text representation are set in the date and time
+
+* -> the methods that convert strings to DateTime objects enable us to **provide detailed information about the formats we expect** and **the elements of a date and time our application needs**
+
+====================================================================
 # String to DateTime Conversion
 * -> có **`5 built-in methods`** luôn được sử dụng: **Convert.ToDateTime()**, **DateTime.Parse()**, **DateTime.TryParse()**, **DateTime.ParseExact()**, **DateTime.TryParseExact()**
 
