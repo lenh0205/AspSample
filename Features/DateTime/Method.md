@@ -10,14 +10,17 @@
 * -> can **specify the culture** for the format of a date time.
 * -> can **specify how missing components** in the text representation are set in the date and time
 
-* -> the methods that convert strings to DateTime objects enable us to **provide detailed information about the formats we expect** and **the elements of a date and time our application needs**
+* => the methods that convert strings to DateTime objects enable us to **provide detailed information about the formats we expect** and **the elements of a date and time our application needs**
 
 ====================================================================
 # String to DateTime Conversion
 * -> có **`5 built-in methods`** luôn được sử dụng: **Convert.ToDateTime()**, **DateTime.Parse()**, **DateTime.TryParse()**, **DateTime.ParseExact()**, **DateTime.TryParseExact()**
 
 * => sự khác biệt giữa _`Convert.ToDateTime`, `DateTime.Parse`, `DateTime.TryParse`_ nằm ở việc xử lý đối với **string input value is `null`** và **string input value is `invalid`**
-* => sự khác biệt giữa _`DateTime.Parse`, `DateTime.ParseExact`_ nằm ở việc _DateTime.ParseExact_ cho phép ta truyền pattern của "datetime string value" giúp việc **parse những invalid format trở nên khả thi**
+* => sự khác biệt giữa _`DateTime.Parse`, `DateTime.ParseExact`_ nằm ở việc _`DateTime.ParseExact`_ cho phép ta truyền pattern của datetime string value () giúp việc **parse những invalid format trở nên khả thi**
+* (_về cơ bản `DateTime.Parse` và `DateTime.TryParse` chỉ dùng để parse những common presentations of date and time, đọc `~/Features/DateTime` để hiểu rõ hơn_)
+
+## 
 
 ## Valid datetime format in any case
 * -> Format should be **MM-dd-yyyy**
@@ -53,10 +56,24 @@ DateTime dateTime = DateTime.Parse(dateString);
 // Exception: String was not recognized as a valid DateTime (because the day of week was incorrect)
 ```
 
+```cs
+string dateInput = "Jan 1, 2009";
+var parsedDate = DateTime.Parse(dateInput);
+Console.WriteLine(parsedDate); // displays the following output on a system whose culture is en-US:   1/1/2009 00:00:00
+
+// uses a format provider to parse a German string into a DateTime:
+var cultureInfo = new CultureInfo("de-DE"); // creates a CultureInfo representing the de-DE culture
+string dateString = "12 Juni 2008";
+var dateTime = DateTime.Parse(dateString, cultureInfo);
+// -> by using the standard "DateTimeFormatInfo" objects that we specific 
+// -> it precludes whatever setting is in the "CurrentCulture" of the "CurrentThread"
+Console.WriteLine(dateTime); // The example displays the following output:   6/12/2008 00:00:00
+```
+
 ====================================================================
 ## Convert.ToDateTime()
 * -> converts **`specified string data`** to _equivalent date and time_
-* -> it contains a couple of overload methods, but **`2 most important`**: **ToDateTime(string value)** and **oDateTime(string value, IFormatProvider provider)**
+* -> it contains a couple of overload methods, but **`2 most important`**: **ToDateTime(string value)** and **ToDateTime(string value, IFormatProvider provider)**
 
 * -> **value**: **`a string representation of date and time`**; 
 * -> **provider**: an object which provides **`culture-specific info`**
