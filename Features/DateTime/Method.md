@@ -20,8 +20,6 @@
 * => sự khác biệt giữa _`DateTime.Parse`, `DateTime.ParseExact`_ nằm ở việc _`DateTime.ParseExact`_ cho phép ta truyền pattern của datetime string value () giúp việc **parse những invalid format trở nên khả thi**
 * (_về cơ bản `DateTime.Parse` và `DateTime.TryParse` chỉ dùng để parse những common presentations of date and time, đọc `~/Features/DateTime` để hiểu rõ hơn_)
 
-## 
-
 ## Valid datetime format in any case
 * -> Format should be **MM-dd-yyyy**
 
@@ -59,15 +57,23 @@ DateTime dateTime = DateTime.Parse(dateString);
 ```cs
 string dateInput = "Jan 1, 2009";
 var parsedDate = DateTime.Parse(dateInput);
-Console.WriteLine(parsedDate); // displays the following output on a system whose culture is en-US:   1/1/2009 00:00:00
+Console.WriteLine(parsedDate); // output on a system whose culture is en-US:   1/1/2009 00:00:00
 
 // uses a format provider to parse a German string into a DateTime:
-var cultureInfo = new CultureInfo("de-DE"); // creates a CultureInfo representing the de-DE culture
+// -> creates a CultureInfo representing the "de-DE" culture
+// -> this CultureInfo object ensures successful parsing of the given string below
+var cultureInfo = new CultureInfo("de-DE"); 
 string dateString = "12 Juni 2008";
 var dateTime = DateTime.Parse(dateString, cultureInfo);
 // -> by using the standard "DateTimeFormatInfo" objects that we specific 
 // -> it precludes whatever setting is in the "CurrentCulture" of the "CurrentThread"
-Console.WriteLine(dateTime); // The example displays the following output:   6/12/2008 00:00:00
+Console.WriteLine(dateTime); // output:   6/12/2008 00:00:00
+
+var cultureInfo = new CultureInfo("de-DE");
+string dateString = "12 Juni 2008";
+var dateTime = DateTime.Parse(dateString, cultureInfo,
+                                DateTimeStyles.NoCurrentDateDefault);
+Console.WriteLine(dateTime); // output if the current culture is en-US: 6/12/2008 00:00:00
 ```
 
 ====================================================================
