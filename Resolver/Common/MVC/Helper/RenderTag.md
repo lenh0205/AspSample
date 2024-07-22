@@ -79,7 +79,7 @@ public class MvcApplication : System.Web.HttpApplication
 ===================================================================================
 # "Html.ActionLink" and "Html Anchor Tag" 
 
-## "Html.ActionLink" and "
+## "Html.ActionLink"
 * -> we should use **`Html.ActionLink()` to generate anchor tags** and **`Url.Action()` to generate URL** 
 
 * -> as it will make sure to **`generate correct relative URL`** **from the action and controller name**

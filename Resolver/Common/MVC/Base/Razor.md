@@ -1,3 +1,5 @@
+=============================================================================
+
 # Model in ASP.NET MVC
 * -> represents the **`shape of the domain-specific data as public properties`** and **`business logic as methods`** in MVC application
 * -> the model class can be **`used in the view to populate the data`**, as well as **`sending data to the controller`**

@@ -44,7 +44,8 @@ root
     |--HRAreaRegistration.cs
 ```
 
-## Creating and Register Area
+=========================================================================
+# Creating and Register Area
 * -> open Visual Studio -> right-click on the project -> Add -> Area... -> enter Area name
 * -> sau đó ta có thể thêm vào Area ta vừa tạo các controller, view, model
 
@@ -65,8 +66,9 @@ protected void Application_Start()
 }
 ```
 
-## Structure
-* -> each `Area` includes the **AreaRegistration** class - override the **RegisterArea** method to **`map the routes for the area`**
+=========================================================================
+# Structure
+* -> each `Area` includes the **AreaRegistration** class - override the **RegisterArea** method to **`map the routes for the Area`**
 
 ```cs - adminAreaRegistration.cs
 public class adminAreaRegistration : AreaRegistration 
@@ -89,7 +91,12 @@ public class adminAreaRegistration : AreaRegistration
             "admin_default",
             "admin/{controller}/{action}/{id}",
             new { action = "Index", id = UrlParameter.Optional }
+            // -> ta có thể sửa thành: new { action = "Index", controller = "Home", id = UrlParameter.Optional }
+            // -> để chỉ cần truy cập "http://localhost/admin" thì nó sẽ nhảy đến "Index.cshtml" của "Home"
         );
     }
 }
 ```
+
+## Folder Structure
+* -> each `Area folder` by default will include _`Controllers`, `Models`, `Views` folder_ and _a `AreaRegistration.cs` file_  
