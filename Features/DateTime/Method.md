@@ -71,8 +71,8 @@ Console.WriteLine(dateTime); // output:   6/12/2008 00:00:00
 
 var cultureInfo = new CultureInfo("de-DE");
 string dateString = "12 Juni 2008";
-var dateTime = DateTime.Parse(dateString, cultureInfo,
-                                DateTimeStyles.NoCurrentDateDefault);
+var dateTime = DateTime.Parse(dateString, cultureInfo,DateTimeStyles.NoCurrentDateDefault);
+// -> uses the 'DateTimeStyles' enumeration to specify that the current date and time information shouldn't be added to the DateTime for unspecified fields
 Console.WriteLine(dateTime); // output if the current culture is en-US: 6/12/2008 00:00:00
 ```
 
