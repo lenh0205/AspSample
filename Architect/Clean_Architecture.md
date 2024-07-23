@@ -109,3 +109,8 @@ Trả View về cho Client.
 * -> khi so sánh với Onion Architecture, **Clean Architecture** sẽ duy trì Application Services layer (Use Cases) và Entities layer nhưng dường như nó quên mất **`Domain Services layer`**
 * -> tuy nhiên thực tế trong Clean Architecture, **Entities** không chỉ là và Entity theo ý nghĩa của DDD mà bất cứ Domain object nào; tức là **`2 layer bên trong đã được sát nhập để đơn giản sơ đồ`**
 * _"Một entity có thể là một đối tượng với các phương thức, hoặc nó có thể là một tập hợp các cấu trúc dữ liệu và các hàm"_
+
+
+# Triển khai với ASP.NET
+https://topdev.vn/blog/lam-the-nao-de-sap-xep-clean-architecture-theo-modular-patterns-trong-10-phut/
+https://tuhocict.com/lesson/web-application-architectures/#google_vignette

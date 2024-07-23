@@ -1,0 +1,2 @@
+https://www.mongodb.com/resources/basics/databases/document-databases
+https://www.mongodb.com/resources/basics/databases/types#:~:text=MongoDB%20is%20a%20NoSQL%20distributed,maps%20to%20a%20flexible%20schema.

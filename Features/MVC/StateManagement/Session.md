@@ -1,3 +1,4 @@
+======================================================================
 # the ASP.NET session state mechanism 
 * -> uses a **session identifier** (**`session ID`**) 
 * -> to **`distinguish between different user sessions`** and **`associate the correct session data with each user's requests`**
@@ -13,3 +14,5 @@
 ## Session Data Retrieval: 
 * -> when we retrieve the value of Session["myProperty"], the ASP.NET runtime **`uses the session ID`** to **look up the correct session data**
 * -> then return the value that we **`had previously stored`**
+
+    

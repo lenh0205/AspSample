@@ -1,34 +1,35 @@
 ================================================================
-# NoSql
-* -> NoSQL databases are widely recognized for their **ease of development**, **functionality**, and **performance at scale**
-
-## Flexibility
-* -> _NoSQL databases_ generally **provide flexible schemas**  to **`store data`**
-* -> that **enable faster and more iterative development**
-* -> the flexible data model makes NoSQL databases ideal for **semi-structured** and **unstructured data**
-
-## Scalability
-* -> scale easily for **`building modern applications`**
-* -> it's typically **designed to scale out by using distributed clusters of hardware**, as opposed to **`scaling up by adding expensive and robust servers`**
-* _some cloud providers handle these operations behind the scenes as a fully managed service_
-
-## High performance
-* -> _NoSQL databases_ are **optimized for specific data models and access patterns**
-* -> these **`enable higher performance`** than if we were trying to accomplish **`similar functionality with relational databases`**
-
-## Highly functional
-* -> _NoSQL databases_ provide **highly functional APIs and data types** that are **purpose-built** for **`each of their respective data models`**
+# Mechanism
+* -> _NoSQL databases_ **use a variety of data models for `accessing` and `managing` data**; **these types of databases are optimized specifically** for applications that require:
+* -> **`flexible data models`**, **`large data volume`**, and **`low latency`**, which are achieved by **relaxing some of the data consistency restrictions of relational databases**
+* -> there are differences in implementation based on the data model; however, many NoSQL databases **`use Javascript Object Notation (JSON)`** - an open data interchange format that represents data as a collection of name-value pairs
 
 ================================================================
-# Example
+
+# Example 1
 * -> **`applications process a large data volume from disparate sources`** like _social media, smart sensors, and third-party databases_
 * -> all of this **`disparate data doesn't fit neatly into the relational model`**
 * -> **`enforcing tabular structures`** can lead to **redundancy, data duplication, and performance issues at scale**
 
+# Example 2
+```r
+// in a "relational database", a book record is often disassembled (or normalized) and stored in separate "tables", and relationships are defined by primary and foreign "key" constraints
+// -> the "Books table" has columns for ISBN, Book Title, and Edition Number
+// -> the "Authors table" has columns for AuthorID and Author Name; 
+// -> and finally, the "Author-ISBN" table has columns for AuthorID and ISBN
+// => the "relational model" is designed to enable the database to "enforce referential integrity between tables in the database", "normalized to reduce the redundancy", and "generally optimized for storage"
+
+// in a "NoSQL database", a book record is usually stored as a "document"
+// -> for each book - the item, ISBN, Book Title, Edition Number, Author Name, and AuthorID are stored as attributes in a single document
+// -> in this model, data is "optimized for intuitive development" and "horizontal scalability"
+```
+
+================================================================
 # Use Cases
 * -> the range of NoSQL databases and their respective uses cases are **wide-ranging**
 * -> like building **`high-performance mobile`**, **`Internet of Things (IoT)`**, **`gaming`**, and **`web applications that provide great user experiences at scale`**
-* -> while it is challenging to present a representative set of use cases, below we provide a few illustrative examples as thought-starters:
+
+* _while it is challenging to present a representative set of use cases, below is a few illustrative examples as thought-starters:_
 
 ## Real-time data management
 * -> we can deliver **`real-time recommendations`**, **`personalization`**, and **`improved user experiences`** with NoSQL databases
