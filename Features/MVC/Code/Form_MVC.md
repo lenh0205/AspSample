@@ -30,6 +30,11 @@ public class LoginController : Controller
         }
         else {
             Session["username"] = user.UserName;
+            // -> hiểu đơn giản thì đây là 1 dấu check để biết user login hay chưa
+            // => trong trường hợp này, chỉ cần get ra Session["username"] != null là đã login rồi
+            // -> ta có thể viết kiểu này Session["isLoggedIn"] = true; để thể hiện điều tương tự
+            // -> nhưng thường ta sẽ lưu 1 user info (VD: userId) để sau này truy xuất Database nếu cần
+            // -> và tất nhiên trước khi có thể check thì ta cần Authen người dùng trước 
         }
 
         return View(user);
