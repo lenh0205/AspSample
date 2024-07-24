@@ -150,6 +150,5 @@ public static class WebApiConfig
 [RequireHttps]
 public class ValuesController : ApiController
 {
-
 }
 ```
