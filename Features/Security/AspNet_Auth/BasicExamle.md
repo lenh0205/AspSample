@@ -1,3 +1,8 @@
+# Content
+* _`/Login` action kiểm `usename-password` gửi tới với cái đã lưu trong `Database`_
+* _nếu oke thì generate 1 cái `Token` từ `Claims`_
+* _và set `Token` vào `cookie` với tên "jwtCookie"; những request phía sau sẽ có cookie này và `server chỉ cần kiểm tra cookie này là được`_
+* _khi ta `decode` token này ra ta sẽ thấy 3 phần `Header.Payload.Signature`_
 
 # Setup NuGet package
 * -> install **Microsoft.AspNetCore.Authentication.JwtBearer**
@@ -12,7 +17,7 @@ services
         options.DefaultScheme = JwtBearerDefaults.AuthentcationScheme;
     })
     .AddJwtBearer(options => 
-    {
+    { // validate token
         options.SaveToken = true;
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
@@ -32,9 +37,15 @@ app.UseAuthorization();
 ```
 
 # Login Action
-* _`/Login` action kiểm `usename-password` gửi tới với cái đã lưu trong `Database`_
-* _nếu oke thì tạo 1 `Token` và set vào `cookie` với tên "jwtCookie"; những request phía sau sẽ có cookie này và `server chỉ cần kiểm tra cookie này là được`_
-* _khi ta `decode` token này ra ta sẽ thấy 3 phần `Header.Payload.Signature`_
+
+```cs - Users.cs
+public class Users
+{
+    public string UserName { get; set; }
+    public string Password { get; set; }
+    public string Role { get; set; }
+}
+```
 
 ```cs
 [ApiController]
@@ -48,13 +59,17 @@ public class AuthController : ControllerBase
             .Where(a => a.UserName == username && a.Password == password).FirstOrDefault();
         if (loginUser == null) return new JsonResult("Login Failed");
 
-        var accessToken = GenerateJSONWebToken();
+        var claims = new[] 
+        {
+            new Claim(ClaimTypes.Role, loginUser.Role)
+        };
+        var accessToken = GenerateJSONWebToken(claims);
         setJWTCookie(accessToken);
 
         return new JsonResult(accessToken);
     }
 
-    private string GenerateJSONWebToken()
+    private string GenerateJSONWebToken(Claim[] claims)
     {
         // import "SymmetricSecurityKey", "SymmetricSecurityKey" from "System.IdentityModel.Tokens"
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SomethingSecret")); 
@@ -82,7 +97,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("jwtCookie", token, cookieOptions);
     }
 
-    private List<Users> CreateDummyUsers()
+    private List<Users> CreateDummyUsers() // Database
     {
         List<Users> userList = new List<Users> 
         {
@@ -92,13 +107,6 @@ public class AuthController : ControllerBase
         }
         return userList;
     }
-}
-
-public class Users
-{
-    public string UserName { get; set; }
-    public string Password { get; set; }
-    public string Role { get; set; }
 }
 ```
 
@@ -117,4 +125,48 @@ public class HomeController : ControllerBase
 axios.get('https://url', {}, { 
     Authorization: `Bearer ${token}` 
 });
+```
+
+# Create a custom "Middleware" to modify request at server - create 'Authorization' header from 'cookie' header
+* _vì ta đã sử dụng `HttpOnly`, nên các client app không thể sử dụng `Javascript` để đọc giá trị từ `cookie`, vậy nên cũng không thể tạo ra `Authorization header - Bearer Token` được_
+* _mà server thì đang kiểm tra token thông qua `Authorization Bearer`_
+* _tức là hiện tại user muốn truy cập vào `protected resouces`, thì đòi hỏi họ phải tự vào DevTook copy giá trị của Token trong Cookie, rồi dùng 1 công cụ gọi API như `Postman` để paste token vô mới gọi được_
+* => _vậy nên tại server trước khi kiểm tra token, nó sẽ can thiệp vào `HttpRequest` object trước đó - bằng cách tạo thêm 1 `Authorization header - Bearer token` rồi nhét giá trị của của cookie vào_
+
+```cs
+public class JWTInHeaderMiddleware
+{
+    private readonly RequestDelegate _next;
+    public JWTInHeaderMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+    public async Task Invoke(HttpContext context)
+    {
+        var name = "jwtCookie";
+        var cookie = context.Request.Cookies[name];
+
+        if (cookie != null && !context.Request.Headers.ContainsKey("Authorization"))
+        {
+            context.Request.Headers.Append("Authorization", "Bearer " + cookie);
+        }
+        await _next.Invoke(context);
+    }
+}
+```
+
+```cs - Startup.cs
+app.Routing();
+app.UseMiddleware<JWTInHeaderMiddleware>();
+```
+
+```cs
+[Authorize(Roles = "Admin")] // require "Authentication"; and "Authorization" with Role = "Admin"
+[ApiController]
+[Route("[controller]")]
+public class HomeController : ControllerBase
+{
+}
+// -> vậy nên giờ để truy cập được action trong "AdminController" đòi hỏi ta phải login bằng "username" là "a" và "password" là "a"
+// -> nếu không nó sẽ trả về 403: Forbidden
 ```
