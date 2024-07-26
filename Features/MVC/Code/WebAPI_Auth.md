@@ -18,7 +18,7 @@ public static class WebApiConfig
             defaults: new { id = RouteParameter.Optional }
         );
 
-        config.Filters.Add(new BasicAuthenticationAttribute());
+        config.Filters.Add(new BasicAuthenticationAttribute()); // Add this filter
     }
 }
 ```
