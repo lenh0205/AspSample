@@ -1,5 +1,6 @@
 > ta cần nhớ rằng việc sử dụng session (`stateful`) là của các Web App trước đây theo kiến trúc monolothic giúp thuận tiện hơn trong việc sử dụng thông tin được cá nhân hoá
 > sau này các hệ thống phân tán ngày càng nhiều nên việc thiết kế Web API (`stateless`) trở nên phát triển hơn
+> và 1 điều nữa thì mobile app không thể sử dụng cookie nên ta cần sử dụng token
 > 1 khi đã gọi là stateful, tức là request sau có thể sẽ phải phụ thuộc vào request trước đó; và điều này khá nguy hiểm nếu request trước đó bị lỗi
 
 > cách làm chức năng shopping cart trong stateless web app

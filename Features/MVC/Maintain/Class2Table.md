@@ -1,5 +1,5 @@
 
-
+# create "table" in database from "class" in project
 ```r - MVC
 // xem "~/Resolver/Common/MVC/Code/Form_MVC.md" để tìm hiểu thêm
 ```

@@ -1,4 +1,5 @@
-# implement Data Validation in MVC
+=================================================================
+# Implement Data Validation in MVC
 * -> include **`data validation`** and **`display validation messages`** on the **violation of business rules** in an ASP.NET MVC applicatio
 
 ## add validation metadata by 'Data Annotation' Attributes

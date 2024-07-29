@@ -1,6 +1,6 @@
 ==================================================================
 # 'Basic Auth' for Web API in MVC project
-* -> trong thực tế, thì ta chỉ gửi **`username-password`** lần đầu thôi sau đó ta sẽ sử dụng **`token`** (token-base authentication)
+* _đòi hỏi mỗi lần thực hiện Action đều cần gửi `username-password`_
 
 ```cs - ~/App_Start/WebApiConfig.cs
 public static class WebApiConfig
@@ -83,9 +83,20 @@ public class ValuesController : ApiController
 await axios.post(Url, {}, { auth: { username, password } });
 ```
 
+==================================================================
 # Using Token in 'Basic Auth'
+* -> trong thực tế, thì ta chỉ gửi **`username-password`** lần đầu thôi sau đó ta sẽ sử dụng **`token`** (token-base authentication)
 * _lần đầu gửi lên `username:password` thực sự, server sẽ trả về 1 `token` đồng thời lưu `token` này vào trường `Token` của `User`_
 * _lần sau gửi lên `token: tokenValue` theo dạng `username: password` của Basic Auth; so sánh với token của user trong database_
+
+* **BCrypt** - thuật toán **`Hashing`**
+* -> cùng 1 input nhưng mỗi lần hashing sẽ ra 1 output khác nhau (_khác ở phần `salt` và `hashing password`_)
+* -> nhưng hàm **`verify()`** của nó có thể kiểm tra 1 output bất kỳ và input có khớp nhau không
+* -> chuỗi output hasing sẽ trông như này: 
+```r
+// [Algorithm][cost][salt][hashed password]
+// VD: "$2y$10$6z7GKa9kpDN7KC3ICW1Hi.fd0/to7Y/x36WUKNPOIndHdkdR9Ae3K"
+```
 
 ```cs - User.cs
 public partial class User 
@@ -122,12 +133,20 @@ public class BasicAuthenticationAttribute : AuthorizationFilterAttribute
             }
             else {
                 fakeToken = RandomString(100);
-                User user = db.Users.SingleOrDefault(w => w.userName == userName && w.password == password);
+                User user = db.Users.SingleOrDefault(w => w.userName == userName);
                 if (user != null)
                 {
-                    isValid = true;
-                    user.token = fakeToken;
-                    db.SaveChanges();
+                    // hash and save a password
+                    int costParameter = 12;
+                    string hashedPassword = BCrypt.Net.Bcrypt.HashPassword(password, costParameter);
+                    bool test = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+
+                    // check a password
+                    isValid = BCrypt.Net.BCrypt.Verify(password, user.password);
+                    if (isValid) {
+                        user.token = fakeToken;
+                        db.SaveChanges();
+                    }
                 }
             }
             

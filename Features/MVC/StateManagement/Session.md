@@ -1,3 +1,7 @@
+> về cơ bản thì `Session` để maintain specific **`user state`** khi chuyển trang (hoặc reload page) => keep track of user actions
+> do đó session có thể được dùng để ensure **secure interactions** between the users and the website or web application
+> dữ liệu trong session là dữ liệu tạm chỉ tồn tại trong 1 phiên mặc định của ASP.NET là 20 phút
+
 ======================================================================
 # the ASP.NET session state mechanism 
 * -> uses a **session identifier** (**`session ID`**) 
