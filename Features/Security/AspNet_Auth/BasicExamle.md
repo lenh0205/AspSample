@@ -17,6 +17,11 @@
 {
     "AppSettings": {
         "Secret": "this is the secret string with 32 characters"
+    },
+    "JWT": {
+        "ValidIssuer": "https://localhost:7014",
+        "ValidAudience": "client",
+        "Secret": "this is the secret string with 32 characters"
     }
 }
 ```
@@ -39,10 +44,10 @@ services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
 ```cs - Startup.cs
 // -> thuật toán chỉ chạy trên bit nên ta sẽ cần Encode 'secret key'
-var secretKey = Configuration["AppSettings:SecretKey"];
+var secretKey = Configuration["JWT:Secret"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
 
-services
+builder.Services
     .AddAuthentication(option => { // sử dụng lại Authen nào ? (cookie-base, jwt bearer, ...)
         // import "JwtBearerDefaults" from "Microsoft.AspNetCore.Authentication.JwtBearer"
         options.DefaultAuthentcateSheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,12 +59,14 @@ services
     { // validate token
         options.SaveToken = true;
         options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+
+        // import "TokenValidationParameters" from "Microsoft.IdentityModel.Tokens"
+        options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidIssuer = "https://abc",
-            ValidAudience = "https://abc",
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
             ClockSkew = TimeSpan.Zero, // force token to expire exactly at token expiration time
             IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
             // ValidateIssuerSigningKey = true, // related to X509 certificate
@@ -514,11 +521,185 @@ public class AuthController : ControllerBase
 ```
 
 =======================================================================
-# ASP.NET Core Identity
-* https://www.youtube.com/watch?v=9YSOZgBvWXY
+> hỗ trợ 1 số UI; cung cấp các **`identity model`** cho phép ta customize 
+> https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-8.0
+
 * https://www.youtube.com/watch?v=ltQQPPWV3QA
 
+# ASP.NET Core Identity
+* -> install **Microsoft.AspNetCore.Identity**
 
+## Tạo 'user' model
 
+```cs - ~/Data/ApplicationUser.cs
+using Microsoft.AspNetCore.Identity;
 
+public class ApplicationUser : IdentityUser
+{
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+}
+```
+
+## Modify 'DbContext'
+* -> install **Microsoft.AspNetCore.Identity.EntityFrameworkCore**
+
+```cs
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+public class MyDbContext : IdentityDbContext<ApplicationUser> // chỉ định lớp quản lý user là 'ApplicationUser'
+{
+    public DbSet<Book> Books { get; set; }
+}
+```
+
+## Cấu hình service sử dụng Identity
+* -> install **Microsoft.AspNetCore.Authentication.JwtBearer**
+
+```cs - program.cs
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>() // add "Identity" service
+    .AddEntityFrameworkStores<MyDbContext>() // chứa 1 số bảng của "Identity"
+    .AddDefaultTokenProvider();
+
+builder.Services.AddDbContext<MyDbContext>(options => {
+    options.UseSqlServer(builder.Configuration.GetConnectString("myDb"))});
+
+```
+
+## Migration
+* -> **Add-Migration AddIdentity** - ta sẽ thấy nó tạo 1 list bảng **`AspNetRoles`**, **`AspNetUsers`**, **`AspNetRoleClaims`**, **`AspNetUserClaims`**, **`AspNetUserLogins`**, **`AspNetUserRoles`**, **`AspNetUserTokens`**
+* -> **update-database** - vào SSMS để xem diagram biểu thị mối quan hệ của những bảng này
+
+## Tạo Model cho "login" và "signup"
+
+```cs - ~/Model/
+public class SignInModel 
+{
+    [Required, EmailAddress]
+    public string Email { get; set; } = null!;
+
+    [Required]
+    public string Password { get; set; } = null!;
+}
+
+public class SignUpModel
+{
+    [Required]
+    public string FirstName { get; set; } = null!;
+
+    [Required]
+    public string LastName { get; set; } = null!;
+
+    [Required, EmailAddress]
+    public string Email { get; set; } = null!;
+
+    [Required]
+    public string Password { get; set; } = null!;
+
+    [Required]
+    public string ConfirmPassword { get; set; } = null!;
+}
+```
+
+## Repositories
+
+```cs - ~/Repositories/IAccountRepository.cs
+public interface IAccountRepository
+{
+    public Task<IdentityResult> SignUpAsync(SignUpModel model);
+    public Task<string> SignInAsync(SignInModel model); // trả về token 
+}
+
+public class AccountRepository : IAccountRepository
+{
+    private readonly UserManager<ApplicationUser> userManager;
+    private readonly SignInManager<ApplciationUser> signInManager;
+    private readonly IConfiguration configuration;
+
+    // "UserManager", "SignInManager" là service cung cấp bởi Identity
+    public AccountRepository(
+        UserManager<ApplicationUser> userManager, 
+        SignInManager<ApplciationUser> signInManager,
+        IConfiguration configuration
+    )
+    {
+        this.userManager = userManager;
+        this.signInManager = signInManager;
+        this.configuration = configuration;
+    }
+
+    public Task<string> SignInAsync(SignInModel model)
+    {
+        // 'signInManager' sẽ tự động check giúp ta
+        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+        if (!result.Succeeded) return string.Empty;
+
+        var authClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, model.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+        var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+
+        var token = new JwtSecurityToken(
+            issuer: configuration["JWT:ValidIssuer"],
+            audience: configuration["JWT:ValidAudience"],
+            expires: DateTime.Now.AddMinutes(20),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
+        );
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task<IdentityResult> SignUpAsync(SignUpModel model)
+    {
+        var user = new ApplicationUser
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Email = model.Email,
+            UserName = model.Email
+        };
+
+        // 'userManager' tự động lưu vào "AspNetUsers" table 
+        // nó cũng sẽ hash password cho ta luôn
+        return await userManager.CreateAsync(user, model.Password); 
+    }
+}
+```
+
+```cs
+// program.cs
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
+// Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class AccountsController : ControllerBase
+{
+    private readonly IAccountRepository accountRepo;
+
+    public AccountsController(IAccountRepository repo)
+    {
+        accountRepo = repo;
+    }
+
+    [HttpPost("SignUp")]
+    public async Task<IActionResult> SignUp (SignUpModel signUpModel)
+    {
+        var result = await accountRepo.SignUpAsync(SignUpModel);
+        if (result.Succeeded) return Ok(result.Succeeded);
+        return Unauthorized();
+    }
+
+    [HttpPost("SignIn")]
+    public async Task<IActionResult> SignIn(SignInModel signInModel)
+    {
+        var result = await accountRepo.SignInAsync(signInModel);
+        if (string.IsNullOrEmpty(result)) return Unauthorized();
+        return Ok(result);
+    }
+}
+```
 
