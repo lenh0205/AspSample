@@ -1,3 +1,6 @@
+> việc sử dụng session rất thích hợp khi ta muốn persist giỏ hàng từ lúc user chưa login rồi sau đó login
+https://xuanthulab.net/asp-net-core-mvc-xay-dung-gio-hang-cart-voi-net-core.html
+
 =================================================================
 # "Shopping cart" feature by 'session'
 * -> dùng session để lưu 1 list `CartItem`
@@ -11,18 +14,15 @@ services.AddSession();
 app.UseSession();
 ```
 
-```cs - create model
-public class CartItem
-{
-    public int MaHh { get; set; } // id 
-    public string TenHh { get; set; }
-    public string Hinh { get; set; }
-    public double DonGia { get; set; }
-    public int SoLuong { get; set; }
-    public double ThanhTien => SoLuong * DonGia;
-}
+```cs - hoặc
+services.AddDistributedMemoryCache();  // đăng ký dịch vụ lưu cache trong bộ nhớ (Session sẽ sử dụng nó)
+services.AddSession(cfg => { // Đăng ký dịch vụ Session
+    cfg.Cookie.Name = "mySession";   // tên Session - sử dụng ở Browser (Cookie)
+    cfg.IdleTimeout = new TimeSpan(0,30, 0); // Thời gian tồn tại của Session
+});
 ```
 
+## write "Extension" to interact with session easier
 ```cs - Session Extension
 // ví 'session' chỉ hỗ trợ kiểu "string" và "int"; vậy nên ta sẽ viết extension để hỗ trợ kiểu phức tạp hơn
 public static class SessionExtensions
@@ -39,16 +39,31 @@ public static class SessionExtensions
 } 
 ```
 
+## Model
+```cs - create model
+public class CartItem
+{
+    public int MaHh { get; set; } // id 
+    public string TenHh { get; set; }
+    public string Hinh { get; set; }
+    public double DonGia { get; set; }
+    public int SoLuong { get; set; }
+    public double ThanhTien => SoLuong * DonGia;
+}
+```
+
+## Action
 ```cs - controller
 public class CartController : Controller
 {
     private readonly MyStore2020Context _context;
+    public const string CARTKEY = "GioHang";
 
     public List<CartItem> Carts
     {
         get 
         {
-            var data = HttpContext.Session.Get<List<CartItem>>("GioHang");
+            var data = HttpContext.Session.Get<List<CartItem>>(CARTKEY);
             if (data == null) data = new List<CartItem>();
             return data;
         }
@@ -84,7 +99,7 @@ public class CartController : Controller
         {
             item.SoLuong += SoLuong;
         }
-        HttpContext.Session.Set("GioHang", myCart);
+        HttpContext.Session.Set(CARTKEY, myCart);
 
         return RedirectToAction("Index");
     }
@@ -190,7 +205,7 @@ public class CartController : Controller
 public IActionResult AddToCart(int id, int SoLuong, string type = "Normal")
 {
     // ....
-    HttpContext.Session.Set("GioHang", myCart);
+    HttpContext.Session.Set(CARTKEY, myCart);
 
     if (type == "ajax") return Json(new {
         SoLuong = Carts.Sum(c => c.SoLuong)

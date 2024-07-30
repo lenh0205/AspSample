@@ -521,10 +521,9 @@ public class AuthController : ControllerBase
 ```
 
 =======================================================================
-> hỗ trợ 1 số UI; cung cấp các **`identity model`** cho phép ta customize 
+> ASP.NET Core Identity hỗ trợ 1 số UI; cung cấp các **`identity model`** cho phép ta customize 
 > https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-8.0
-
-* https://www.youtube.com/watch?v=ltQQPPWV3QA
+> ta sẽ sử dụng Role-based authorization; và Identity đã hỗ trợ cho ta sẵn 1 số Role
 
 # ASP.NET Core Identity
 * -> install **Microsoft.AspNetCore.Identity**
@@ -602,6 +601,19 @@ public class SignUpModel
 }
 ```
 
+## Role
+```cs - ~/Helper/AppRole.cs
+public static class AppRole
+{
+    public const string Admin = "Administrator";
+    public const string Customer = "Customer";
+    public const string Manager = "Manager";
+    public const string Accountant = "Accountant";
+    public const string HR = "Human Resource";
+    public const string Warehouse = "Warehose staff";
+}
+```
+
 ## Repositories
 
 ```cs - ~/Repositories/IAccountRepository.cs
@@ -615,31 +627,45 @@ public class AccountRepository : IAccountRepository
 {
     private readonly UserManager<ApplicationUser> userManager;
     private readonly SignInManager<ApplciationUser> signInManager;
+    private readonly RoleManager<IdentityRole> roleManager;
     private readonly IConfiguration configuration;
 
     // "UserManager", "SignInManager" là service cung cấp bởi Identity
     public AccountRepository(
         UserManager<ApplicationUser> userManager, 
         SignInManager<ApplciationUser> signInManager,
+        RoleManager<IdentityRole> roleManager,
         IConfiguration configuration
     )
     {
         this.userManager = userManager;
         this.signInManager = signInManager;
+        this.roleManager = roleManager;
         this.configuration = configuration;
     }
 
     public Task<string> SignInAsync(SignInModel model)
     {
-        // 'signInManager' sẽ tự động check giúp ta
-        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-        if (!result.Succeeded) return string.Empty;
-
+        // kiểm tra tính hợp lệ của user credential
+        var user = await userManager.FindByEmailAsync(model.Email);
+        var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
+        if (user == null || !passwordValid) return string.Empty;
+        
         var authClaims = new List<Claim>
         {
             new Claim(ClaimTypes.Email, model.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        // lấy ra list "role" gắn với user tướng ứng; 
+        // từ đó tạo 1 list "claim" với type là "Role" và giá trị là từng role của user
+        // thêm list claim đó vào list claim hiện có
+        var userRoles = await userManager.GetRolesAsync(user);
+        foreach(var role in userRoles)
+        {
+            authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+        }
+
         var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
 
         var token = new JwtSecurityToken(
@@ -664,7 +690,24 @@ public class AccountRepository : IAccountRepository
 
         // 'userManager' tự động lưu vào "AspNetUsers" table 
         // nó cũng sẽ hash password cho ta luôn
-        return await userManager.CreateAsync(user, model.Password); 
+        var result = await userManager.CreateAsync(user, model.Password);
+
+        if (result.Succeeded)
+        {
+            // add role default cho user là "Customer"
+            // chỉ thêm duy nhất trong lần đầu có 1 request chạy vô đây
+            // kiểm tra role "Customer" đã có (trong DB của Identity) chưa
+            if (!await roleManager.RoleExistAsync(AppRole.Customer))
+            {
+                // chưa có thì tạo rồi lưu vào bảng 'AspNetRoles' của 'Identity'
+                await roleManager.CreateAsync(new IdentityRole(AppRole.Customer));
+            }
+
+            // thêm dữ liệu vào bảng 'AspNetUserRoles'
+            await userManager.AddToRoleAsync(user, AppRole.Customer)
+        }
+
+        return result;
     }
 }
 ```
@@ -690,7 +733,7 @@ public class AccountsController : ControllerBase
     {
         var result = await accountRepo.SignUpAsync(SignUpModel);
         if (result.Succeeded) return Ok(result.Succeeded);
-        return Unauthorized();
+        return StatusCode(500);
     }
 
     [HttpPost("SignIn")]
@@ -703,3 +746,18 @@ public class AccountsController : ControllerBase
 }
 ```
 
+## Usage
+
+```cs
+[HttpGet]
+[Authorize] // require "authen" only
+public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+{
+}
+
+[HttpGet("{id}")]
+[Authorize(Roles = AppRole.Customer)] // require "author" by role
+public async Task<ActionResult<Book>> GetBook(int id)
+{
+}
+```
