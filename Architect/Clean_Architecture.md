@@ -4,17 +4,17 @@
 ========================================================================
 
 # Clean Architecture
-* _i **`loại bỏ sự lệ thuộc trực tiếp`** giữa các đối tượng cũng như các layer trong ứng dụng; **`hướng tâm`** - các layer ở trong không biết gì về các layer bên ngoài_
+* _i **`loại bỏ sự lệ thuộc trực tiếp`** giữa các **object** cũng như các **layer** trong ứng dụng - **`hướng tâm`**: các layer ở trong không biết gì về các layer bên ngoài_
 
-* -> về cơ bản thì gồm **4 layer** được đại diện thông qua các vòng tròn đồng tâm
+* về cơ bản thì gồm **4 layer** được đại diện thông qua các vòng tròn đồng tâm
+* -> **Enitites** , **Use Cases** , **Interface Adapters** (**`Controllers, Gateways, Presenters`**), **Frameworks & Drivers** (**`UI, Web, DB, Framework, devices`**)
 * -> để các layer trong Clean Architecture có thể làm việc được nhưng lại độc lập với nhau thì chúng sẽ dùng các **interfaces**
 * -> mỗi vòng sẽ có tập hợp các "Dependencies", chỉ có **`objects của vòng ngoài mới phụ thuộc vào dependencies của vòng trong không có chiều ngược lại`**
-
-* -> **Enitites** , **Use Cases** , **Interface Adapters** (**`Controllers, Gateways, Presenters`**), **Frameworks & Drivers** (**`UI, Web, DB, Framework, devices`**)
+<br/>
 
 * => nó sẽ **đòi hỏi viết nhiều class, interface**; nhưng nhờ sự độc lập giữa các tầng mà việc **Debug và Testing trở nên dễ dàng** hơn
 * _tách biệt `presentation logic`, `business logic`, `data access logic`_
-* _vẫn test được dù thiếu `Database`, ``, `Web server`_
+* _vẫn test được dù thiếu `Database`, `Web server`_
 
 ## Note
 * -> bởi việc đảm bảo business rules và core domain của ta bên trong vòng tròn là hoàn toàn **không có bất kì sự phụ thuộc nào bên ngoài hoặc các thư việc bên thứ 3 (3rd party libraries)**
@@ -23,7 +23,9 @@
 * -> khi chúng ta truyền dữ liệu qua một ranh giới (Boundary), nó **luôn ở dạng thuận tiện nhất cho vòng tròn phía trong**
 
 * -> `Clean Architecture` là kiến trúc tham khảo, nên trên thực tế **không nhất thiết phải là 4 tầng**
-```r - Ex: 1 business của API update "product"
+
+```r - Ex: 
+// 1 business của API update "product"
 // gồm 3 tầng: "Transport" -> "Business" -> "Repository/Storage"
 // chứa tương ứng: "HTTP Handler methods; parse & validate data from request" -> "implement business logic" -> "store, retrieve data"
 // business: "API update Product" -> "UpdateProduct(product)" -> "FindProductById(id); UpdateProduct(product)"
@@ -79,20 +81,19 @@
 * -> mọi thứ bên trong / giữa các đường kẻ đôi màu đen đại diện cho Model trong MVC
 * -> mô hình này cũng đại diện cho kiến trúc **`EBI`** (với **Boundary**, **Interactor** và the **Entities**), **Application** trong **`Hexagonal Architecture`**, **Application Core** trong **`Onion Architecture`**, **Entities** và **Use Cases** layer trong **`Clean Architecture`**
 
-Theo biểu đồ luồng tương tác, chúng ta có một yêu cầu HTTP đến các Controller. Controller sau đó sẽ:
-
-Phân tích Request;
-Tạo một Request Model với các dữ liệu có liên quan;
-Execute một method trong Interactor (đã được đưa (inject) vào Controller bằng cách sử dụng interface của Interactor là Boundary), chuyển nó cho Request Model;
-Interactor sẽ:
-Sử dụng implementation của Entity Gateway (được đưa vào Interactor bằng cách sử dụng Entity Gateway Interface) để tìm các Entities liên quan;
-Phối hợp các tương tác giữa các Entities;
-Tạo Response Model với kết quả dữ liệu trả về;
-Tạo ra Presenter chứa Response Model;
-Trả lại Presenter cho Controller;
-Dùng Presenter để tạo ra một ViewModel;
-Bind ViewModel với View;
-Trả View về cho Client.
+* _Theo biểu đồ luồng tương tác, chúng ta có một yêu cầu HTTP đến các Controller. Controller sau đó sẽ:_
+* -> Phân tích Request;
+* -> Tạo một Request Model với các dữ liệu có liên quan;
+* -> Execute một method trong Interactor (đã được đưa (inject) vào Controller bằng cách sử dụng interface của Interactor là Boundary), chuyển nó cho Request Model;
+* -> Interactor sẽ:
+* -> Sử dụng implementation của Entity Gateway (được đưa vào Interactor bằng cách sử dụng Entity Gateway Interface) để tìm các Entities liên quan;
+* -> Phối hợp các tương tác giữa các Entities;
+* -> Tạo Response Model với kết quả dữ liệu trả về;
+* -> Tạo ra Presenter chứa Response Model;
+* -> Trả lại Presenter cho Controller;
+* -> Dùng Presenter để tạo ra một ViewModel;
+* -> Bind ViewModel với View;
+* -> Trả View về cho Client.
 
 ========================================================================
 # Compare
@@ -110,7 +111,13 @@ Trả View về cho Client.
 * -> tuy nhiên thực tế trong Clean Architecture, **Entities** không chỉ là và Entity theo ý nghĩa của DDD mà bất cứ Domain object nào; tức là **`2 layer bên trong đã được sát nhập để đơn giản sơ đồ`**
 * _"Một entity có thể là một đối tượng với các phương thức, hoặc nó có thể là một tập hợp các cấu trúc dữ liệu và các hàm"_
 
+========================================================================
 
 # Triển khai với ASP.NET
+* _thường thì 4 layer khi triển khai 'Clean Architect" trong ASP.NET: `Domain, Application, Infrastructure, Presentation` (từ trong ra ngoài)_
+* -> "Application Layer" và "Domain Layer are always **the core** of system's design; the core will be **independent of the `data access` and `infrastructure` concerns**
+* -> we can achieve this goal by **`using the Interfaces and abstraction`** **within the core system**, but **`implementing them`** **outside of the core system**
+https://www.c-sharpcorner.com/article/clean-architecture-in-asp-net-core-web-api/
+
 https://topdev.vn/blog/lam-the-nao-de-sap-xep-clean-architecture-theo-modular-patterns-trong-10-phut/
 https://tuhocict.com/lesson/web-application-architectures/#google_vignette
