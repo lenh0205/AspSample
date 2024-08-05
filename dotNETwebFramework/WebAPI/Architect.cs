@@ -17,9 +17,9 @@ public class DanhSachHoSoController : GenericController<Guid, DanhSachHoSo, Appl
 {
     private readonly ISeedService _service;
     public DanhSachHoSoController(
-            ISeedService service, 
-            IGenericService<DanhSachHoSo, ApplicationDbContext> genericService
-        ) : base(genericService) 
+        ISeedService service, 
+        IGenericService<DanhSachHoSo, ApplicationDbContext> genericService
+    ) : base(genericService) 
     {
         _service = service;
     }

@@ -32,6 +32,16 @@ protected IActionResult UnprocessedEntityResult() {
     return StatusCode(StatusCodes.Status422UnprocessableEntity);
 }
 ```
+===================================================================
+# using @ before string
+* -> to **`interpret the string literally`**
+* _nói chung là string của ta thế nào thì nó sẽ interpret như vậy không cần xử lý những **escape sequences**_
+
+```cs
+var path = @"\\servername\share\folder"; 
+// instead of:
+var path = "\\\\servername\\share\\folder";
+```
 
 ===================================================================
 # Access API Route information
