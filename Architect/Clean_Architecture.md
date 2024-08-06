@@ -116,31 +116,34 @@
 ========================================================================
 
 # Triển khai với ASP.NET
-* -> _thường thì 4 layer khi triển khai 'Clean Architect" trong ASP.NET: `Domain, Application, Infrastructure, Presentation` (từ trong ra ngoài)_
-* -> _múc đích chính là separate `implementation details` from `business logic`_
-
-* -> **Application Layer** và **Domain Layer** are always **the core** of system's design; the core will be **independent of the `data access` and `infrastructure` concerns**
-* -> we can achieve this goal by **`using the Interfaces and abstraction`** **within the core system**, but **`implementing them`** **outside of the core system**
+* -> _thường thì 4 layers khi triển khai 'Clean Architect" trong ASP.NET sẽ là: **Domain**, **Application**, **Infrastructure**, **Presentation**_
+* -> Clean Architecture enforces strict layering with **`inward-pointing dependencies`**
+* _**Application Layer** và **Domain Layer** are always **`the core`** of system's design_
+* _the outer layers (**Presentation** or **Infrastructure**) **`depend on abstractions defined by the inner layers`** ( **Application** or **Domain**)_
 
 <img src="../nonrelated/clean_architect_asp.jpg">
 
 ## Domain Layer
-* -> contains the **enterprise logic** (_like the **`entities`** and **`specifications`**_)
+* -> contains the **business logic** (_like the **`entities`** and **`specifications`**_)
 * -> the **application entities** - which are the **`application model classes`** or **`database model classes`**
-
-* _using the code first approach in the "application development using Asp.net core", these entities are used to create the tables in the database_
+* -> with **`no dependencies on other layers`**
 
 ## Application Layer
-* -> contains all **business logic**
-* -> in this layer, **services interfaces** are **`kept separate from their implementation`** (_for loose coupling and separation of concerns_)
+* -> contains all **application logic**
+* -> in this layer, **`services interfaces`** are kept separate from their **`implementation`** (_for loose coupling and separation of concerns_)
+* -> also **`define interfaces for the outer layers`**
+* -> **`depends on the Domain layer`**, but **`not directly on Presentation or Infrastructure layers`**
 
 ## Infrastructure Layer
-* -> have **model objects** we will **`maintain all the database migrations`** and **`database context Objects`** 
-* -> have the **repositories of all the domain model objects**
+* -> **`implements interfaces from the Application layer`** - dealing with data access, file systems, network,...
 
 ## Presentation Layer
 * -> presents us the object data from the database using the HTTP request in the form of JSON Object
 * -> but in the case of front-end applications, we present the data using the UI by consuming the APIS
+* -> **`interacting with the Application layer`**
+
+https://medium.com/codenx/code-in-clean-vs-traditional-layered-architecture-net-31c4cad8f815#:~:text=Domain%20Layer%3A%20Contains%20the%20business,on%20Presentation%20or%20Infrastructure%20layers.
+https://medium.com/c-sharp-progarmming/tutorial-net-5-clean-architecture-4cc900f7945b
 
 ========================================================================
 # Triển khai "Domain Layer" in ASP.NET
