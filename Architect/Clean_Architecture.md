@@ -72,7 +72,7 @@
 ## Frameworks & Drivers
 * -> là tầng ngoài cùng, **tổ hợp các công cụ cụ thể phục vụ cho từng nhu cầu của end user** như: thiết bị (devices), web, application, databases,... 
 * -> trong kiến trúc Clean Architecture thì ở tầng này là "nhẹ" nhất vì chúng ta không cần phải viết quá nhiều code
-* -> trên thực tế thì đây là nơi "biết tất cả" cụ thể các tầng là gì thông qua việc chịu trách nhiệm khởi tạo các objects cho các tầng bên trong (hay còn gọi là Setup Dependencies)
+* -> trên thực tế thì đây là nơi "biết tất cả" cụ thể các tầng là gì thông qua việc **`chịu trách nhiệm khởi tạo các objects cho các tầng bên trong (hay còn gọi là Setup Dependencies)`**
 
 # Flow of control giữa các control
 * _biểu đồ nhỏ góc dưới bên phải của mô hình Clean Architect_
@@ -123,7 +123,7 @@
 
 <img src="../nonrelated/clean_architect_asp.jpg">
 
-## Domain Layer
+## Domain Layer ('Entities' Layer in Clean Architecture)
 * -> contains the **business logic** (_like the **`entities`** and **`specifications`**_)
 * -> the **application entities** - which are the **`application model classes`** or **`database model classes`**
 * -> with **`no dependencies on other layers`**
@@ -134,10 +134,10 @@
 * -> also **`define interfaces for the outer layers`**
 * -> **`depends on the Domain layer`**, but **`not directly on Presentation or Infrastructure layers`**
 
-## Infrastructure Layer
+## Infrastructure Layer ('Framework & Driver Layer' in Clean Architect)
 * -> **`implements interfaces from the Application layer`** - dealing with data access, file systems, network,...
 
-## Presentation Layer
+## Presentation Layer ('Framework & Driver Layer' in Clean Architect)
 * -> presents us the object data from the database using the HTTP request in the form of JSON Object
 * -> but in the case of front-end applications, we present the data using the UI by consuming the APIS
 * -> **`interacting with the Application layer`**

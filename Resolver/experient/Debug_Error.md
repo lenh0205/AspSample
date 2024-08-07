@@ -154,6 +154,16 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> trong controller thay [Route("api/[controller]")] bằng [Route("api/[controller]/[action]")] ???
 * -> hoặc define explicit route for action: [Route("GetById")]
 
+# BE - System.IO - bị lỗi khi gặp tên file quá dài
+* -> cụ thể là với **`path length > 259 character`** và sử dụng **.NET Framework** để xử lý
+* -> đối với **version > .NET 4.6.2**, solution là ta có thể dùng path với **extended-length path syntax**: **`\\?\D:\very long path`**
+* -> đối với **version < .NET 4.6.2**, solution là use **`extended-length path syntax`** and **`the Unicode version of the Win32 API function with P/Invoke`**
+* -> với **.NET Core** thì không cần vị nó sẽ tự add cho ta
+
+* -> nhưng lưu ý sử dụng **extended-length path syntax** sẽ **`turns off file name normalization`** (_removing trailing spaces, expanding '.' and '..', converting relative paths into full paths,..._) performed by Windows APIs
+* -> can be used in most of the file-related Windows APIs, but **`not all Windows APIs`** (Ex: LoadLibrary<...> fails if the file name is longer than MAX_PATH)
+* -> compatibility with other Windows-based applications and the Windows shell itself 
+
 ==============================================================
 
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
