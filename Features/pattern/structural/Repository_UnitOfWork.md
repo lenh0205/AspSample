@@ -50,8 +50,8 @@ if (!String.IsNullOrEmpty(searchString))
 
 =======================================================================
 ## Unit of Work
-* -> we could instantiate a new context in the repository, but then if we used multiple repositories in one controller, each would end up with **`a separate context`**
 * -> a unit of work class serves one purpose **`ensure that multiple repositories share a single database context`**
+* -> when we used multiple repositories and each one **uses a separate database context instance**; then when we update 2 different entity types as part of the same transaction, **`one might succeed and the other might fail`**
 * -> that way, **when a unit of work is complete** we can call the **SaveChanges** method on **that instance of the context** and be **`assured that all related changes will be coordinated`**
 
 * => this is really important when dealing with **`transaction`**

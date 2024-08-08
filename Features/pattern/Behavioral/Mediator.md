@@ -1,0 +1,1 @@
+> đổi quan hệ many-to-many thành one-to-many bằng cách tạo ra 1 thằng trung gian; tránh những giao tiếp phức tạp giữa các component

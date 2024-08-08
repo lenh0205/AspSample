@@ -30,18 +30,31 @@ public class HoSoCongViecRepository : GenericRepository<HoSoCongViec, Applicatio
 /// Generic Repository
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
-/// <typeparam name="TContext"></typeparam>
-public interface IGenericRepository<TEntity, TContext>
-    where TEntity : class
-    where TContext : DbContext
+public interface IGenericRepository<TEntity> where TEntity : class
 {
-    List<TEntity> GetList(Expression<Func<TEntity, bool>> filter = null!, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!, string includeProperties = "", int pageIndex = 0, int pageSize = 0);
-    IQueryable<TEntity> GetQuery(Expression<Func<TEntity, bool>> filter = null!, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!, string includeProperties = "");
+    List<TEntity> GetList(
+        Expression<Func<TEntity, bool>> filter = null!, 
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!, 
+        string includeProperties = "", 
+        int pageIndex = 0, 
+        int pageSize = 0
+    );
+    
+    IQueryable<TEntity> GetQuery(
+        Expression<Func<TEntity, bool>> filter = null!, 
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!, 
+        string includeProperties = ""
+    );
     TEntity GetByID(object? id);
+    
     void Insert(TEntity entity);
+    
     void InsertRange(IEnumerable<TEntity> entities);
+    
     void TryDelete(object id);
+    
     void Delete(TEntity entity);
+    
     public void DeleteRange(IEnumerable<TEntity> entities);
 
     void Update(TEntity entityToUpdate);
@@ -64,7 +77,7 @@ using SER.Infrastructure.IEntityRepositories.Base;
 using System.Linq.Expressions;
 namespace SER.Infrastructure.EntityRepositories.Base;
 
-public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity, TContext>
+public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity>
     where TEntity : class
     where TContext : DbContext
 {
@@ -74,6 +87,11 @@ public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity, 
     {
         _context = context;
         _dbSet = _context.Set<TEntity>();
+    }
+
+    public virtual IEnumerable<TEntity> GetWithRawSql(string query, params object[] parameters)
+    {
+        return dbSet.SqlQuery(query, parameters).ToList();
     }
 
     public virtual List<TEntity> GetList(Expression<Func<TEntity, bool>> filter = null!,
