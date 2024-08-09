@@ -39,7 +39,7 @@
 
 ## Entities (`Enterprise Business Rules`)
 * -> Entities là layer trong cùng, cũng là **`layer quan trọng nhất`**
-* -> Entity chính là các thực thể hay từng **đối tượng cụ thể và các rule business logic của nó**
+* -> Entity chính là các **`thực thể`** hay từng **đối tượng cụ thể và các rule business logic của nó**
 * -> trong OOP, đây chính là Object cùng với **`các method và properties tuân thủ nguyên tắc Encapsulation`** - chỉ bên trong Object mới có thể thay đổi trạng thái (State) của chính nó
 
 ```r 

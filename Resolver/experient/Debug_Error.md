@@ -1,4 +1,9 @@
 ==============================================================
+# Git lỗi toàn cục
+* -> không thể show các changes, xoá đi tải lại vẫn không được
+* -> vào **`C:/Users/<user>/`** xoá file **`.gitconfig`**
+
+==============================================================
 # Http - Đối với việc gửi data bằng request-response sẽ có giới hạn. VD gửi 23000 records lên Client thì response sẽ không chịu nổi 
 * có thể dùng Take() để giảm bớt số lượng cần lấy
 * filter bớt những trường không cần thiết, chỉ để 1 trường làm identity và 1 trường để hiển thị là đủ

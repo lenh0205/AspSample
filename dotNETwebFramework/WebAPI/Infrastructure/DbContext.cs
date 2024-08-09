@@ -45,7 +45,17 @@ public class HoSoCongViecConfiguration : IEntityTypeConfiguration<HoSoCongViec>
     }
 }
 
-# RelationshipConfig
+# FluentAPI - handle decimal to avoid precision loss
+// -> avoid truncate 
+modelBuilder.Entity<Rental>()
+    .Property(p => p.TotalCost)
+    .HasColumnType("decimal(18,2");
+
+modelBuilder.Entity<Movie>()
+    .Property(p => p.RentalCost)
+    .HasColumnType("decimal(18,2");
+
+# FluentApi - "one-to-many" relationship config
 //Model:
 public class Blog
 {
@@ -99,9 +109,26 @@ modelBuilder.Entity<Post>()
     .HasForeignKey(p => p.BlogId);
 
 // Ngoài ra:
-.HasPrincipalKey 
+.HasPrincipalKey;
 // -> By default, Entity Framework Core will use the primary key of the principal entity as the principal key for a relationship, 
 // -> but you can use the HasPrincipalKey method to specify a different property as the principal key if needed
+
+# FluentAPI - "many-to-many" relationship config
+// Ví dụ: ta có 2 bảng "Movie" và "Rental" có quan hệ "many-to-many"
+// ta sẽ cần 1 bảng trung gian gọi là "MovieRental"
+
+public DbSet<Movie> Movies { get; set; }
+public DbSet<Rental> Rentals { get; set; }
+public DbSet<MovieRental> MovieRentals { get; set; }
+
+modelBuilder.Entity<MovieRental>()
+    .HasKey(sr => new { sr.MovieId, sr.RentId })
+
+public class MovieRental
+{
+    public int RentalId { get; set; }
+    public int MovieId { get; set; }
+}
 
 # NavigationProperty
 // -> are not necessary for defining relationships between entities
@@ -138,5 +165,4 @@ var author = blog.Author; // Second database query to load the Author
 var blog = context.Blogs.Include(b => b.Posts).Include(b => b.Author).Single(b => b.BlogId == blogId);
 var posts = blog.Posts; // No database query, data is already loaded
 var author = blog.Author; // No database query, data is already loaded
-
 
