@@ -1,6 +1,6 @@
 
 # Redis
-* -> is an **`open source in-memory data store`**, which is often used as a distributed cache
+* -> is an **`open source in-memory data store`** (_an in-memory database_), which is often used as **a distributed cache**
 
 ## Setting
 * -> first, create **`an Azure Cache for Redis`** (_dù là ta dùng **Azure-hosted ASP.NET Core app** hoặc **local development**_)
