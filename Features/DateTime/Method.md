@@ -104,6 +104,10 @@ var dateTime = Convert.ToDateTime(dateString);
 string dateString = "Tue Dec 30, 2015"; // Có thể parse nếu sửa lại 1 xíu
 DateTime dateTime12 = Convert.ToDateTime(dateString);
 // Exception: String was not recognized as a valid DateTime (because the day of week was incorrect)
+
+
+string dateString = @"20/05/2012";
+DateTime date2 = Convert.ToDateTime(dateString, System.Globalization.CultureInfo.GetCultureInfo("hi-IN").DateTimeFormat);
 ```
 
 ====================================================================
@@ -176,6 +180,13 @@ DateTime dateTime = DateTime.ParseExact(
     DateTimeStyles.None
 );
 string temp = dateTime.ToString(); // Output: 10/22/2015 12:00:00 AM
+
+
+string dateString = @"20/05/2012";
+DateTime date3 = DateTime.ParseExact(
+    dateString, 
+    @"d/M/yyyy", // "d/M/yyyy" matches both single and double digit months, days like 20/05/2012, 20/5/2012
+	System.Globalization.CultureInfo.InvariantCulture);
 ```
 
 ====================================================================

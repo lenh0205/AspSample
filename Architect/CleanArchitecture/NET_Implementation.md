@@ -62,7 +62,7 @@ public interface ICustomerBasket
 ```
 
 ```cs - Ex: ISpecifications.cs 
-public interface ISpecifications < T > {
+public interface ISpecifications<T> {
     Expression <Func<T,bool>> Criteria { get; }
     List <Expression<Func<T, object>>> Includes { get; }
     Expression<Func<T, object>> OrderBy { get; }
@@ -73,14 +73,14 @@ public interface ISpecifications < T > {
 }
 ```
 ```cs - Ex: BaseSpecification.cs
-public class BaseSpecification < T > : ISpecifications < T > 
+public class BaseSpecification <T> : ISpecifications <T> 
 {
-    public Expression<Func<T,bool >> Criteria { get; }
+    public Expression<Func<T,bool>> Criteria { get; }
     public BaseSpecification() {}
-    public BaseSpecification(Expression < Func < T, bool >> Criteria) {
+    public BaseSpecification(Expression <Func<T, bool>> Criteria) {
         this.Criteria = Criteria;
     }
-    public List<Expression<Func <T, object>>> Includes { get; } 
+    public List<Expression<Func<T, object>>> Includes { get; } 
         = new List <Expression<Func<T,object>>> ();
     public Expression <Func<T,object >> OrderBy { get; private set;}
     public Expression <Func<T, object>> OrderByDescending { get; private set; }
@@ -89,13 +89,13 @@ public class BaseSpecification < T > : ISpecifications < T >
     public int Skip { get; private set; }
     public bool isPagingEnabled { get; private set; }
 
-    protected void AddInclude(Expression < Func < T, object >> includeExpression) {
+    protected void AddInclude(Expression<Func<T, object >> includeExpression) {
         Includes.Add(includeExpression);
     }
-    public void AddOrderBy(Expression < Func < T, object >> OrderByexpression) {
+    public void AddOrderBy(Expression<Func<T, object>> OrderByexpression) {
         OrderBy = OrderByexpression;
     }
-    public void AddOrderByDecending(Expression < Func < T, object >> OrderByDecending) {
+    public void AddOrderByDecending(Expression<Func<T, object>> OrderByDecending) {
         OrderByDescending = OrderByDecending;
     }
     public void ApplyPagging(int take, int skip) {
@@ -138,7 +138,7 @@ public interface ICustomService <T> {
 
 ```cs
 public class StoreContext: DbContext {
-    public StoreContext(DbContextOptions < StoreContext > options): base(options) {}
+    public StoreContext(DbContextOptions<StoreContext> options): base(options) {}
     public DbSet <Products> Products { get; set; }
     public DbSet <ProductType> ProductTypes { get; set; }
     public DbSet <ProductBrand> ProductBrands { get; set; }
@@ -174,14 +174,14 @@ public class BasketRepository: ICustomerBasket {
     public BasketRepository(IConnectionMultiplexer radis) {
         _database = radis.GetDatabase();
     }
-    public async Task < bool > DeleteBasketAsync(string basketId) {
+    public async Task<bool> DeleteBasketAsync(string basketId) {
         return await _database.KeyDeleteAsync(basketId);
     }
-    public async Task < CustomerBasket > GetBasketAsync(string basketId) {
+    public async Task<CustomerBasket> GetBasketAsync(string basketId) {
         var data = await _database.StringGetAsync(basketId);
-        return data.IsNullOrEmpty ? null : JsonSerializer.Deserialize < CustomerBasket > (data);
+        return data.IsNullOrEmpty ? null : JsonSerializer.Deserialize<CustomerBasket> (data);
     }
-    public async Task < CustomerBasket > UpdateBasketAsync(CustomerBasket basket) {
+    public async Task<CustomerBasket> UpdateBasketAsync(CustomerBasket basket) {
         var created = await _database.StringSetAsync(basket.Id, JsonSerializer.Serialize(basket), TimeSpan.FromDays(15));
         if (!created) {
             return null;
