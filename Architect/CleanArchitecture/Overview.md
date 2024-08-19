@@ -102,3 +102,5 @@
 
 https://topdev.vn/blog/lam-the-nao-de-sap-xep-clean-architecture-theo-modular-patterns-trong-10-phut/
 https://tuhocict.com/lesson/web-application-architectures/#google_vignette
+
+https://medium.com/@gushakov/clean-architecture-domain-entities-and-interface-adapters-4152b9ee22d2
