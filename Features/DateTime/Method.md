@@ -28,6 +28,23 @@
 // "01/10/2015"
 ```
 
+## DateTime to a string
+
+```cs
+DateTime dt = new DateTime(2010, 8, 18, 13, 30, 30);
+
+var dtStr1 = dt.ToString(); // 8/18/2010 1:30:30 PM
+var dtStr2 = dt.ToString("yyyyMMdd"); // 20100818
+
+var dtStr3 = dt.ToLongDateString(); // Wednesday, August 18, 2010
+var tmStr3 = dt.ToLongTimeString(); // 1:30:30 PM
+
+var dtStr4 = dt.ToShortDateString(); // 8/18/2010
+var tmStr4 = dt.ToShortTimeString(); // 1:30 PM
+
+var dtStr4 = dt.ToUniversalTime(); // 2010-08-18T06:30:30Z
+```
+
 ====================================================================
 ## DateTime.Parse()
 * -> converts **`specified string data`** to _equivalent date and time_
