@@ -28,6 +28,23 @@
 // "01/10/2015"
 ```
 
+## DateTime to a string
+
+```cs
+DateTime dt = new DateTime(2010, 8, 18, 13, 30, 30);
+
+var dtStr1 = dt.ToString(); // 8/18/2010 1:30:30 PM
+var dtStr2 = dt.ToString("yyyyMMdd"); // 20100818
+
+var dtStr3 = dt.ToLongDateString(); // Wednesday, August 18, 2010
+var tmStr3 = dt.ToLongTimeString(); // 1:30:30 PM
+
+var dtStr4 = dt.ToShortDateString(); // 8/18/2010
+var tmStr4 = dt.ToShortTimeString(); // 1:30 PM
+
+var dtStr4 = dt.ToUniversalTime(); // 2010-08-18T06:30:30Z
+```
+
 ====================================================================
 ## DateTime.Parse()
 * -> converts **`specified string data`** to _equivalent date and time_
@@ -104,6 +121,10 @@ var dateTime = Convert.ToDateTime(dateString);
 string dateString = "Tue Dec 30, 2015"; // Có thể parse nếu sửa lại 1 xíu
 DateTime dateTime12 = Convert.ToDateTime(dateString);
 // Exception: String was not recognized as a valid DateTime (because the day of week was incorrect)
+
+
+string dateString = @"20/05/2012";
+DateTime date2 = Convert.ToDateTime(dateString, System.Globalization.CultureInfo.GetCultureInfo("hi-IN").DateTimeFormat);
 ```
 
 ====================================================================
@@ -176,6 +197,13 @@ DateTime dateTime = DateTime.ParseExact(
     DateTimeStyles.None
 );
 string temp = dateTime.ToString(); // Output: 10/22/2015 12:00:00 AM
+
+
+string dateString = @"20/05/2012";
+DateTime date3 = DateTime.ParseExact(
+    dateString, 
+    @"d/M/yyyy", // "d/M/yyyy" matches both single and double digit months, days like 20/05/2012, 20/5/2012
+	System.Globalization.CultureInfo.InvariantCulture);
 ```
 
 ====================================================================

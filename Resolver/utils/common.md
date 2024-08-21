@@ -141,3 +141,39 @@ public enum EMyEnums
     QuaHan = 4,
 }
 ```
+
+===================================================================
+# Tạo 1 IEnumerable<int> trong khoảng 2 con số x và y
+
+```cs
+var xRange = Enumerable.Range(0, 3); // sẽ bao gồm (0, 1, 2)
+```
+
+===================================================================
+# Tạo mảng từ 'string' và tạo 'string' từ mảng
+```cs
+var str = "Davis, Clyne, Fonte";
+string[] arr = str.Split(", ");
+var str2 = string.Join(", "); // Davis, Clyne, Fonte
+```
+
+===================================================================
+# get time span between 2 timeline contain minutes and seconds
+
+```cs
+public IActionResult LayTungKhoangThoiGian()
+{
+    var str = "00:45,01:32,02:18,03:01,03:44,04:31,05:19,06:01,06:47,07:35";
+    var arr = str.Split(",");
+
+    var result = arr.Select((item, index) =>
+    {
+        var currentTime = DateTime.ParseExact(item, "mm:ss", CultureInfo.InvariantCulture);
+        var previousTime = DateTime.ParseExact(index == 0 ? "00:00" : arr[index - 1], "mm:ss", CultureInfo.InvariantCulture);
+        var timeSpan = currentTime - previousTime;
+        return timeSpan.TotalSeconds;
+    });
+
+    return Ok(string.Join(", ", result));
+}
+```
