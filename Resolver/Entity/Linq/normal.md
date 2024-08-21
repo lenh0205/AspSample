@@ -1,4 +1,4 @@
-
+=========================================================================
 # Aggregate
 * -> nó cho phép ta tích luỹ qua từng lần lặp (_giống reduce trong javascript_)
 
@@ -17,6 +17,7 @@ public IActionResult LayTatCaToaDo(int x, int y)
 } 
 ```
 
+=========================================================================
 # SelectMany
 * -> **`flattens queries that return lists of lists`**
 ```cs
@@ -98,4 +99,22 @@ response = [
   { "n": 20, "a": "dog" },
   { "n": 20, "a": "donkey" }
 ]
+```
+
+=========================================================================
+# Enumerable.Zip
+* -> **`merges`** each element of the **first sequence** with an element that has the **`same index`** in the **second sequence**
+
+* -> this method is implemented by using **`deferred execution`** - the **query represented by this method is not executed until the object is enumerated** (_either by calling its **GetEnumerator** method directly or by using **foreach**_)
+* -> if the sequences do not have the same number of elements, the method merges sequences until it reaches the end of one of them (`tức là 1 thằng có 3 phần tử, 1 thằng có 4 phần tử thì kết quả sẽ có 3 phần tử`)
+
+```cs
+int[] numbers = { 1, 2, 3, 4 };
+string[] words = { "one", "two", "three" };
+
+IEnumerable<string> numbersAndWords = numbers.Zip(words, (first, second) => first + " " + second);
+// Output: ["1 one", "2 two", "3 three"]
+
+IEnumerable<string> wordsAndNumbers = words.Zip(numbers, (first, second) => first + " " + second);
+// Output: ["one 1", "two 2", "three 3"]
 ```

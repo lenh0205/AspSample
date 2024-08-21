@@ -350,6 +350,10 @@ foreach (Pet pet in pets.DefaultIfEmpty())
 
 // khi ".Select()" ta sẽ cần truy cập các field thông qua ".Key."
 
+var results = from p in persons
+              group p.car by p.PersonId into g
+              select new { PersonId = g.Key, Cars = g.ToList() };
+
 ## with Aggregate function
 foreach
 (

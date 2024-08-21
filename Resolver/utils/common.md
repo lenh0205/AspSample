@@ -152,6 +152,12 @@ var xRange = Enumerable.Range(0, 3); // sẽ bao gồm (0, 1, 2)
 ===================================================================
 # Tạo mảng từ 'string' và tạo 'string' từ mảng
 ```cs
+var str = "The quick brown fox jumps over the lazy dog";
+
+// nếu không truyền tham số thì mặc định nó sẽ split() bằng " "
+var result1 = str.Split(); // ["The", "quick", "brown", "fox", "jumps","over", "the", "lazy", "dog"]
+var result2 = str.Split(" "); // ["The", "quick", "brown", "fox", "jumps","over", "the", "lazy", "dog"]
+
 var str = "Davis, Clyne, Fonte";
 string[] arr = str.Split(", ");
 var str2 = string.Join(", "); // Davis, Clyne, Fonte
