@@ -44,34 +44,10 @@ var path = "\\\\servername\\share\\folder";
 ```
 
 ===================================================================
-# Access API Route information
+# Tạo 1 IEnumerable<int> trong khoảng 2 con số x và y
 
-## get Controller name and Action name in MVC
 ```cs
-// VD: a partial view responsible for rendering the website's menu links
-// for every page in website, the links are prepared and passed to the view from an action called "SiteMenuPartial" in "LayoutController"
-// when we load up /Home/Index, the layout page is retrieved, the SiteMenuPartial method is called by the layout page, and the SiteMenuPartial.cshtml partial view is returned
-// if inside that partial view, we do:
-
-@{ 
-    // return name of Controller handling the view where the code is executed
-    // Output: Layout
-    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString(); // MVC 4
-    var controllerName = ViewContext.Controller.ValueProvider.GetValue("controller").RawValue // MVC 3
-}
-
-@{ 
-    // return name of controller requested in the URL
-    // in case we are inside a partial view belonging to a different controller and want to get the name of the controller "higher-up" in the chain
-    // Output: Home
-    var controllerName = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString();
-}
-
-<%= ViewContext.RouteData.Values["Controller"] %>
-<%= ViewContext.RouteData.Values["Action"] %> // get "Action" name
-
-<script>var controllerName = @controllerName</script>
-<script>var controllerName = @iewContext.RouteData.Values["controller"]</script>
+var xRange = Enumerable.Range(0, 3); // sẽ bao gồm (0, 1, 2)
 ```
 
 ===================================================================
@@ -141,16 +117,8 @@ public enum EMyEnums
     QuaHan = 4,
 }
 ```
-
 ===================================================================
-# Tạo 1 IEnumerable<int> trong khoảng 2 con số x và y
-
-```cs
-var xRange = Enumerable.Range(0, 3); // sẽ bao gồm (0, 1, 2)
-```
-
-===================================================================
-# Tạo mảng từ 'string' và tạo 'string' từ mảng
+# Tạo "mảng" từ "string" và tạo "string" từ "mảng"
 ```cs
 var str = "The quick brown fox jumps over the lazy dog";
 
@@ -182,4 +150,48 @@ public IActionResult LayTungKhoangThoiGian()
 
     return Ok(string.Join(", ", result));
 }
+```
+
+===================================================================
+# Caculate "Age" of a person base on birthdate
+
+```cs
+public static int GetAge(this DateTime dateOfBirth)
+{
+    DateTime today = DateTime.Today;
+    int age = today.Year - dateOfBirth.Year;
+    if (dateOfBirth > today.AddYears(-age)) age--;
+    return age;
+}
+```
+
+===================================================================
+# Access API Route information
+
+## get Controller name and Action name in MVC
+```cs
+// VD: a partial view responsible for rendering the website's menu links
+// for every page in website, the links are prepared and passed to the view from an action called "SiteMenuPartial" in "LayoutController"
+// when we load up /Home/Index, the layout page is retrieved, the SiteMenuPartial method is called by the layout page, and the SiteMenuPartial.cshtml partial view is returned
+// if inside that partial view, we do:
+
+@{ 
+    // return name of Controller handling the view where the code is executed
+    // Output: Layout
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString(); // MVC 4
+    var controllerName = ViewContext.Controller.ValueProvider.GetValue("controller").RawValue // MVC 3
+}
+
+@{ 
+    // return name of controller requested in the URL
+    // in case we are inside a partial view belonging to a different controller and want to get the name of the controller "higher-up" in the chain
+    // Output: Home
+    var controllerName = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString();
+}
+
+<%= ViewContext.RouteData.Values["Controller"] %>
+<%= ViewContext.RouteData.Values["Action"] %> // get "Action" name
+
+<script>var controllerName = @controllerName</script>
+<script>var controllerName = @iewContext.RouteData.Values["controller"]</script>
 ```

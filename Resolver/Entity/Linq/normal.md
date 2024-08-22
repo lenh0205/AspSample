@@ -1,5 +1,5 @@
 =========================================================================
-# Aggregate
+# ,Aggregate()
 * -> nó cho phép ta tích luỹ qua từng lần lặp (_giống reduce trong javascript_)
 
 ```cs
@@ -18,7 +18,7 @@ public IActionResult LayTatCaToaDo(int x, int y)
 ```
 
 =========================================================================
-# SelectMany
+# .SelectMany()
 * -> **`flattens queries that return lists of lists`**
 ```cs
 public class PhoneNumber
@@ -102,7 +102,7 @@ response = [
 ```
 
 =========================================================================
-# Enumerable.Zip
+# Enumerable.Zip()
 * -> **`merges`** each element of the **first sequence** with an element that has the **`same index`** in the **second sequence**
 
 * -> this method is implemented by using **`deferred execution`** - the **query represented by this method is not executed until the object is enumerated** (_either by calling its **GetEnumerator** method directly or by using **foreach**_)
@@ -117,4 +117,68 @@ IEnumerable<string> numbersAndWords = numbers.Zip(words, (first, second) => firs
 
 IEnumerable<string> wordsAndNumbers = words.Zip(numbers, (first, second) => first + " " + second);
 // Output: ["one 1", "two 2", "three 3"]
+```
+
+=========================================================================
+# .ToLookup()
+* -> similar to a Dictionary but the one advantage that it can contain **duplicate keys**
+* -> receive 2 parameters: first is lambda to specify the field as **`Key for lookup`**; second lambda to specify the field we want to take as **`final values base on lookup key`**
+
+```cs
+var persons = new List<Person>
+{
+    new Person { PersonId = 1, Car = "abc" },
+    new Person { PersonId = 3, Car = "def" },
+    new Person { PersonId = 1, Car = "egh" },
+    new Person { PersonId = 5, Car = "jkm" },
+    new Person { PersonId = 1, Car = "erp" },
+    new Person { PersonId = 3, Car = "uhk" },
+};
+ILookup<int,string> carsByPersonId = persons.ToLookup(p => p.PersonId, p => p.Car);
+IEnumerable<string>? result = carsByPersonId[1]; // ["abc", "egh", "erp"]
+
+public class Person
+{
+    public int PersonId { get; set; }
+    public string Car { get; set; } = string.Empty;
+}
+```
+
+```cs - loop
+public static void ToLookupEx1()
+{
+  List<Package> packages = new List<Package>
+  { 
+    new Package { Company = "Coho Vineyard", Weight = 25.2, TrackingNumber = 89453312L },
+    new Package { Company = "Lucerne Publishing", Weight = 18.7, TrackingNumber = 89112755L },
+    new Package { Company = "Wingtip Toys", Weight = 6.0, TrackingNumber = 299456122L },
+    new Package { Company = "Contoso Pharmaceuticals", Weight = 9.3, TrackingNumber = 670053128L },
+    new Package { Company = "Wide World Importers", Weight = 33.8, TrackingNumber = 4665518773L } 
+  };
+
+  ILookup<char, string> lookup = packages.ToLookup(
+                                  p => p.Company[0], // use the first character of Company as the key value
+                                  p => p.Company + " " + p.TrackingNumber); // element values
+
+  // Iterate through each IGrouping in the Lookup.
+  foreach (IGrouping<char, string> packageGroup in lookup)
+  {
+      Console.WriteLine(packageGroup.Key); // key value
+
+      // Iterate through each value in the IGrouping 
+      foreach (string str in packageGroup)
+          Console.WriteLine("    {0}", str);
+    }
+}
+
+/* -----------> Output:
+ C
+     Coho Vineyard 89453312
+     Contoso Pharmaceuticals 670053128
+ L
+     Lucerne Publishing 89112755
+ W
+     Wingtip Toys 299456122
+     Wide World Importers 4665518773
+*/
 ```

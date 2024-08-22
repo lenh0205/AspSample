@@ -350,9 +350,42 @@ foreach (Pet pet in pets.DefaultIfEmpty())
 
 // khi ".Select()" ta sẽ cần truy cập các field thông qua ".Key."
 
-var results = from p in persons
-              group p.car by p.PersonId into g
+var persons = new List<Person>
+{
+    new Person { PersonId = 1, Car = "abc" },
+    new Person { PersonId = 3, Car = "def" },
+    new Person { PersonId = 1, Car = "egh" },
+    new Person { PersonId = 5, Car = "jkm" },
+    new Person { PersonId = 1, Car = "erp" },
+    new Person { PersonId = 3, Car = "uhk" },
+};
+
+IEnumerable results = from p in persons
+              group p.Car by p.PersonId into g 
               select new { PersonId = g.Key, Cars = g.ToList() };
+// -> nhóm dựa trên "PersonId" giống nhau để tạo thành thành các "Key" riêng biệt
+// -> mỗi Key sẽ ứng với 1 list "p.Car" 
+
+// hoặc
+var results = persons.GroupBy(
+    p => p.PersonId, // nếu muốn nhóm dựa trên 2 cột VD: p => new { p.PersonId, p.Car}
+    p => p.car,
+    (key, g) => new { PersonId = key, Cars = g.ToList() });
+
+output = [
+  {
+    "personId": 1,
+    "cars": ["abc", "egh", "erp"]
+  },
+  {
+    "personId": 3,
+    "cars": ["def", "uhk"]
+  },
+  {
+    "personId": 5,
+    "cars": ["jkm"]
+  }
+]
 
 ## with Aggregate function
 foreach

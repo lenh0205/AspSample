@@ -32,3 +32,6 @@
 * -> if an **offset is omitted** from the string representation of a time, **`parsing returns`** a DateTime object with its **Kind** property set to **DateTimeKind.Unspecified**
 * -> if an **offset is specified**, **`parsing returns`** a DateTime object with its **Kind** property set to **DateTimeKind.Local** - its **`value`** is also adjusted to the **local time zone of our machine**
 * _we can modify this behavior by using a **DateTimeStyles** value with the parsing method_
+
+===============================================================================
+# UTC
