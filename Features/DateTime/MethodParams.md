@@ -31,4 +31,16 @@ var dateTime = DateTime.Parse(dateString, cultureInfo);
 * -> the **`CultureInfo`** returned by **CultureInfo.CurrentCulture** has a **CultureInfo.DateTimeFormat** property 
 * -> this property is a **DateTimeFormatInfo** object that **`represents the current culture`**
 
+===============================================================================
+# 'DateTimeKind' Enum
+* -> specifies whether **`a DateTime object`** represents a **local time**, a **Coordinated Universal Time (UTC)**, or is **not specified as either local time or UTC**
+* -> used in **`conversion operations between local time and Coordinated Universal Time (UTC)`**
 
+```cs
+var kind0 = DateTimeKind.Unspecified; // Output: Unspecified
+var kind1 = DateTimeKind.Utc; // Output: Utc
+var kind2 = DateTimeKind.Local; // Output: Local
+
+var dt = DateTime.Now;
+DateTimeKind kind = dt.Kind; // Output: Local
+```

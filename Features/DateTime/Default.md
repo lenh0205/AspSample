@@ -21,6 +21,11 @@
 ```
 
 ===============================================================================
+# UTC - Coordinated Universal Time 
+* -> is a **`high-precision (or most precise), atomic time standard`** (_the world's time zones are expressed as positive or negative offsets from UTC_)
+* -> the use of UTC is recommended when **`a date and time's portability across computers is important`**
+
+===============================================================================
 # Offset
 * -> in addition to **`a date`** and **`a time`** component, the **`string representation`** of a date and time can include an **offset**
 * -> **indicates how much the time differs from `UTC` (Coordinated Universal Time)**
@@ -33,5 +38,10 @@
 * -> if an **offset is specified**, **`parsing returns`** a DateTime object with its **Kind** property set to **DateTimeKind.Local** - its **`value`** is also adjusted to the **local time zone of our machine**
 * _we can modify this behavior by using a **DateTimeStyles** value with the parsing method_
 
+## 'DateTimeOffset' Struct
+* -> **`represents a point in time`** (_typically expressed as **a date and time of day**_), relative to **`Coordinated Universal Time (UTC)`**
+* -> because _DateTimeOffset objects_ store **`a date and time value along with its offset from UTC`**, they always represent **a particular point in time in relation to UTC**
+
+* => so we can also **serialize a DateTimeOffset structure** to **`represent a single point in time unambiguously`**
+
 ===============================================================================
-# UTC
