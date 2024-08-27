@@ -201,6 +201,9 @@ Ví dụ Migration cần drop 1 Table nhưng Table đó không tồn tại trong
 
 * -> hoặc cũng có thể là ta đang **`mixing relational expressions with scalar operators (OR)`**
 
+# DB - SQL - lỗi 'Microsoft.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occured while establishing a connection to SQL Server' khi 'update-database'
+* -> lỗi này rất có thể là do **`ConnectionString`** của ta đang không đúng
+
 ===============================================
 # FE - React can't access an object before it gets initialize
 * **Lý do**: 
