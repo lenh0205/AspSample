@@ -169,6 +169,13 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> can be used in most of the file-related Windows APIs, but **`not all Windows APIs`** (Ex: LoadLibrary<...> fails if the file name is longer than MAX_PATH)
 * -> compatibility with other Windows-based applications and the Windows shell itself 
 
+## BE - Https hoặc SSL certificate có vấn đề
+* -> thứ nhất để chạy project web của ta trên 1 URL ta chỉ định thì ta có thể vô **`~/Properties/lauchSettings.json`**
+* -> check xem URL mà web ta đang chạy có giống với URL trong file "launchSettings.json", nếu chưa thì chỉnh lại cho đúng
+
+* -> if we get an **error connecting** it may be that we are running **https** and the **`development certificate`** for **localhost** is not trusted
+* -> we can run **`dotnet dev-certs https --trust`** in order to trust the development certificate (_this only needs to be done once_)
+
 ==============================================================
 
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);

@@ -97,3 +97,49 @@ dotnet new is4empty -n IdentityServer
 * -> define **`a client application to access our new API`**
 * -> the client will **authenticate** using the **`ClientId`** and **`ClientSecret`** with **IdentityServer** (_as the **login** and **password** for our application itself_)
 * -> it **`identifies our application to the identity server`** so that it knows which application is trying to connect to it
+
+## Configuring IdentityServer
+* -> we'll **load resource and client definitions** in **Startup.cs** - add services using **`.AddIdentityServer()`**, ....
+* -> giờ ta có thể run the server and navigate to "https://localhost:5001/.well-known/openid-configuration" (_xem `~\Features\Security\Auth\Protocol\OpenID_Connect phần discovery document` để hiểu_)
+* -> also in first startup, IdentityServer sẽ tạo 1 **`developer signing key`** (_a file called **``**tempkey.jwk`**_) cho ta
+
+## Create an Web API 
+* -> create a project with "ASP.NET Core Web API template" running on "https://localhost:6001" 
+* -> to **`test the authorization requirement`**, as well as **`visualize the claims identity through the eyes of the API`**
+
+* -> ta sẽ cần add the **authentication services to DI** and the **authentication middleware to the pipeline**
+* -> ta sẽ cần install NuGet package: **Microsoft.AspNetCore.Authentication.JwtBearer**
+* -> từ đó ta có thể **`validate the incoming token to make sure it is coming from a trusted issuer`** and **`validate that the token is valid to be used with this api (aka audience)`**
+
+* _hiện tại khi ta access vào "https://localhost:6001/identity" thì response sẽ trả về **401 status code** - chứng tỏ nó đang được **`protected by IdentityServer`** và **`require a credential to access`**_
+
+## Creating the client
+* -> ta sẽ tạo 1 **a client** (_ta sẽ tạo 1 project với template là **Console App**_) that **`requests an access token`**, and **`then uses this token to access the API`**
+
+* -> we will use a client library called **IdentityModel** that encapsulates the protocol interaction in an easy to access the **`token endpoint of IdentityServer that implement OAuth 2.0 protocol`**
+* _but we can always use raw HTTP to access it_
+* -> also, **IdentityModel** includes a client library to use with the **discovery endpoint**
+* => this way we only need to know the **base-address of IdentityServer** - the actual endpoint addresses can be read from the metadata
+
+* -> h thì ta sẽ **add code để get token từ IdentityServer**
+* -> ta sẽ start 2 project là Client và IdentityServer lên (_nếu gặp lỗi **SSL certificate** thì xem `~/Resolver/experient/Debug_Error.md` để fix_)
+* -> nếu lấy được **Access Token** thì ta thửu pass nó vào "jwt.ms" để xem **`raw token`**, nó sẽ trông như sau:
+```json
+{
+  "alg": "RS256",
+  "kid": "B2F02363B9CF44F9E88FD16E946C7D65",
+  "typ": "at+jwt"
+}.{
+  "nbf": 1724841020,
+  "exp": 1724844620,
+  "iss": "https://localhost:5001",
+  "client_id": "client",
+  "jti": "BBCFED9EC5B28F7F9B0F7385935E5EA5",
+  "iat": 1724841020,
+  "scope": [
+    "api1"
+  ]
+}.[Signature]
+```
+
+## Calling the API

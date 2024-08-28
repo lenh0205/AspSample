@@ -48,7 +48,7 @@
 * _this endpoint is used by the **`Authorization Code`** (_use **`response_type=code`** parameter_) and the **`Implicit`** (_use **`response_type=token`** to include **access token** or **`response_type=id_token`** to include both an **access token** and an **ID token**_) grant types_ 
 * _depend on the grant type, the **Authorization Server** will **`issue different kind of credential`**_
 * -> for the **Authorization Code grant**, it will **`issue an authorization code`** (which can later be **`exchanged for an access token`** at the **/oauth/token endpoint**)
-* -> for the **Implicit** grant, it will **`issue an access token`** (_an opaque string - for example, a JWT_) that denotes who has authorized which **`permissions (scopes) to which application`**
+* -> for the **Implicit** grant, it will **`issue an access token`** (_an opaque string - for example, a **`JWT`**_) that denotes who has authorized which **`permissions (scopes) to which application`**
 
 * -> the **OAuth 2.0 Multiple Response Type Encoding Practices specification** define a (optional) parameter called **`response_mode`** to specifies how the **`result of the authorization request is formatted`**
 * -> it can take one of these value: **query**, **fragment**, **form_post**, **web_message**
