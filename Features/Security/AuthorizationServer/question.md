@@ -57,7 +57,43 @@
 * -> **clients request access tokens** and **forward them to the API**
 * -> Access tokens contain **`information about the client and the user (if present)`** - APIs use that information to authorize access to their data.
 
+============================================================================
+# Quick starts 
 
+## ToDo
+* _this is the most scenario for protecting APIs using IdentityServer_
+* -> **`adding IdentityServer`** to an ASP.NET Core application
+* -> **`configuring IdentityServer`**
+* -> **`issuing tokens`** for various clients
+* -> securing **`web applications`** and **`APIs`**
+* -> adding support for **`EntityFramework`** based configuration
+* -> adding support for **`ASP.NET Identity`**
 
+## Overview
+* -> we'll define **an API** and **a Clients** with which to access it
+* -> the **client** will request an **`access token`** from the **Identity Server** using its **`client ID`** and **`secret`**
+* -> then use the token to gain access to the API
 
+## Preparation
+* -> install the **`IdentityServer templates`**
+```r
+dotnet new -i IdentityServer4.Templates
+```
 
+# Quickstack #1: Securing an API using Client Credentials
+
+* create an **`ASP.NET Core`** application include **`basic Identity setup`** 
+```r
+dotnet new is4empty -n IdentityServer
+```
+* -> **`Program.cs`** and **`Startup.cs`** - **the main application entry point**
+* -> **`Config.cs`** - **IdentityServer resources** and **`clients configuration file**
+* -> Output: app running on **https** protocol and the port is set to **5001** when running on **Kestrel** or a random one on **IISExpress**
+
+## Defining an API Scope
+* -> ta sẽ load API resource thông qua file **`Config.cs`** vì Template này sử dụng **'code as configuration' approach**
+
+## Defining the client
+* -> define **`a client application to access our new API`**
+* -> the client will **authenticate** using the **`ClientId`** and **`ClientSecret`** with **IdentityServer** (_as the **login** and **password** for our application itself_)
+* -> it **`identifies our application to the identity server`** so that it knows which application is trying to connect to it
