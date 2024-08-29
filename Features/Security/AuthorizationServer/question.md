@@ -55,7 +55,9 @@
 ## Access Token
 * -> **`allows access to an API resource`**
 * -> **clients request access tokens** and **forward them to the API**
-* -> Access tokens contain **`information about the client and the user (if present)`** - APIs use that information to authorize access to their data.
+* -> Access tokens contain **`information about the client and the user (if present)`** - APIs use that information to authorize access to their data
+
+* -> **by default**, an _access token_ will contain **claims** about the **`scope`**, **`lifetime (nbf and exp)`**, the client ID (client_id) and the issuer name (iss)
 
 ============================================================================
 # Quick starts 
@@ -143,3 +145,15 @@ dotnet new is4empty -n IdentityServer
 ```
 
 ## Calling the API
+* -> ta sẽ dùng **`HTTP Authorization header`** để send **Access Token** to the **API** 
+* _using **`SetBearerToken`** extension method of **HttpClient** object được định nghĩa trong thư viện **IdentityModel**_
+
+* -> ta sẽ chạy select **Multiple Startup Projects** trong Visual Studio để có thể start đồng thời "Api" và "IdentityServer"; sau đó **Start New Instance** cho "Client" 
+* -> ta sẽ thấy giờ thì API đã **`accepts any access token issued by your identity server`**
+
+## Authorization at the API - ASP.NET Core authorization policy system
+* -> ta sẽ cần thêm đoạn code để kiểm tra presence of the **`scope`** in the **access token** that the **client asked for (and got granted)**
+* -> và ta sẽ sử dụng **`ASP.NET Core authorization policy system`** để làm điều đó
+
+* _ta có thể áp 1 policy ở nhiều cấp độ: **`globally`**, **`for all API endpoints`**, **`for specific controllers/actions`**_
+
