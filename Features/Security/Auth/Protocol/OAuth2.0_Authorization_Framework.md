@@ -25,11 +25,15 @@
 
 ## Grant types - flows to get an access token (4 flows)
 * _deciding the right flow will depends mostly on our **`application type`**_
-
 * -> **`Authorization Code Flow`** - used by **Web Apps executing on a server**; also used by **mobile apps, using the Proof Key for Code Exchange (PKCE) technique**
 * -> **`Implicit Flow with Form Post`** - used by **JavaScript-centric apps (Single-Page Applications)** executing on the user's browser.
 * -> **`Resource Owner Password Flow`** - used by **highly-trusted apps**
 * -> **`Client Credentials Flow`** - used for **machine-to-machine communication**
+
+* _there're other grant types:_
+* -> **`Refresh token grant`** - authorization server optionally **issues a refresh token to the client**; the client can **exchange the refresh token for an access token** when the access token has expired
+* -> **`Proof key for code exchange (PKCE)`** - the client app needs to prove to the authorization server that the **authorization code is authentic**; this type is **security-centric**
+* -> **`Device code Grant`** - aimed at **devices with limited input or display capabilities** (_such as `smart TVs`_); the Device Code grant type value is **`urn:ietf:params:oauth:grant-type:device_code`**
 
 ## Endpoints
 * -> OAuth 2.0 uses two endpoints: the **`/authorize`** endpoint and the **`/oauth/token`** endpoint

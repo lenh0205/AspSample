@@ -1,63 +1,3 @@
-============================================================================
-> trong `https://identityserver4.readthedocs.io/en/latest/intro/big_picture.html`, Applications have two fundamental ways with which they communicate with APIs – using the application identity, or delegating the user’s identity ?
-
-# The Big Picture
-* -> cho ta thấy **`interaction`**tổng quan giữa 1 hệ thống gồm các tầng, lớp clients và servers khác nhau (**Browser**, **Web API**, **Web App**, **Native App**, **Server App**) 
-* -> để thêm security mà tránh duplicate giữa các chúng ta sẽ dùng 1 **`Security Token Service`**
-* -> và hệ thống sau khi support bởi **Security Token Service** sẽ cần follow **`architect và một số protocol`**
-* -> design này sẽ chia security concern thành 2 phần **`Authentication`** và **`API Access`**
-
-* -> có nhiều **Authentication protocol** nhưng **`OpenID Connect`** is future - vì nó được designed theo kiểu **API friendly**
-
-* -> **OAuth2** is a **protocol** that **`allows applications to request access tokens from a security token service`** and **use them to communicate with APIs**
-* => this delegation reduces complexity in both the client applications as well as the APIs since **`authentication and authorization can be centralized`**
-
-* => the **combination of OpenID Connect and OAuth 2.0** (_i **`OpenID Connect is an extension on top of OAuth 2.0`**_) is the best approach to secure modern applications
-* -> **2 fundamental security concerns** (_authentication and API access_) are combined into **a single protocol** - often with **`a single round trip to the security token service`**
-
-* => **`IdentityServer4`** is **an implementation of these two protocols** and is highly optimized to solve the typical security problems of today's **mobile, native and web applications**
-* -> is **`middleware`** that **`adds the spec compliant OpenID Connect and OAuth 2.0 endpoints`** to **an arbitrary ASP.NET Core application**
-* -> nói đơn giản dù ta có 1 hosting application phức tạp, nhưng ta chỉ sử dụng middlware này để add **`necessary protocol heads`** cho **authentication related UI** (_login/logout page, consent..._) 
-* -> nhờ đó mà **client applications can talk to our application** **`using those standard protocols`**
-
-============================================================================
-# Terminology
-
-## IdentityServer
-* hay **Security Token Service** / **Identity Provider** / **Authorization Server** / **OpenID Connect Provider** / **IP-STS** là tương tự nhau - đơn giản là **`a piece of software that issues security tokens to clients`**
-* -> **`protect our resources`**
-* -> **`authenticate users using a local account store or via an external identity provider`**
-* -> **`provide session management and single sign-on`**
-* -> **`manage and authenticate clients`**
-* -> **`issue identity and access tokens to clients`**
-* -> **`validate tokens`**
-
-## User
-* -> a human that is using **a registered client** to access resources
-
-## Client
-* -> is _a piece of software_ that **`requests tokens from IdentityServer`** - either for **authenticating a user** (requesting an **`identity token`**) or for **accessing a resource** (requesting an **`access token`**)
-* -> **`a client must be first registered with IdentityServer before it can request tokens`**
-
-* _Examples for clients are web applications, native mobile or desktop applications, SPAs, server processes, ..._
-
-## Resources
-* -> are something we want to **`protect with IdentityServer`** - either **`identity data`** of our users, or **`APIs`**
-* -> **Identity data** - **`claims`** / **identity information** about a user (_e.g. name or email address_)
-* -> **APIs** - **APIs resources** represent functionality a client wants to invoke (_typically modelled as **`Web APIs`**, but not necessarily_)
-
-* _every resource has a unique name - and clients use this name to specify to which resources they want to get access to_
-
-## Identity Token
-* -> _an Identity Token_ represents the **`outcome of an authentication process`**
-* -> contains at **a bare minimum an identifier for the user** (_called the **`sub`** aka **`subject claim`**_) and information about **how and when the user authenticated**; also can contain additional identity data
-
-## Access Token
-* -> **`allows access to an API resource`**
-* -> **clients request access tokens** and **forward them to the API**
-* -> Access tokens contain **`information about the client and the user (if present)`** - APIs use that information to authorize access to their data
-
-* -> **by default**, an _access token_ will contain **claims** about the **`scope`**, **`lifetime (nbf and exp)`**, the client ID (client_id) and the issuer name (iss)
 
 ============================================================================
 # Quick starts 
@@ -73,7 +13,7 @@
 
 ## Overview
 * -> we'll define **an API** and **a Clients** with which to access it
-* -> the **client** will request an **`access token`** from the **Identity Server** using its **`client ID`** and **`secret`**
+* -> the **client** will not have an **`interactive user`**; it'll request an **`access token`** from the **Identity Server** using its **`client ID`** and **`secret`**
 * -> then use the token to gain access to the API
 
 ## Preparation
@@ -82,7 +22,9 @@
 dotnet new -i IdentityServer4.Templates
 ```
 
-# Quickstack #1: Securing an API using Client Credentials
+============================================================================
+
+# Securing an API using 'Client Credentials' grant type
 
 * create an **`ASP.NET Core`** application include **`basic Identity setup`** 
 ```r
@@ -149,7 +91,7 @@ dotnet new is4empty -n IdentityServer
 * _using **`SetBearerToken`** extension method of **HttpClient** object được định nghĩa trong thư viện **IdentityModel**_
 
 * -> ta sẽ chạy select **Multiple Startup Projects** trong Visual Studio để có thể start đồng thời "Api" và "IdentityServer"; sau đó **Start New Instance** cho "Client" 
-* -> ta sẽ thấy giờ thì API đã **`accepts any access token issued by your identity server`**
+* -> ta sẽ thấy giờ thì API đã **`accepts any access token issued by our identity server`**
 
 ## Authorization at the API - ASP.NET Core authorization policy system
 * -> ta sẽ cần thêm đoạn code để kiểm tra presence of the **`scope`** in the **access token** that the **client asked for (and got granted)**
@@ -157,3 +99,23 @@ dotnet new is4empty -n IdentityServer
 
 * _ta có thể áp 1 policy ở nhiều cấp độ: **`globally`**, **`for all API endpoints`**, **`for specific controllers/actions`**_
 
+## Summary
+* -> **Client** sẽ sử dụng 1 method cho phép gửi request sử dụng **`Client Credential Grant`** với nội dung bao gồm:
+* -> **client Id** là "client", **client secret** là "secret", **scope** là "api1", **address** (_`token endpoint` lấy `OIDC discovery`_)
+* -> request này sẽ được gửi tới **address** (_i **`/connect/token`** endpoint của **IdentityServer**_) để lấy về **`token`** (_ở đây là **`Access Token`**_)
+* -> sau đó **Client** sẽ gửi 1 request đến **protected endpoint 'Get'** (_trả về 1 list **claim**_) của **resource server** - bằng cách bỏ **`Access Token`** vào **`Authorization header bearer`** 
+
+* -> **IdentityServer** sẽ cần định nghĩa list những **`Client`** và list những **`ApiScope`** mà nó sẽ hỗ trợ
+* -> ở đây ta sẽ định nghĩa 1 **ApiScope** với tên "api1"
+* -> ta cũng sẽ định nghĩa 1 **Client** với **`ClientId`** là "client", **`ClientSecrets`** là "secret" và **`AllowedScopes`** là "api1"
+* => vậy nên nếu 1 máy "client" gửi request đến "IdentityServer" để lấy "Access Token" thì sẽ cần cung cấp đầy đủ những thông tin này 
+* -> ta sẽ s/d **`.AddIdentityServer()`** để load những definition này
+
+* -> **resource server** sẽ add **`Authentication service`**, những việc mà service này sẽ làm là:
+* -> đầu tiên nó sẽ validate **`token có đến từ trusted issuer`** bằng cách so sánh **iss** lấy được từ "access token" với giá trị của **expected hosting url của IdentityServer** mà ta truyền vô, 
+* -> thứ hai nó sẽ validate **`token is valid to be used with this api`** bằng cách kiểm tra **aud**
+* -> **resource server** cũng add **`Authorization service`**, nó sẽ:
+* -> tạo sẽ thêm 1 **`Policy`** gọi là "ApiScope" để kiêm tra xem **scope** trong "access token" có bao gồm "api1"
+* -> sau đó khi khởi tạo API endpoint, ta sẽ thêm **policy** này vào endpoint ta cần để nó kiểm tra
+
+============================================================================

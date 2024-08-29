@@ -34,3 +34,5 @@
 ## Configure Applications with OIDC Discovery
 * -> **OpenID Connect (OIDC) Discovery documents** contain **`metadata about the identity provider (IdP)`**
 * -> **`adding discovery to our SDK`** to **point our application to the "./wellknown" endpoint** to **`consume information about our IdP`** could **help configure our integration with the IdP**
+
+* => after integrating **OIDC discovery** into our **SDK** provides: **`Exposed endpoints of the IdP`**, **`Standard OIDC supported claims and scope`**, **`Features supported by the IdP`**
