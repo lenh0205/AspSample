@@ -83,6 +83,10 @@
 * -> **by default**, an _access token_ will contain **claims** about the **`scope`**, **`lifetime (nbf and exp)`**, the client ID (client_id) and the issuer name (iss)
 
 ============================================================================
+# Standard 'scopes' and corresponding 'claims'
+* https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims  
+
+============================================================================
 # Preparation Template
 * -> install the **`IdentityServer templates`**
 ```r

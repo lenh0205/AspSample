@@ -1,37 +1,4 @@
 ===================================================================
-# Add MVC to existing Web API project
-```cs
-public void ConfigureServices(IServiceCollection services)
-{
-    //services.AddControllers();
-    services.AddControllersWithViews();
-}
-
-// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-    if (env.IsDevelopment())
-    {
-        app.UseDeveloperExceptionPage();
-    }
-
-    app.UseHttpsRedirection();
-
-    app.UseRouting();
-
-    app.UseAuthorization();
-
-    app.UseEndpoints(endpoints =>
-    {
-        //endpoints.MapControllers();
-        endpoints.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");             
-    });
-}
-```
-
-===================================================================
 # Parse an unvalid DateTime to valid DateTime
 ```cs
 string date = "20121004";
@@ -74,6 +41,39 @@ protected IActionResult UnprocessedEntityResult() {
 var path = @"\\servername\share\folder"; 
 // instead of:
 var path = "\\\\servername\\share\\folder";
+```
+
+===================================================================
+# Add MVC to existing Web API project
+```cs
+public void ConfigureServices(IServiceCollection services)
+{
+    //services.AddControllers(); // for Web API
+    services.AddControllersWithViews();
+}
+
+// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+    }
+
+    app.UseHttpsRedirection(); // not require for MVC enable, but for security of web app
+
+    app.UseRouting();
+
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        //endpoints.MapControllers();
+        endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");             
+    });
+}
 ```
 
 ===================================================================
@@ -230,15 +230,3 @@ public static int GetAge(this DateTime dateOfBirth)
 ```
 
 ===================================================================
-# Read/Write with 'FileStream'
-
-```cs
-// for read file at a specific path:
-var fs = New FileStream("File Path", FileMode.Open);
-
-// for write file at a specific path:
-FileStream fs = new FileStream(strFilePath, FileMode.Create);
-
-FileStream fs = File.Create(strFilePath); 
-// <=> new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.None);
-```
