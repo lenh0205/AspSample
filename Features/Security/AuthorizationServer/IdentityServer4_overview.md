@@ -81,3 +81,36 @@
 * -> Access tokens contain **`information about the client and the user (if present)`** - APIs use that information to authorize access to their data
 
 * -> **by default**, an _access token_ will contain **claims** about the **`scope`**, **`lifetime (nbf and exp)`**, the client ID (client_id) and the issuer name (iss)
+
+============================================================================
+# Preparation Template
+* -> install the **`IdentityServer templates`**
+```r
+dotnet new -i IdentityServer4.Templates
+```
+
+# Type of template
+
+## dotnet new is4empty
+* -> creates **`a minimal IdentityServer4 project without a UI`**
+
+## dotnet new is4ui
+* -> adds the **`quickstart UI`** to the current project (can be e.g added on top of is4empty)
+* _nói chung khi ta chạy CLI này trên 1 project bất kỳ thì nó sẽ **`add cho project các folder chứa các file để tạo UI cho identity`**_
+* _và thường thì ta sẽ dùng lên project có template **is4empty**_
+
+## dotnet new is4inmem
+* -> adds **`a basic IdentityServer`** with **`UI`**, **`test users`** and **`sample clients and resources`** (_shows both in-memory code and JSON configuration_)
+
+## dotnet new is4aspid
+* -> adds **`a basic IdentityServer`** that uses **`ASP.NET Identity`** for user management
+* _if we automatically seed the database, we will get two users: alice and bob - both with password Pass123$ (Check the SeedData.cs file)_
+
+## dotnet new is4ef
+* -> adds a **`basic IdentityServer`** that uses **`Entity Framework`** for configuration and state management. 
+* -> if we seed the database, we get a couple of basic client and resource registrations, check the SeedData.cs file
+
+## dotnet new is4admin
+* -> adds an IdentityServer that includes the **`Rock Solid Knowledge AdminUI Community Edition`** (open http://localhost:5000/admin in the browser)
+* -> this gives us a web-based administration interface for users, claims, clients and resources.
+

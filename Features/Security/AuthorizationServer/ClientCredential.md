@@ -16,12 +16,6 @@
 * -> the **client** will not have an **`interactive user`**; it'll request an **`access token`** from the **Identity Server** using its **`client ID`** and **`secret`**
 * -> then use the token to gain access to the API
 
-## Preparation
-* -> install the **`IdentityServer templates`**
-```r
-dotnet new -i IdentityServer4.Templates
-```
-
 ============================================================================
 
 # Securing an API using 'Client Credentials' grant type
