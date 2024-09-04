@@ -1,3 +1,16 @@
+================================================================
+# OAuth 2.0 Grant Types - flows to get an access token (4 flows)
+* _deciding the right flow will depends mostly on our **`application type`**_
+* -> **`Authorization Code Flow`** - used by **Web Apps executing on a server** (_SSR_); also used by **mobile apps, using the Proof Key for Code Exchange (PKCE) technique**
+* -> **`Implicit Flow with Form Post`** - used by **JavaScript-centric apps (Single-Page Applications)** executing on the user's browser.
+* -> **`Resource Owner Password Flow`** - used by **highly-trusted apps**
+* -> **`Client Credentials Flow`** - used for **machine-to-machine communication**
+
+## OpenID Connect Grant Types - flows to get an ID Token
+* -> the **`Authorization Code Flow`** and **`Implicit Flow`** similar like **OAuth 2.0**
+* -> but it also has the **`Hydrid Flow`** - combine steps from **Implicit Flow with Form Post** and **Authorization Code Flow**
+
+================================================================
 # Authentication and Authorization Flows
 * -> the **`Identity platform`** usually uses the **OpenID Connect (OIDC) Protocol** and **OAuth 2.0 Authorization Framework** 
 * -> to authenticate users and get their authorization to access protected resources

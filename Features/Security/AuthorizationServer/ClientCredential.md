@@ -1,3 +1,8 @@
+> có 1 số câu hỏi cần đặt ra trong demo này, `client` nắm giữ `ClientID` và `ClientSecret` - đây là credential, vậy có ổn không khi **client** giữa nó ?
+> hay nó chỉ đúng trong trường hợp ta sử dụng **`Client Credential Grant type`** ?
+> trong Demo này, Web API sẽ inspect **access token** và lấy claim bên trong để đối chiếu với giá trị đã định nghĩa sẵn (_nên nó chỉ s/d duy nhất `Microsoft.AspNetCore.Authentication.JwtBearer`_)
+> việc này vẫn thiếu thiếu gì đó ? (đáng lẽ WebAPI phải chứa 1 cái **secret key** gì đó để kiểm tra)
+> 1 câu hỏi nữa là liệu trong 1 trường hợp nào đó `Web API` sẽ phải giao tiếp với `IdentityServer` không ? (_trong VD này thì không_)
 
 ============================================================================
 # Quick starts 
@@ -41,6 +46,8 @@ dotnet new is4empty -n IdentityServer
 * -> giờ ta có thể run the server and navigate to "https://localhost:5001/.well-known/openid-configuration" (_xem `~\Features\Security\Auth\Protocol\OpenID_Connect phần discovery document` để hiểu_)
 * -> also in first startup, IdentityServer sẽ tạo 1 **`developer signing key`** (_a file called **``**tempkey.jwk`**_) cho ta
 
+============================================================================
+
 ## Create an Web API 
 * -> create a project with "ASP.NET Core Web API template" running on "https://localhost:6001" 
 * -> to **`test the authorization requirement`**, as well as **`visualize the claims identity through the eyes of the API`**
@@ -50,6 +57,8 @@ dotnet new is4empty -n IdentityServer
 * -> từ đó ta có thể **`validate the incoming token to make sure it is coming from a trusted issuer`** and **`validate that the token is valid to be used with this api (aka audience)`**
 
 * _hiện tại khi ta access vào "https://localhost:6001/identity" thì response sẽ trả về **401 status code** - chứng tỏ nó đang được **`protected by IdentityServer`** và **`require a credential to access`**_
+
+============================================================================
 
 ## Creating the client
 * -> ta sẽ tạo 1 **a client** (_ta sẽ tạo 1 project với template là **Console App**_) that **`requests an access token`**, and **`then uses this token to access the API`**
@@ -93,23 +102,26 @@ dotnet new is4empty -n IdentityServer
 
 * _ta có thể áp 1 policy ở nhiều cấp độ: **`globally`**, **`for all API endpoints`**, **`for specific controllers/actions`**_
 
+============================================================================
+
 ## Summary
-* -> **Client** sẽ sử dụng 1 method cho phép gửi request sử dụng **`Client Credential Grant`** với nội dung bao gồm:
+* -> **Client** (Console App) sẽ sử dụng 1 extension method (hỗ trợ bởi thư viện **IdentityModel**) của HttpClient - cho phép gửi request sử dụng **`Client Credential Grant`** bao gồm:
 * -> **client Id** là "client", **client secret** là "secret", **scope** là "api1", **address** (_`token endpoint` lấy `OIDC discovery`_)
 * -> request này sẽ được gửi tới **address** (_i **`/connect/token`** endpoint của **IdentityServer**_) để lấy về **`token`** (_ở đây là **`Access Token`**_)
 * -> sau đó **Client** sẽ gửi 1 request đến **protected endpoint 'Get'** (_trả về 1 list **claim**_) của **resource server** - bằng cách bỏ **`Access Token`** vào **`Authorization header bearer`** 
 
-* -> **IdentityServer** sẽ cần định nghĩa list những **`Client`** và list những **`ApiScope`** mà nó sẽ hỗ trợ
+* -> **IdentityServer** (is4empty) có lớp **Config.cs** (_`code as configuration` approach_) định nghĩa list những **`Client`** và list những **`ApiScope`** mà nó sẽ hỗ trợ
 * -> ở đây ta sẽ định nghĩa 1 **ApiScope** với tên "api1"
-* -> ta cũng sẽ định nghĩa 1 **Client** với **`ClientId`** là "client", **`ClientSecrets`** là "secret" và **`AllowedScopes`** là "api1"
+* -> ta cũng sẽ định nghĩa 1 **Client** với **`ClientId`** là "client", **`ClientSecrets`** là "secret" và **`AllowedScopes`** là "api1" (_phải có trong `ApiScope`_)
 * => vậy nên nếu 1 máy "client" gửi request đến "IdentityServer" để lấy "Access Token" thì sẽ cần cung cấp đầy đủ những thông tin này 
 * -> ta sẽ s/d **`.AddIdentityServer()`** để load những definition này
 
-* -> **resource server** sẽ add **`Authentication service`**, những việc mà service này sẽ làm là:
+* -> **resource server** (Web API) sẽ add **`Authentication service`**, những việc mà service này sẽ làm là:
 * -> đầu tiên nó sẽ validate **`token có đến từ trusted issuer`** bằng cách so sánh **iss** lấy được từ "access token" với giá trị của **expected hosting url của IdentityServer** mà ta truyền vô, 
 * -> thứ hai nó sẽ validate **`token is valid to be used with this api`** bằng cách kiểm tra **aud**
-* -> **resource server** cũng add **`Authorization service`**, nó sẽ:
-* -> tạo sẽ thêm 1 **`Policy`** gọi là "ApiScope" để kiêm tra xem **scope** trong "access token" có bao gồm "api1"
-* -> sau đó khi khởi tạo API endpoint, ta sẽ thêm **policy** này vào endpoint ta cần để nó kiểm tra
+* -> **resource server** cũng add **`Authorization service`**, nó sẽ định nghĩa các **`Policy`** 
+* -> tạo sẽ có 1 **`Policy`** gọi là "ApiScope" để kiêm tra xem **scope** trong "access token" có bao gồm "api1"
+* -> sau đó ta sẽ gọi **.UseAuthentication()** và **.UseAuthorization()** middleware để s/d các services
+* -> sau khi ta khởi tạo các API endpoint, ta sẽ attach **policy** này vào endpoint mà ta cần kiểm tra (_có 3 cấp độ: global, all endpoints, specific action_)
 
 ============================================================================

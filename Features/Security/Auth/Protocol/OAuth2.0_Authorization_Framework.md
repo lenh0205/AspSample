@@ -23,13 +23,6 @@
 * -> is the **`permissions`** **represented by the access token** in OAuth terms
 * -> when an application authenticates, it'll specifies the scopes it wants; then **if those scopes are authorized by the user**, then the **`access token will represent these authorized scopes`**
 
-## Grant types - flows to get an access token (4 flows)
-* _deciding the right flow will depends mostly on our **`application type`**_
-* -> **`Authorization Code Flow`** - used by **Web Apps executing on a server**; also used by **mobile apps, using the Proof Key for Code Exchange (PKCE) technique**
-* -> **`Implicit Flow with Form Post`** - used by **JavaScript-centric apps (Single-Page Applications)** executing on the user's browser.
-* -> **`Resource Owner Password Flow`** - used by **highly-trusted apps**
-* -> **`Client Credentials Flow`** - used for **machine-to-machine communication**
-
 * _there're other grant types:_
 * -> **`Refresh token grant`** - authorization server optionally **issues a refresh token to the client**; the client can **exchange the refresh token for an access token** when the access token has expired
 * -> **`Proof key for code exchange (PKCE)`** - the client app needs to prove to the authorization server that the **authorization code is authentic**; this type is **security-centric**
