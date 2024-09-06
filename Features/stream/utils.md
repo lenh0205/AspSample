@@ -1,4 +1,7 @@
-
+>https://www.reddit.com/r/csharp/comments/znij41/streams_and_buffer_size/
+https://stackoverflow.com/questions/43935608/difference-between-buffer-stream-in-c-sharp
+https://learn.microsoft.com/en-us/dotnet/api/system.io.bufferedstream?view=net-8.0
+https://www.infoworld.com/article/2337595/how-to-use-bufferedstream-and-memorystream-in-c-sharp.html
 ===================================================================
 # "input stream" and "output stream"
 * -> streams for **`writing only`** are typically called **output streams**
@@ -123,7 +126,7 @@ myBinaryWriter.Write(123);
 ```
 
 # Convert between Stream
-* -> we generally read data from one stream and write it to another
+* -> we generally read data from one stream and write it to another - **`.CopyTo()`**
 
 ```cs - Reading from the "FileStream" and writing to a "MemoryStream"
 string filePath = "example.txt";
