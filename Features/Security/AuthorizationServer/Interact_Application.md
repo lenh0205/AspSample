@@ -71,7 +71,13 @@
 
 ===========================================================================
 # Summary
-* -> Ta sẽ migrate cho **IdentityServer** cho thêm phần hỗ trợ UI
+* -> Ta sẽ migrate cho **IdentityServer** cho thêm phần hỗ trợ **`UI`**
+* -> tiếp theo ta support for **`OpenID Connect Identity Scopes`** bao gồm 2 standard scopes là **`openid`** và **`profile`** 
+* -> định nghĩa thêm 1 **client** (Mvc client) trong **Config.cs** bao gồm **`ClientId`**, **`ClientSecrets`**, **`AllowedGrantTypes`**, **`RedirectUris`**, **`PostLogoutRedirectUris`**, **`AllowedScopes`** 
+* -> đồng thời add some **`user data`** để testing
+
+* -> ta tạo 1 **Mvc Client** và cài thư viện **`support for OpenID Connect authentication`** (_cung cấp `Authority`, `ClientId`, `ClientSecret` cho **.AddOpenIdConnect()**_)
+* -> cấu hình để required **Authorization** mà ta đã định nghĩa lên các endpoint
 
 ===========================================================================
 ## Adding Support for External Authentication

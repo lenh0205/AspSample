@@ -26,37 +26,12 @@
 > Tại sao nên có Authorization Server riêng với Resource Server ?
 
 ===========================================================
-# Identity Glossary - các thuật ngữ identity thường dùng
-* https://auth0.com/docs/glossary  
-
-===========================================================
-
 # IAM - Identity and Access Management 
 * -> provides control over **user validation** and **resource access**
 * -> this technology ensures that the **`right people`** access the **`right digital resources`** at the **`right time`** and for the **`right reasons`**
 
-## Fundamental Concept
-
-* a **digital resource**
-* -> is any **`combination of applications and data`** in a computer system
-* -> _examples of digital resources_ include **`web applications`**, **`APIs`**, **`platforms`**, **`devices`**, or **`databases`** 
-
-* **Identity** (_the core of IAM_)
-* -> someone wants access to your resource, it could be _a customer, employee, member, participant,..._
-* -> in IAM, a **user account** is a **`digital identity`**; _user accounts_ can also represent **`non-humans`**, such as software, Internet of Things devices, or robotics
-
-* **Authentication**
-* -> is the **`verification of a digital identity`**
-* -> someone (or something) authenticates to **`prove that they're the user they claim to be`** 
-
-* **Authorization**
-* -> is the process of determining **`what resources a user can access`**  
-
-## Authentication and Authorization
-* _it’s common to confuse authentication and authorization because they **`seem like a single experience to users`**_
-* -> they are two separate processes: **authentication** proves a **`user’s identity`**, while **authorization** grants or denies the **`user’s access to certain resources`** 
-
-## What does "IAM" do?
+===========================================================
+# What does "IAM" do?
 * _Identity and access management gives us control over `user validation` and `resource access`:_ 
 * -> **How users become a part of your system ?**
 * -> **What user information to store ?**
@@ -65,99 +40,52 @@
 * -> **The experience of proving identity ?**
 * -> **Who can and cannot access different resources ?**
 
-## IAM integration
-* _we will integrate IAM with our **`application, API, device, data store, or other technology`**_
+* => _IAM systems typically provide the following core functionality:_
 
-* _this integration can be very `simple`_
-```r - For example:
-// our web application might "rely entirely on Facebook for authentication", and have an "all-or-nothing authorization policy"
-// our app performs a simple check: if a user isn’t currently logged in to Facebook in the current browser, we direct them to do so
-// once authenticated, all users can access everything in our app.
-```
+## Identity management
+* -> the process of **`creating, storing, and managing`** **identity information**
+* -> **`Identity providers (IdP)`** are software solutions that are used to **track and manage user identities**, as well as the **permissions and access levels** associated with those identities
 
-* _but in practical, it need more `complex IAM solution` to meet the **`needs of your users, organization, industry, or compliance standards`**_
-* _most systems require some combination of these capabilities:_
-* -> **Seamless signup and login experiences** - smooth and professional login and signup experiences occur **`within our app, with our brand’s look and language`** 
-* -> **Multiple sources of user identities** - Users expect to be able to **`log in using a variety of identity providers`** like social (Google, Linkedin, ...), enterprise (Microsoft Active Directory), ....
-* -> **Multi-factor authentication (MFA)** - in an age when **`passwords are often stolen`**, requiring **`additional proof of identity`** is the new standard (_Fingerprint authentication and one-time passwords are examples of common authentication methods_)
-* -> **Step-up authentication** - access to **`advanced capabilities and sensitive information`** require stronger proof of identity than everyday tasks and data; it requires additional identity verification for selected areas and features
-* -> **Attack protection** - preventing **`bots and bad actors`** from breaking into our system is fundamental to cybersecurity
-* -> **Role-based access control (RBAC)** - as **`the number of users grows`**, managing the access of each individual quickly becomes impractical. With RBAC, people who have the **`same role have the same access to resources`**
+## Identity federation 
+* -> allow **`users who already have passwords elsewhere`** (_for example, in our enterprise network or with an internet or social identity provider_) to **get access to our system**
 
+## Provisioning and deprovisioning of users
+* -> the process of creating and managing user accounts, which includes **`specifying which users have access to which resources, and assigning permissions and access levels`**
+
+## Authentication of users 
+* -> authenticate a user, machine, or software component by **`confirming that they're who or what they say they are`**
+* -> we can add **`multifactor authentication (MFA)`** for individual users for **extra security** 
+* -> or **`single sign-on (SSO)`** to **allow users to authenticate their identity with one portal instead of many different resources**
+
+## Authorization of users 
+* -> Authorization **`ensures a user is granted the exact level and type of access`** to a tool that they're entitled to
+* -> Users can also be **`portioned into groups or roles`** so large cohorts of users can be **`granted the same privileges`**
+
+## Access control 
+* -> the process of **`determining who or what has access to which resources`**
+* -> this includes **defining user roles and permissions**, as well as **setting up authentication and authorization mechanisms**
+* => Access controls regulate access to systems and data.
+
+## Reports and monitoring 
+* -> **`generate reports after actions taken on the platform`** (like sign-in time, systems accessed, and type of authentication) to ensure compliance and assess security risks
+* -> gain insights into the security and usage patterns of our environment
+
+===========================================================
 ## How does IAM work? 
 * -> IAM is **`not one clearly defined system`**; IAM is **`a discipline and a type of framework`** for **solving the challenge of secure access to digital resources**
 * -> there’s no limit to the different approaches for implementing an IAM system
 
 * _there're elements and practices in common implementations:_
+* -> The user (resource owner) initiates an authentication request with the identity provider/authorization server from the client application.
 
-## Identity providers
-* **The reason:**
-* -> in the past, _the standard for identity and access management_ was for a system to **`create and manage its own identity information for its users`**
-* -> each time a user wanted to **`use a new web application`**, they **filled in a form** to **`create an account`**
-* -> the application **stored all of their information**, including **`login credentials`**, and **`performed its own authentication`** whenever a user signed in
-* -> as the internet grew and more and more applications became available, most people **`amassed countless user accounts`**, each with its **own account name and password to remember**
-* -> _there are many applications that continue to work this way_
+If the credentials are valid, the identity provider/authorization server first sends an ID token containing information about the user back to the client application.
 
-* => but many others now **`rely on identity providers`** to **reduce their development and maintenance burden and their users’ effort**
-* -> an identity provider **`creates, maintains, and manages identity information, and can provide authentication services to other applications`**
-* -> Identity providers **don’t share your authentication credentials** with the apps that rely on them
+The identity provider/authorization server also obtains end-user consent and grants the client application authorization to access the protected resource. Authorization is provided in an access token, which is also sent back to the client application.
 
-```r 
-// Google Accounts is an "identity provider"
-// they store account information such as our user name, full name, job title, and email address
-// a web like Slate online magazine lets us log in with Google (or another identity provider) rather than go through the steps of entering and storing our information anew 
-// but Slate doesn’t ever see our Google password; Google only lets Slate know that we’ve proven our identity. 
-```
+The access token is attached to subsequent requests made to the protected resource server from the client application.
 
-* other identity providers include **`social media`** (_such as Facebook or LinkedIn_), **`enterprise`** (_such as Microsoft Active Directory_), and **`legal identity providers`** (_such as Swedish BankID_)
+The identity provider/authorization server validates the access token. If successful the request for protected resources is granted, and a response is sent back to the client application.
 
-## Authentication factors
-* -> _Authentication factors_ are **`methods for proving a user’s identity`**
-* -> IAM systems require one or many authentication factors to verify identity
 
-* _commonly fall into these basic types:_
-* -> **Knowledge** (something you know): Pin, password
-* -> **Possession** (something you have): Mobile phone, encryption key device
-* -> **Inherence** (something you are):	Fingerprint, facial recognition, iris scan
-
-## Authentication and authorization standards
-* **`Authentication and authorization standards`** are **open specifications and protocols** that provide guidance on how to:
-* -> **`Design IAM systems to manage identity`**
-* -> **`Move personal data securely`**
-* -> **`Decide who can access resources`**
-
-* _these **`IAM industry standards`** are considered the most secure, reliable, and practical to implement:_
-
-### OAuth 2.0
-* -> OAuth 2.0 is **a delegation protocol** for **`accessing APIs`** and is the **industry-standard protocol for IAM** 
-* -> **`an open authorization protocol`**, OAuth 2.0 lets an app **access resources hosted by other web apps** on behalf of a user **without ever sharing the user’s credentials**
-* -> it’s the standard that allows **`third-party developers`** to **`rely on large social platforms`** (_like Facebook, Google, and Twitter_) for **login**
-
-### Open ID Connect
-* -> a simple **identity layer** that sits **`on top of OAuth 2.0`**
-* -> OpenID Connect - **OIDC** makes it easy to **`verify a user’s identity`** and **`obtain basic profile information`** from the **identity provider**
-* -> OIDC is another **open standard protocol**
-
-### JSON web tokens
-* -> JSON web tokens (JWTs) are **an open standard** that defines **`a compact and self-contained`** way for **`securely transmitting information`** between parties as a JSON object 
-* -> JWTs can be **`verified and trusted`** because they’re **digitally signed**
-* -> they can be used to **`pass the identity of authenticated users`** **between the identity provider and the service requesting the authentication**
-* -> they also can be **`authenticated`** and **`encrypted`**
-
-### Security Assertion Markup Language (SAML)
-* -> is an **open-standard, XML-based data format** 
-* -> lets **`businesses`** communicate **`user authentication and authorization information`** to **`partner companies and enterprise applications that their employees use`**
-
-### Web Services Federation (WS-Fed)
-* -> Developed by Microsoft and used extensively in their applications
-* -> this standard defines the way **security tokens** can be **transported between different entities** to **`exchange identity and authorization information`**
-
-## Why use an IAM platform?
-* -> User expectations, customer requirements, and compliance standards introduce significant technical challenges
-* -> with multiple user sources, authentication factors, and open industry standards, the amount of knowledge and work required to build a typical IAM system can be enormous
-* -> built-in support for all identity providers and authentication factors, offers APIs for easy integration with our software
-* -> relies on the most secure industry standards for authentication and authorization
-
-* => we should **`build on an identity and access management platform`** (_Ex: Auth0_) instead of building our own solution from the ground up
 
 

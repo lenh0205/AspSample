@@ -1,6 +1,35 @@
 > session có tồn tại sau khi người dùng đóng Browser không; và cookie có phải mặc định sẽ bị xoá khi user đóng trình duyệt ?
 > đối với authen, session-based authen sẽ sử dụng cookie, còn Token-based sẽ sử dụng Token ID
 
+===========================================================
+# IAM integration
+* _we will integrate IAM with our **`application, API, device, data store, or other technology`**_
+
+* _this integration can be very `simple`_
+```r - For example:
+// our web application might "rely entirely on Facebook for authentication", and have an "all-or-nothing authorization policy"
+// our app performs a simple check: if a user isn’t currently logged in to Facebook in the current browser, we direct them to do so
+// once authenticated, all users can access everything in our app.
+```
+
+* _but in practical, it need more `complex IAM solution` to meet the **`needs of your users, organization, industry, or compliance standards`**_
+* _most systems require some combination of these capabilities:_
+* -> **Seamless signup and login experiences** - smooth and professional login and signup experiences occur **`within our app, with our brand’s look and language`** 
+* -> **Multiple sources of user identities** - Users expect to be able to **`log in using a variety of identity providers`** like social (Google, Linkedin, ...), enterprise (Microsoft Active Directory), ....
+* -> **Multi-factor authentication (MFA)** - in an age when **`passwords are often stolen`**, requiring **`additional proof of identity`** is the new standard (_Fingerprint authentication and one-time passwords are examples of common authentication methods_)
+* -> **Step-up authentication** - access to **`advanced capabilities and sensitive information`** require stronger proof of identity than everyday tasks and data; it requires additional identity verification for selected areas and features
+* -> **Attack protection** - preventing **`bots and bad actors`** from breaking into our system is fundamental to cybersecurity
+* -> **Role-based access control (RBAC)** - as **`the number of users grows`**, managing the access of each individual quickly becomes impractical. With RBAC, people who have the **`same role have the same access to resources`**
+
+===========================================================
+# Why use an IAM platform?
+* -> User expectations, customer requirements, and compliance standards introduce significant technical challenges
+* -> with multiple user sources, authentication factors, and open industry standards, the amount of knowledge and work required to build a typical IAM system can be enormous
+* -> built-in support for all identity providers and authentication factors, offers APIs for easy integration with our software
+* -> relies on the most secure industry standards for authentication and authorization
+
+* => we should **`build on an identity and access management platform`** (_Ex: Auth0_) instead of building our own solution from the ground up
+
 =============================================================
 # Integrate IAM in Web Development
 * -> IAM solution is a **`gatekeeper to the resources`** we provide **`to customers`** **`as web applications, APIs, ...`** 
