@@ -1,3 +1,5 @@
+https://frontegg.com/blog/oauth-grant-types
+
 ================================================================
 # OAuth 2.0 Grant Types - flows to get an access token (4 flows)
 * _deciding the right flow will depends mostly on our **`application type`**_

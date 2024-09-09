@@ -2,6 +2,7 @@
 https://stackoverflow.com/questions/43935608/difference-between-buffer-stream-in-c-sharp
 https://learn.microsoft.com/en-us/dotnet/api/system.io.bufferedstream?view=net-8.0
 https://www.infoworld.com/article/2337595/how-to-use-bufferedstream-and-memorystream-in-c-sharp.html
+https://stackoverflow.com/questions/63637874/does-converting-between-byte-and-memorystream-cause-overhead
 ===================================================================
 # "input stream" and "output stream"
 * -> streams for **`writing only`** are typically called **output streams**
