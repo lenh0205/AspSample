@@ -106,7 +106,9 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 
 # BE - MVC - InvalidOperationException: The view 'Index' was not found. The following locations were searched: /Views/Home/Index.cshtml
 * -> Lỗi này là do program không tìm thấy file view nó cần ở đường dẫn **`/Views/Home/Index.cshtml`**, mặc dù ta thấy đường dẫn này có tồn tại trong project
-* -> ta cần add thêm service **services.AddControllersWithViews().AddRazorRuntimeCompilation();** (install package **`Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation`**)
+* -> trước tiên ta cần install package **`Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation`**
+* -> nếu là MVC project thì ta thêm **`.AddRazorRuntimeCompilation()`** vào sau **services.AddControllersWithViews()** (_tức là services.AddControllersWithViews().AddRazorRuntimeCompilation();_)
+* -> còn nếu là Razor project thì ta thêm **`.AddRazorRuntimeCompilation()`** vào sau **services.AddRazorPages()**
 
 * _nếu vẫn không được thì ta có thể thử:_
 * -> vô file .csproj để bỏ  dòng <RazorCompileOnBuild>false</RazorCompileOnBuild> và dòng<Content Remove="Views\Home\Index.cshtml" />
