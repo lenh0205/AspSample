@@ -55,9 +55,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // "JwtBearerDefaults" là của thư viện "Microsoft.AspNetCore.Authentication.JwtBearer"
 
-// "CookieAuthenticationDefaults.AuthenticationScheme" is a predefined constant with clarity and consistency for default name of the cookie authentication scheme; it value is just a string "Cookies"
-// so we could provide a different name when calling ".AddCookie()" 
-// Ex: we can config ".AddCookie("MyCustomCookieScheme", ...)" and add "[Authorize(AuthenticationSchemes = "MyCustomCookieScheme")]" to action to use it
+// "CookieAuthenticationDefaults.AuthenticationScheme" is a predefined constant with clarity and consistency for default name of the cookie authentication scheme; 
+// -> it value is just a string "Cookies"; so we could provide a different name when calling ".AddCookie()" 
+// -> Ex: we can config ".AddCookie("MyCustomCookieScheme", ...)" and add "[Authorize(AuthenticationSchemes = "MyCustomCookieScheme")]" to action to use it
 
 // "options => builder.Configuration.Bind("JwtSettings", options))" 
 // -> get configuration settings from our application's configuration sources - like "appsettings.json"
