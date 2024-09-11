@@ -14,7 +14,7 @@
 
 ## Init project
 * -> ta sẽ khởi tạo project sử dụng **template** là **`ASP.NET Core Web App (Model-Controller-View)`** và select **Authentication type** là **`Individual Accounts`** (_để add ASP.NET Core Identity_) 
-* -> this project will provide ASP.NET Core Identity as **`a Razor class library`**
+* -> ASP.NET Core Identity will be provided as **`a Razor class library`**
 
 ## Endpoint
 * -> the Identity Razor class library exposes endpoints with the **`Identity`** area
@@ -79,11 +79,7 @@ app.UseAuthorization();
 ```
 
 ## Scaffold Register, Login, LogOut, and RegisterConfirmation
-* -> hiện tại các view như **`Register, Login, LogOut, and RegisterConfirmation`** ta đều đang sử dụng mặc định; để ghi đè nó thì ta sẽ sử dụng **Identity Scaffold** 
-* -> để nó làm hiện ra những view mặc định này trong project của chúng ta (vì bình thường khi mới khởi tạo project chúng sẽ bị giấu đi), từ đó ta có thể sửa code trực tiếp trong những view này
-* -> trước tiên để **`scaffold item`** ta cần install the **`Microsoft.VisualStudio.Web.CodeGeneration.Design`** NuGet package
-* -> **Process**: right-click on the project > Add > New Scaffolded Item > chọn Identity > chọn Identity > rồi click "Add" và chờ vài giây > chọn view mà ta muốn override (hoặc có option để override tất cả)
-* -> ngoài ra ta cần chọn **DbContext** để có thể Scaffold
+* -> ta sẽ ghi đề lại các page **Register, Login, LogOut, and RegisterConfirmation** sử dụng **`Identity Scaffolder`** (_xem `Features/Security/AspNet_Auth/AspNet_Core_Identity/Scaffold_Identity.md` để hiểu_)
 
 ### Register
 * -> when a user clicks the _"Register" button_ on the _Register page_, the **`RegisterModel.OnPostAsync`** action is invoked
