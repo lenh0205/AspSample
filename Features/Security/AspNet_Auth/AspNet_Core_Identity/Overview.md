@@ -6,3 +6,4 @@
 # ASP.NET Core Identity
 * -> ASP.NET Core Identity provides **a framework** for **`managing and storing user accounts in ASP.NET Core apps`**
 * _**Identity is added to our project** when **`Individual User Accounts`** is selected as the authentication mechanism_
+* _by default, Identity makes use of an **`Entity Framework (EF) Core data model`**_

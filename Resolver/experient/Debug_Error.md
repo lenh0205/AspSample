@@ -130,6 +130,9 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 }
 ```
 
+# BE - MVC - start project (MVC hay Razor page) nhưng chỉ có nội dung hiện lên không có CSS
+* -> ta thử xoá thư mục **.vs**, clean solution rồi rebuild lại project
+
 # BE - ASP.NET - Cannot access a disposed object
 * -> rất có thể là trong 1 Scope request-reponse, logic trước đó đã **`.Dispose()`** hoặc **`.Close()`** đi 1 connection hoặc instance; nên logic sau cần sử dụng **`instance`** đó thì không có
 * -> ta có thể **`DI kiểu Scope`**; hoặc với mỗi logic ta lại tạo instance sau đó dispose nó 
