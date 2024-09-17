@@ -1,14 +1,19 @@
+======================================================================
 # The Identity model
 
-## Entity types
-* -> **`User`** - represents the user
-* -> **`Role`** - represents a role
-* -> **`UserRole`** - a join entity that associates users and roles
+## Entity types and their default Common Language Runtime (CLR) types
+* -> **`User`** - **`IdentityUser`** - represents the user
+* -> **`Role`** - **`IdentityRole`** - represents a role
+* -> **`UserRole`** - **`IdentityUserRole`** - a join entity that associates users and roles
 
-* -> **`UserLogin`** - associates a user with a login
-* -> **`UserToken`** - represents an authentication token for a user
-* -> **`UserClaim`** - represents a claim that a user possesses
-* -> **`RoleClaim`** - represents a claim that's granted to all users within a role
+* -> **`UserLogin`** - **`IdentityUserLogin`** - associates a user with a login
+* -> **`UserToken`** - **`IdentityUserToken`** - represents an authentication token for a user
+* -> **`UserClaim`** - **`IdentityUserClaim`** - represents a claim that a user possesses
+* -> **`RoleClaim`** - **`IdentityRoleClaim`** - represents a claim that's granted to all users within a role
+
+* => rather than using these types directly, the types can be used as **`base classes`** for the app's own types
+* => **the DbContext classes defined by Identity** are **`generic`**, such that **`different CLR types can be used for one or more of the entity types in the model`**
+* _these generic types also **allow the User primary key (PK) data type to be changed**_
 
 ## Entity type relationships
 * -> each **User** can have many associated **Roles**, and each **Role** can be associated with many **Users**
@@ -143,3 +148,138 @@ builder.Entity<TUserRole>(b =>
     b.ToTable("AspNetUserRoles");
 });
 ```
+
+## Model generic types
+
+```cs - using Identity with support for roles
+// Uses all the built-in Identity types
+// Uses `string` as the key type
+public class IdentityDbContext
+    : IdentityDbContext<IdentityUser, IdentityRole, string>
+{
+}
+
+// Uses the built-in Identity types except with a custom User type
+// Uses `string` as the key type
+public class IdentityDbContext<TUser>
+    : IdentityDbContext<TUser, IdentityRole, string>
+        where TUser : IdentityUser
+{
+}
+
+// Uses the built-in Identity types except with custom User and Role types
+// The key type is defined by TKey
+public class IdentityDbContext<TUser, TRole, TKey> : IdentityDbContext<
+    TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>,
+    IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+        where TKey : IEquatable<TKey>
+{
+}
+
+// No built-in Identity types are used; all are specified by generic arguments
+// The key type is defined by TKey
+public abstract class IdentityDbContext<
+    TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+    : IdentityUserContext<TUser, TKey, TUserClaim, TUserLogin, TUserToken>
+         where TUser : IdentityUser<TKey>
+         where TRole : IdentityRole<TKey>
+         where TKey : IEquatable<TKey>
+         where TUserClaim : IdentityUserClaim<TKey>
+         where TUserRole : IdentityUserRole<TKey>
+         where TUserLogin : IdentityUserLogin<TKey>
+         where TRoleClaim : IdentityRoleClaim<TKey>
+         where TUserToken : IdentityUserToken<TKey>
+```
+
+```cs - use Identity without roles (only claims)
+// Uses the built-in non-role Identity types except with a custom User type
+// Uses `string` as the key type
+public class IdentityUserContext<TUser> : IdentityUserContext<TUser, string> where TUser : IdentityUser
+{
+}
+
+// Uses the built-in non-role Identity types except with a custom User type
+// The key type is defined by TKey
+public class IdentityUserContext<TUser, TKey> 
+    : IdentityUserContext<
+        TUser, 
+        TKey, 
+        IdentityUserClaim<TKey>, IdentityUserLogin<TKey>,
+        IdentityUserToken<TKey>
+    > where TUser : IdentityUser<TKey> where TKey : IEquatable<TKey>
+{}
+
+// No built-in Identity types are used; all are specified by generic arguments, with no roles
+// The key type is defined by TKey
+public abstract class IdentityUserContext<TUser, TKey, TUserClaim, TUserLogin, TUserToken> 
+    : DbContext
+        where TUser : IdentityUser<TKey>
+        where TKey : IEquatable<TKey>
+        where TUserClaim : IdentityUserClaim<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
+        where TUserToken : IdentityUserToken<TKey>
+{
+}
+```
+
+======================================================================
+# Customize the model
+* _the starting point for model customization is to **derive from the appropriate context type**_
+
+## Custom Identity DbContext
+* _https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-6.0#model-generic-types_
+
+## Custom user data
+* -> custom user data is supported by inheriting from **`IdentityUser`**
+
+* -> if we add a property to our **Identity user class**
+* -> there's **no need to `override 'OnModelCreating'` in the ApplicationDbContext class**, EF Core **`maps the property by convention`**
+* -> however, the **`database needs to be updated to create a new custom column`** by adding a migration, and then update the database 
+
+```cs - custom user data
+public class ApplicationUser : IdentityUser
+{
+    public string CustomTag { get; set; }
+}
+
+// generic argument for the context
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+    }
+}
+```
+
+```cs - update in "Program.cs" config
+services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// this equivalent to:
+services.AddAuthentication(o =>
+{
+    o.DefaultScheme = IdentityConstants.ApplicationScheme;
+    o.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+})
+.AddIdentityCookies(o => { });
+
+services.AddIdentityCore<TUser>(o =>
+{
+    o.Stores.MaxLengthForKeys = 128;
+    o.SignIn.RequireConfirmedAccount = true;
+})
+.AddDefaultUI()
+.AddDefaultTokenProviders();     
+```
+
+## Change the primary key type
+* -> a **change to the PK column's data type after the database has been created** is **`problematic on many database systems`**
+* -> changing the PK typically involves dropping and re-creating the table. Therefore, key types should be specified in the initial migration when the database is created.
