@@ -228,10 +228,12 @@ public abstract class IdentityUserContext<TUser, TKey, TUserClaim, TUserLogin, T
 # Customize the model
 * _the starting point for model customization is to **derive from the appropriate context type**_
 
-## Custom Identity DbContext
+======================================================================
+# Custom Identity DbContext
 * _https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-6.0#model-generic-types_
 
-## Custom user data
+======================================================================
+# Custom user data
 * -> custom user data is supported by inheriting from **`IdentityUser`**
 
 * -> if we add a property to our **Identity user class**
@@ -280,20 +282,21 @@ services.AddIdentityCore<TUser>(o =>
 .AddDefaultTokenProviders();     
 ```
 
-## Change the primary key type
+======================================================================
+# Change the primary key type
 * -> a **change to the PK column's data type after the database has been created** is **`problematic on many database systems`**
 * -> **changing the PK** typically involves **`dropping`** and **`re-creating`** the table
 * -> therefore, **key types** should be **`specified in the initial migration`** when the database is created
 
 * => steps to change the PK type:
 
-### Drop Database
+## Drop Database
 * -> if the **database was created before the PK change**, run **`Drop-Database (PMC)`** or **`dotnet ef database drop (.NET CLI)`** to delete it
 
-### Remove Migration
+## Remove Migration
 * -> after confirming deletion of the database, **remove the initial migration** with **`Remove-Migration (PMC)`** or **`dotnet ef migrations remove (.NET CLI)`**
 
-### Update DbContext
+## Update DbContext
 * -> **update the ApplicationDbContext class** to **`derive from IdentityDbContext<TUser,TRole,TKey>`**
 * -> **`specify the new key type for TKey`**
 
@@ -313,7 +316,7 @@ services.AddDefaultIdentity<IdentityUser<Guid>>(options => options.SignIn.Requir
         .AddEntityFrameworkStores<ApplicationDbContext>();
 ```
 
-### Update custom Identity User class (if exist)
+## Update custom Identity User class (if exist)
 * -> if a custom **ApplicationUser** class is being used, **`update the class to inherit from IdentityUser`**
 
 ```cs
@@ -338,7 +341,7 @@ services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireCo
         .AddEntityFrameworkStores<ApplicationDbContext>();
 ```
 
-### Update custom Identity Role class (if exist)
+## Update custom Identity Role class (if exist)
 * -> if a custom **ApplicationRole** class is being used, **`update the class to inherit from IdentityRole<TKey>`**
 
 ```cs
@@ -381,12 +384,20 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-### Add navigation properties
+======================================================================
+# Add navigation properties
 * -> changing the model configuration for **`relationships can be more difficult`** than making other changes
 * -> care must be taken to **`replace the existing relationships rather than create new, additional relationships`**
 * -> in particular, the changed relationship must **`specify the same foreign key (FK) property as the existing relationship`**
 
-```cs - Example: the relationship between "Users" and "UserClaims" by default is:
+* -> this kind of model change **`doesn't require the database to be updated`**
+* -> because **the FK for the relationship hasn't changed**
+* -> the **navigation properties** **`only exist in the EF model, not the database`**
+* -> this can be **checked by adding a migration after making the change**; the "Up" and "Down" methods are empty
+
+```cs - Example: the relationship between "Users" and "UserClaims" by default:
+// -> the FK for this relationship is specified as the "UserClaim.UserId" property
+// -> "HasMany" and "WithOne" are called without arguments to create the relationship without navigation properties
 builder.Entity<TUser>(b =>
 {
     // Each User can have many UserClaims
@@ -395,4 +406,340 @@ builder.Entity<TUser>(b =>
      .HasForeignKey(uc => uc.UserId)
      .IsRequired();
 });
+```
+
+```cs - Add a navigation property to "ApplicationUser"
+//  that allows associated "UserClaims" to be referenced from the user
+
+public class ApplicationUser : IdentityUser
+{
+    public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }
+    // the "TKey" for "IdentityUserClaim<TKey>" is the type specified for the PK of users
+    // it's not the PK type for the "UserClaim" entity type
+    // in this case, "TKey" is string because the defaults are being used
+}
+```
+
+
+* _now that the navigation property exists, it must be configured in `OnModelCreating`:_
+```cs
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ApplicationUser>(b =>
+        {
+            // Each User can have many UserClaims
+            b.HasMany(e => e.Claims)
+                .WithOne()
+                .HasForeignKey(uc => uc.UserId)
+                .IsRequired();
+        });
+    }
+}
+```
+
+## Add "Role" and all "User" navigation properties
+* _for configuring **unidirectional navigation properties** for **`all relationships on User`** (the same way as above)_
+
+```cs - Identity User
+public class ApplicationUser : IdentityUser
+{
+    public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }
+    public virtual ICollection<IdentityUserLogin<string>> Logins { get; set; }
+    public virtual ICollection<IdentityUserToken<string>> Tokens { get; set; }
+    public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
+}
+
+public class ApplicationRole : IdentityRole
+{
+    public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
+}
+
+public class ApplicationUserRole : IdentityUserRole<string>
+{
+    public virtual ApplicationUser User { get; set; }
+    public virtual ApplicationRole Role { get; set; }
+}
+```
+
+```cs - Identity DbContext
+public class ApplicationDbContext 
+    : IdentityDbContext<
+        ApplicationUser, ApplicationRole, string,
+        IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>,
+        IdentityRoleClaim<string>, IdentityUserToken<string>>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ApplicationUser>(b =>
+        {
+            // Each User can have many UserClaims
+            b.HasMany(e => e.Claims)
+                .WithOne()
+                .HasForeignKey(uc => uc.UserId)
+                .IsRequired();
+
+            // Each User can have many UserLogins
+            b.HasMany(e => e.Logins)
+                .WithOne()
+                .HasForeignKey(ul => ul.UserId)
+                .IsRequired();
+
+            // Each User can have many UserTokens
+            b.HasMany(e => e.Tokens)
+                .WithOne()
+                .HasForeignKey(ut => ut.UserId)
+                .IsRequired();
+
+            // Each User can have many entries in the UserRole join table
+            // needed to navigate the many-to-many relationship from Users to Roles
+            b.HasMany(e => e.UserRoles)
+                .WithOne()
+                .HasForeignKey(ur => ur.UserId)
+                .IsRequired();
+        });
+    }
+}
+```
+
+## Add all navigation properties
+* _configures navigation properties for **all relationships** on all **entity types**_
+
+```cs
+public class ApplicationUser : IdentityUser
+{
+    public virtual ICollection<ApplicationUserClaim> Claims { get; set; }
+    public virtual ICollection<ApplicationUserLogin> Logins { get; set; }
+    public virtual ICollection<ApplicationUserToken> Tokens { get; set; }
+    public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
+}
+
+public class ApplicationRole : IdentityRole
+{
+    public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
+    public virtual ICollection<ApplicationRoleClaim> RoleClaims { get; set; }
+}
+
+public class ApplicationUserRole : IdentityUserRole<string>
+{
+    public virtual ApplicationUser User { get; set; }
+    public virtual ApplicationRole Role { get; set; }
+}
+
+public class ApplicationUserClaim : IdentityUserClaim<string>
+{
+    public virtual ApplicationUser User { get; set; }
+}
+
+public class ApplicationUserLogin : IdentityUserLogin<string>
+{
+    public virtual ApplicationUser User { get; set; }
+}
+
+public class ApplicationRoleClaim : IdentityRoleClaim<string>
+{
+    public virtual ApplicationRole Role { get; set; }
+}
+
+public class ApplicationUserToken : IdentityUserToken<string>
+{
+    public virtual ApplicationUser User { get; set; }
+}
+```
+
+```cs - DbContext
+public class ApplicationDbContext
+    : IdentityDbContext<
+        ApplicationUser, ApplicationRole, string,
+        ApplicationUserClaim, ApplicationUserRole, ApplicationUserLogin,
+        ApplicationRoleClaim, ApplicationUserToken>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ApplicationUser>(b =>
+        {
+            // Each User can have many UserClaims
+            b.HasMany(e => e.Claims)
+                .WithOne(e => e.User)
+                .HasForeignKey(uc => uc.UserId)
+                .IsRequired();
+
+            // Each User can have many UserLogins
+            b.HasMany(e => e.Logins)
+                .WithOne(e => e.User)
+                .HasForeignKey(ul => ul.UserId)
+                .IsRequired();
+
+            // Each User can have many UserTokens
+            b.HasMany(e => e.Tokens)
+                .WithOne(e => e.User)
+                .HasForeignKey(ut => ut.UserId)
+                .IsRequired();
+
+            // Each User can have many entries in the UserRole join table
+            b.HasMany(e => e.UserRoles)
+                .WithOne(e => e.User)
+                .HasForeignKey(ur => ur.UserId)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<ApplicationRole>(b =>
+        {
+            // Each Role can have many entries in the UserRole join table
+            b.HasMany(e => e.UserRoles)
+                .WithOne(e => e.Role)
+                .HasForeignKey(ur => ur.RoleId)
+                .IsRequired();
+
+            // Each Role can have many associated RoleClaims
+            b.HasMany(e => e.RoleClaims)
+                .WithOne(e => e.Role)
+                .HasForeignKey(rc => rc.RoleId)
+                .IsRequired();
+        });
+    }
+}
+```
+
+======================================================================
+# Use composite keys
+* -> changing the Identity key model to use **composite keys** **`isn't supported or recommended`**
+* -> using a composite key with Identity involves changing **how the Identity manager code interacts with the model**
+
+## Change table/column names and facets
+* -> to change the **names of tables and columns**, call **`base.OnModelCreating`**; then, **`add configuration`** to override any of the defaults
+
+```cs - Example: change the name of all the Identity tables (that use the default Identity types)
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<IdentityUser>(b =>
+    {
+        b.ToTable("MyUsers");
+    });
+
+    modelBuilder.Entity<IdentityUserClaim<string>>(b =>
+    {
+        b.ToTable("MyUserClaims");
+    });
+
+    modelBuilder.Entity<IdentityUserLogin<string>>(b =>
+    {
+        b.ToTable("MyUserLogins");
+    });
+
+    modelBuilder.Entity<IdentityUserToken<string>>(b =>
+    {
+        b.ToTable("MyUserTokens");
+    });
+
+    modelBuilder.Entity<IdentityRole>(b =>
+    {
+        b.ToTable("MyRoles");
+    });
+
+    modelBuilder.Entity<IdentityRoleClaim<string>>(b =>
+    {
+        b.ToTable("MyRoleClaims");
+    });
+
+    modelBuilder.Entity<IdentityUserRole<string>>(b =>
+    {
+        b.ToTable("MyUserRoles");
+    });
+}
+```
+
+```cs - Example: changes some column names
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<IdentityUser>(b =>
+    {
+        b.Property(e => e.Email).HasColumnName("EMail");
+    });
+
+    modelBuilder.Entity<IdentityUserClaim<string>>(b =>
+    {
+        b.Property(e => e.ClaimType).HasColumnName("CType");
+        b.Property(e => e.ClaimValue).HasColumnName("CValue");
+    });
+}
+```
+
+* _some types of database columns **can be configured with certain facets** (for example, the maximum string length allowed)_
+```cs - Example: sets "column maximum lengths" for several "string properties" in the model
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<IdentityUser>(b =>
+    {
+        b.Property(u => u.UserName).HasMaxLength(128);
+        b.Property(u => u.NormalizedUserName).HasMaxLength(128);
+        b.Property(u => u.Email).HasMaxLength(128);
+        b.Property(u => u.NormalizedEmail).HasMaxLength(128);
+    });
+
+    modelBuilder.Entity<IdentityUserToken<string>>(b =>
+    {
+        b.Property(t => t.LoginProvider).HasMaxLength(128);
+        b.Property(t => t.Name).HasMaxLength(128);
+    });
+}
+```
+
+======================================================================
+# Map to a different schema
+* -> _`schemas` can behave differently across `database providers`_
+* -> For **SQL Server**, the **`default is to create all tables in the dbo schema`**; however, the tables can be created in a different schema
+
+```cs - Example:
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.HasDefaultSchema("notdbo");
+}
+```
+
+======================================================================
+# Lazy loading
+* -> _in this section, `support for lazy-loading proxies in the Identity model is added`_
+* -> **Lazy-loading** is useful since it **`allows navigation properties to be used without first ensuring they're loaded`**
+
+* _Entity types can be made suitable for lazy-loading in several ways; for simplicity, **`use lazy-loading proxies`**, which requires:_
+* -> installation of the **Microsoft.EntityFrameworkCore.Proxies** package.
+* -> a call to **UseLazyLoadingProxies** inside AddDbContext.
+* -> public entity types with **public virtual** navigation properties
+
+```cs - calling 'UseLazyLoadingProxies' in 'Startup.ConfigureServices'
+services
+    .AddDbContext<ApplicationDbContext>(
+        b => b.UseSqlServer(connectionString)
+              .UseLazyLoadingProxies())
+    .AddDefaultIdentity<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 ```
