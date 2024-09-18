@@ -282,4 +282,117 @@ services.AddIdentityCore<TUser>(o =>
 
 ## Change the primary key type
 * -> a **change to the PK column's data type after the database has been created** is **`problematic on many database systems`**
-* -> changing the PK typically involves dropping and re-creating the table. Therefore, key types should be specified in the initial migration when the database is created.
+* -> **changing the PK** typically involves **`dropping`** and **`re-creating`** the table
+* -> therefore, **key types** should be **`specified in the initial migration`** when the database is created
+
+* => steps to change the PK type:
+
+### Drop Database
+* -> if the **database was created before the PK change**, run **`Drop-Database (PMC)`** or **`dotnet ef database drop (.NET CLI)`** to delete it
+
+### Remove Migration
+* -> after confirming deletion of the database, **remove the initial migration** with **`Remove-Migration (PMC)`** or **`dotnet ef migrations remove (.NET CLI)`**
+
+### Update DbContext
+* -> **update the ApplicationDbContext class** to **`derive from IdentityDbContext<TUser,TRole,TKey>`**
+* -> **`specify the new key type for TKey`**
+
+```cs - For example: to use a "Guid" key type
+
+// the generic classes IdentityUser<TKey> and IdentityRole<TKey> must be specified to use the new key type
+public class ApplicationDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+}
+```
+
+```cs - Startup.ConfigureServices must be updated to use the generic user:
+services.AddDefaultIdentity<IdentityUser<Guid>>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+```
+
+### Update custom Identity User class (if exist)
+* -> if a custom **ApplicationUser** class is being used, **`update the class to inherit from IdentityUser`**
+
+```cs
+public class ApplicationUser : IdentityUser<Guid>
+{
+    public string CustomTag { get; set; }
+}
+```
+
+```cs - update "ApplicationDbContext" to reference the custom "ApplicationUser" class
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+}
+```
+
+```cs - Startup.ConfigureServices
+// the primary key's data type is inferred by analyzing the DbContext object
+services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+```
+
+### Update custom Identity Role class (if exist)
+* -> if a custom **ApplicationRole** class is being used, **`update the class to inherit from IdentityRole<TKey>`**
+
+```cs
+public class ApplicationRole : IdentityRole<Guid>
+{
+    public string Description { get; set; }
+}
+```
+
+```cs - update "ApplicationDbContext" to reference the custom "ApplicationRole" class
+// references a custom "ApplicationUser" and a custom "ApplicationRole"
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+}
+```
+
+```cs - Startup.ConfigureServices
+public void ConfigureServices(IServiceCollection services)
+{
+    services.Configure<CookiePolicyOptions>(options =>
+    {
+        options.CheckConsentNeeded = context => true;
+        options.MinimumSameSitePolicy = SameSiteMode.None;
+    });
+
+    services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(
+            Configuration.GetConnectionString("DefaultConnection")));
+
+    services.AddIdentity<ApplicationUser, ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultUI()
+            .AddDefaultTokenProviders();
+
+    services.AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+}
+```
+
+### Add navigation properties
+* -> changing the model configuration for **`relationships can be more difficult`** than making other changes
+* -> care must be taken to **`replace the existing relationships rather than create new, additional relationships`**
+* -> in particular, the changed relationship must **`specify the same foreign key (FK) property as the existing relationship`**
+
+```cs - Example: the relationship between "Users" and "UserClaims" by default is:
+builder.Entity<TUser>(b =>
+{
+    // Each User can have many UserClaims
+    b.HasMany<TUserClaim>()
+     .WithOne()
+     .HasForeignKey(uc => uc.UserId)
+     .IsRequired();
+});
+```
