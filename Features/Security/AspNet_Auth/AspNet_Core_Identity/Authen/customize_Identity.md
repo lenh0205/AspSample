@@ -2,11 +2,11 @@
 # The Identity model
 
 ## Entity types and their default Common Language Runtime (CLR) types
-* -> **`User`** - **`IdentityUser`** - represents the user
-* -> **`Role`** - **`IdentityRole`** - represents a role
+* -> **`User`** - **`IdentityUser`** - represents the registered users, the "IdentityUser" type may be extended or used as an example for our own custom type
+* -> **`Role`** - **`IdentityRole`** - represents a role - Authorization groups for our site
 * -> **`UserRole`** - **`IdentityUserRole`** - a join entity that associates users and roles
 
-* -> **`UserLogin`** - **`IdentityUserLogin`** - associates a user with a login
+* -> **`UserLogin`** - **`IdentityUserLogin`** - associates a user with a login (_information about the external authentication provider (like Facebook or a Microsoft account) to use when logging in a user_)
 * -> **`UserToken`** - **`IdentityUserToken`** - represents an authentication token for a user
 * -> **`UserClaim`** - **`IdentityUserClaim`** - represents a claim that a user possesses
 * -> **`RoleClaim`** - **`IdentityRoleClaim`** - represents a claim that's granted to all users within a role

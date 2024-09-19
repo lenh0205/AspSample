@@ -171,3 +171,56 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 ```
+
+========================================================================
+# Password Hasher options
+* -> _PasswordHasherOptions_ **gets and sets options** for **`password hashing`**
+
+```r
++-------------------+------------------------------------------------------------------------------------------------------------+
+| Option	        |                                              Description                                                   |
++-------------------+------------------------------------------------------------------------------------------------------------+
+| CompatibilityMode	| The compatibility mode used when hashing new passwords. Defaults to IdentityV3. The first byte of a hashed | 
+|                   | password, called a format marker, specifies the version of the hashing algorithm used to hash the password.|
+|                   | When verifying a password against a hash, the VerifyHashedPassword method selects the correct algorithm    | 
+|                   | based on the first byte. A client is able to authenticate regardless of which version of the algorithm was |
+|                   | used to hash the password. Setting the compatibility mode affects the hashing of new passwords.            |
++-------------------+------------------------------------------------------------------------------------------------------------+
+|  IterationCount	| the number of iterations used when hashing passwords using PBKDF2. This value is only used when the        |
+|                   | CompatibilityMode is set to IdentityV3. The value must be a positive integer and defaults to 100000        |
++-------------------+------------------------------------------------------------------------------------------------------------+
+```
+
+========================================================================
+# Globally require all users to be authenticated
+* -> xem phần `~\Features\Security\AspNet_Auth\AspNet_Core_Identity\Authorize`
+
+========================================================================
+# 'ISecurityStampValidator' and 'SignOut' everywhere
+* -> **Apps need to react to events** involving **`security sensitive actions`** by **`regenerating the users 'ClaimsPrincipal'`**
+* _For example, the **ClaimsPrincipal should be regenerated** when **`joining a role`**, **`changing the password`**, or other security sensitive events_
+
+* -> "Identity" uses the **`ISecurityStampValidator interface`** to **regenerate the 'ClaimsPrincipal'**
+* -> the **`default implementation of Identity`** registers a **SecurityStampValidator** with the **`main application cookie`** and **`the two-factor cookie`**
+
+* -> the **`validator`** hooks into **the `OnValidatePrincipal` event of each cookie** to call into Identity to **`verify that the user's security stamp claim is unchanged from what's stored in the cookie`**
+* -> the validator calls in at **`regular intervals`**
+* -> the "call interval" is a tradeoff between **hitting the datastore too frequently** and **not often enough**
+* -> **checking with a long interval** results in **`stale claims`**
+
+* -> call **userManager.UpdateSecurityStampAsync(user)** to **`force existing cookies to be invalided the next time they are checked`**
+* -> **most of the Identity UI account and manage pages** call **userManager.UpdateSecurityStampAsync(user)** **`after changing the password or adding a login`**
+* -> Apps can call **userManager.UpdateSecurityStampAsync(user)** to **`implement a sign out everywhere action`**
+
+```cs
+builder.Services.AddDefaultIdentity<IdentityUser>(options => 
+options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Force Identity's security stamp to be validated every minute.
+builder.Services.Configure<SecurityStampValidatorOptions>(o => 
+                   o.ValidationInterval = TimeSpan.FromMinutes(1));
+
+builder.Services.AddRazorPages();
+```
+
