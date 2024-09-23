@@ -12,7 +12,7 @@
 * -> **all authentication schemes** that use **`derived AuthenticationSchemeOptions`** and the **`associated AuthenticationHandler<TOptions>`**:
 * -> are **`automatically policy schemes`** in ASP.NET Core 2.1 and later and can be **`enabled via configuring the scheme's options`**
 
-```cs
+```cs - AuthenticationSchemeOptions
 public class AuthenticationSchemeOptions
 {
     /// <summary>

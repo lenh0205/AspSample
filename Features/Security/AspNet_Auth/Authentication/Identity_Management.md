@@ -1,3 +1,5 @@
+> https://learn.microsoft.com/en-us/aspnet/core/security/identity-management-solutions?view=aspnetcore-6.0
+
 ===================================================================
 # Identity management solution
 * -> this is one of core functionality of IAM system (_xem `Features\Security\Auth\IAM\Overview.md` để hiểu thêm_)
@@ -87,3 +89,6 @@
 
 * -> others prefer to store data on their **`own servers`** due to **regulations, compliance, policy,...**
 * -> if the data is stored on our servers, we'll most likely need to choose an **`installable or container-based solution`**
+
+===================================================================
+# Identity management solutions for .NET web apps
