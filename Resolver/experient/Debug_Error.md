@@ -181,6 +181,12 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> if we get an **error connecting** it may be that we are running **https** and the **`development certificate`** for **localhost** is not trusted
 * -> we can run **`dotnet dev-certs https --trust`** in order to trust the development certificate (_this only needs to be done once_)
 
+## BE - MVC - trang không load được CSS 
+* -> ta cần kiểm tra lại thẻ link đến các external resource trong trang **_Layout.cshtml**, xem thực sự
+ các **external resource** này có thực sự tồn tại không
+* -> rất có thể các file **`bootstrap`** cũng như **`jquery`** đã mất đi
+* -> ta có thể start 1 project MVC rồi copy các file đã mất qua
+
 ==============================================================
 
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);

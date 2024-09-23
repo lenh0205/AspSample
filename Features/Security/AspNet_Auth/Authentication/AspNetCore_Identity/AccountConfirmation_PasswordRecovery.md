@@ -250,5 +250,32 @@ builder.Services.AddRazorPages();
 ```
 
 ## Debug email
+* -> If you can't get email working:
 
-## Combine social and local login accounts
+Set a breakpoint in EmailSender.Execute to verify SendGridClient.SendEmailAsync is called.
+Create a console app to send email using similar code to EmailSender.Execute.
+Review the Email Activity page.
+Check your spam folder.
+Try another email alias on a different email provider (Microsoft, Yahoo, Gmail, etc.)
+Try sending to different email accounts.
+A security best practice is to not use production secrets in test and development. If you publish the app to Azure, set the SendGrid secrets as application settings in the Azure Web App portal. The configuration system is set up to read keys from environment variables.
+
+==================================================================================
+# Combine social and local login accounts
+* _we must first enable an **`external authentication provider`** (xem `Features\Security\AspNet_Auth\AspNet_Core_Identity\Authen\ExternalAuthenticationProvider.md`)_
+
+* -> we can **`combine local and social accounts`**
+* -> we can created a local login first; or create the account as a social login first, then add a local login
+* -> we will click a **`link to another login service`** and **`accept the app requests`**
+
+* => when the 2 accounts have been combined, we are **`able to sign in with either account`**
+* _we might want our users to add **local accounts** in case their social login authentication service is down, or more likely they've lost access to their social account_
+
+==================================================================================
+# Enable account confirmation after a site has users
+* -> **enabling account confirmation on a site with users** **`locks out all the existing users`**
+* -> **existing users are locked out** because **`their accounts aren't confirmed`**
+
+* _to work around existing user lockout:_
+* -> **`update the database`** to **mark all existing users as being confirmed**
+* -> **`confirm existing users`** (_For example, batch-send emails with confirmation links_)
