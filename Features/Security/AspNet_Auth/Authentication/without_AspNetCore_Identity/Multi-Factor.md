@@ -169,6 +169,9 @@ services.AddAuthorization(options =>
 * -> if **the identity has logged in using MFA**, **`the Admin menu is displayed without the tooltip warning`** 
 * -> when **the user has logged in without MFA**, **`the Admin (Not Enabled) menu is displayed along with the tooltip that informs the user (explaining the warning)`**
 ```cs
+// if the user logs in without MFA, the warning: Admin(Not Enabled)
+// if then user click one the "Admin" link, they is redirected to the "MFA enable view"
+
 @if (SignInManager.IsSignedIn(User))
 {
     @if ((AuthorizationService.AuthorizeAsync(User, "TwoFactorEnabled")).Result.Succeeded)
@@ -194,10 +197,248 @@ services.AddAuthorization(options =>
 
 ==============================================================================
 # Send MFA sign-in requirement to OpenID Connect server
+* -> the **`acr_values` parameter** can be used to **pass the mfa required value from the client to the server in an authentication request**
+* -> the **'acr_values' parameter** needs to be **`handled on the OpenID Connect server`**
 
 ## OpenID Connect ASP.NET Core client
+* -> **the ASP.NET Core Razor Pages OpenID Connect client app** uses the **`AddOpenIdConnect`** method to **`login to the OpenID Connect server`**
+* -> the **`acr_values` parameter** is set with the **`mfa`** value and sent with the **authentication request**
+* -> the **`OpenIdConnectEvents`** is used to add this
+* _for **recommended acr_values parameter values**: https://datatracker.ietf.org/doc/html/draft-ietf-oauth-amr-values-08_
+
+```cs
+build.Services.AddAuthentication(options =>
+{
+	options.DefaultScheme =
+		CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme =
+		OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddOpenIdConnect(options =>
+{
+	options.SignInScheme =
+		CookieAuthenticationDefaults.AuthenticationScheme;
+	options.Authority = "<OpenID Connect server URL>";
+	options.RequireHttpsMetadata = true;
+	options.ClientId = "<OpenID Connect client ID>";
+	options.ClientSecret = "<>";
+	options.ResponseType = "code";
+	options.UsePkce = true;	
+	options.Scope.Add("profile");
+	options.Scope.Add("offline_access");
+	options.SaveTokens = true;
+	options.Events = new OpenIdConnectEvents
+	{
+		OnRedirectToIdentityProvider = context =>
+		{
+			context.ProtocolMessage.SetParameter("acr_values", "mfa");
+			return Task.FromResult(0);
+		}
+	};
+});
+```
 
 ## Example OpenID Connect Duende IdentityServer server with ASP.NET Core Identity
+* -> on **`the OpenID Connect server`**, which is implemented using **ASP.NET Core Identity** with **Razor Pages**, a new page named **`ErrorEnable2FA.cshtml`** is created
+* -> the view displays if the **Identity** comes from an **`app that requires MFA`** but the **`user hasn't activated this in Identity`**
+* -> also **`informs the user`** and **`adds a link to activate this`**
+
+```cs
+@{
+    ViewData["Title"] = "ErrorEnable2FA";
+}
+
+<h1>The client application requires you to have MFA enabled. Enable this, try login again.</h1>
+
+<br />
+
+You can enable MFA to login here:
+
+<br />
+
+<a href="~/Identity/Account/Manage/TwoFactorAuthentication">Enable MFA</a>
+```
+
+* -> in the **Login** method, the **IIdentityServerInteractionService interface** implementation **`_interaction`** is used to **`access the OpenID Connect request parameters`**
+* -> the **'acr_values' parameter** is accessed using the **`AcrValues`** property
+* -> as the **`client sent this with 'mfa' set`**, this **can then be checked**
+
+* -> if **MFA is required**, and the user in ASP.NET Core Identity has **MFA enabled**, then **`the login continues`**
+* -> when the user has **no MFA enabled**, the **user is redirected to the custom view `ErrorEnable2FA.cshtml`**
+* -> then ASP.NET Core Identity signs the user in
+
+* _the `Fido2Store` is used to check if the user has activated MFA using a `custom FIDO2 Token Provider`_
+```cs
+public async Task<IActionResult> OnPost()
+{
+	// check if we are in the context of an authorization request
+	var context = await _interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
+
+	var requires2Fa = context?.AcrValues.Count(t => t.Contains("mfa")) >= 1;
+
+	var user = await _userManager.FindByNameAsync(Input.Username);
+	if (user != null && !user.TwoFactorEnabled && requires2Fa)
+	{
+		return RedirectToPage("/Home/ErrorEnable2FA/Index");
+	}
+
+	// code omitted for brevity
+
+	if (ModelState.IsValid)
+	{
+		var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberLogin, lockoutOnFailure: true);
+		if (result.Succeeded)
+		{
+			// code omitted for brevity
+		}
+		if (result.RequiresTwoFactor)
+		{
+			var fido2ItemExistsForUser = await _fido2Store.GetCredentialsByUserNameAsync(user.UserName);
+			if (fido2ItemExistsForUser.Count > 0)
+			{
+				return RedirectToPage("/Account/LoginFido2Mfa", new { area = "Identity", Input.ReturnUrl, Input.RememberLogin });
+			}
+
+			return RedirectToPage("/Account/LoginWith2fa", new { area = "Identity", Input.ReturnUrl, RememberMe = Input.RememberLogin });
+		}
+
+		await _events.RaiseAsync(new UserLoginFailureEvent(Input.Username, "invalid credentials", clientId: context?.Client.ClientId));
+		ModelState.AddModelError(string.Empty, LoginOptions.InvalidCredentialsErrorMessage);
+	}
+
+	// something went wrong, show form with error
+	await BuildModelAsync(Input.ReturnUrl);
+	return Page();
+}
+```
+
+* -> if the user is already logged in, the client app still **validates the `amr` claim** and can **`set up the MFA with a link to the ASP.NET Core Identity view`**
 
 ==============================================================================
 # Force ASP.NET Core OpenID Connect client to require MFA
+* -> for **requiring that users have authenticated using MFA** in **`an ASP.NET Core Razor Page app`**, which **`uses OpenID Connect to sign in`**
+* -> to **validate the MFA requirement**, an **`IAuthorizationRequirement`** requirement is created
+* -> this will be added to **`the pages using a policy that requires MFA`**
+
+```cs
+using Microsoft.AspNetCore.Authorization;
+
+namespace AspNetCoreRequireMfaOidc;
+
+public class RequireMfa : IAuthorizationRequirement{}
+```
+
+* -> an **AuthorizationHandler is implemented** that will **`use the 'amr' claim`** and **`check for the value 'mfa'`**
+* -> the **amr** is returned in the **`id_token`** of a successful authentication and can have many different values as defined in the **`Authentication Method Reference Values specification`**
+* -> the **`returned value`** depends on **how the identity authenticated** and on **the OpenID Connect server implementation**
+* -> the **AuthorizationHandler** **`uses the 'RequireMfa' requirement`** and **`validates the 'amr' claim`**
+
+* -> the **`OpenID Connect server can be implemented`** using **`Duende Identity Server`** with **`ASP.NET Core Identity`**. 
+* -> when a **user logs in using `TOTP`**, **the `amr` claim** is returned with **an `MFA` value**
+* -> if using a different **OpenID Connect server implementation** or a different **MFA type**, **`the 'amr' claim will, or can, have a different value`**
+* -> the code must be extended to accept this as well
+
+```cs
+public class RequireMfaHandler : AuthorizationHandler<RequireMfa>
+{
+	protected override Task HandleRequirementAsync(
+		AuthorizationHandlerContext context, 
+		RequireMfa requirement)
+	{
+		if (context == null)
+			throw new ArgumentNullException(nameof(context));
+		if (requirement == null)
+			throw new ArgumentNullException(nameof(requirement));
+
+		var amrClaim =
+			context.User.Claims.FirstOrDefault(t => t.Type == "amr");
+
+		if (amrClaim != null && amrClaim.Value == Amr.Mfa)
+		{
+			context.Succeed(requirement);
+		}
+
+		return Task.CompletedTask;
+	}
+}
+```
+
+* -> in the program file, the **`AddOpenIdConnect`** method is used as the **`default challenge scheme`**
+* -> the **authorization handler**, which is used to **`check the 'amr' claim`**, is added to the Inversion of Control container
+* -> **`a policy is then created`** which **adds the `RequireMfa` requirement**
+```cs
+builder.Services.ConfigureApplicationCookie(options =>
+        options.Cookie.SecurePolicy =
+            CookieSecurePolicy.Always);
+
+builder.Services.AddSingleton<IAuthorizationHandler, RequireMfaHandler>();
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultScheme =
+		CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme =
+		OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddOpenIdConnect(options =>
+{
+	options.SignInScheme =
+		CookieAuthenticationDefaults.AuthenticationScheme;
+	options.Authority = "https://localhost:44352";
+	options.RequireHttpsMetadata = true;
+	options.ClientId = "AspNetCoreRequireMfaOidc";
+	options.ClientSecret = "AspNetCoreRequireMfaOidcSecret";
+	options.ResponseType = "code";
+	options.UsePkce = true;	
+	options.Scope.Add("profile");
+	options.Scope.Add("offline_access");
+	options.SaveTokens = true;
+});
+
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("RequireMfa", policyIsAdminRequirement =>
+	{
+		policyIsAdminRequirement.Requirements.Add(new RequireMfa());
+	});
+});
+
+builder.Services.AddRazorPages();
+```
+
+* -> this **policy** is then **`used in the Razor page as required`**; the policy **`could be added globally for the entire app as well`**
+```cs
+[Authorize(Policy= "RequireMfa")]
+public class IndexModel : PageModel
+{
+    public void OnGet()
+    {
+    }
+}
+```
+
+* -> if **the user authenticates without MFA**, **the `amr` claim** will probably **have a `pwd` value**
+* -> **`the request won't be authorized to access the page`**
+* -> using the **default values**, **`the user will be redirected to the 'Account/AccessDenied' page`**
+* _this behavior can be changed or we can implement our own custom logic here_
+* _in this example, a link is added so that the `valid user can set up MFA for their account`_
+```cs
+@page
+@model AspNetCoreRequireMfaOidc.AccessDeniedModel
+@{
+    ViewData["Title"] = "AccessDenied";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>AccessDenied</h1>
+
+You require MFA to login here
+
+<a href="https://localhost:44352/Manage/TwoFactorAuthentication">Enable MFA</a>
+```
+
+* -> now **`only users that authenticate with MFA can access the page or website`**
+* -> if **different MFA types are used or if 2FA is okay**, **the `amr` claim** will **`have different values`** and needs to be **`processed correctly`**
+* -> **different OpenID Connect servers** also return different values for this claim and might not follow the Authentication Method Reference Values specification
