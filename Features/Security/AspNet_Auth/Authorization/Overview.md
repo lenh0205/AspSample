@@ -1,10 +1,10 @@
 ============================================================================
 # Authorization in ASP.NET Core
-* -> **Authorization** is orthogonal and independent from **Authentication**. However, authorization requires an authentication mechanism
+* -> **Authorization** is **`orthogonal and independent`** from **Authentication**. However, **authorization** requires **`an authentication mechanism`**
 * -> **ASP.NET Core authorization** provides a simple, declarative **`role`** and a rich **`policy-based`** model
 
-* -> Authorization is expressed in requirements, and **`handlers evaluate a user's claims`** against **requirements**
-* -> **`imperative checks`** can be based on **simple policies** or **policies which evaluate both the user identity and properties of the resource** that the user is attempting to access
+* -> Authorization is expressed in **`requirements`**, and **`handlers evaluate a user's claims`** against **requirements**
+* -> **`imperative checks` can be based on** **`simple policies`** or **`policies which evaluate both the user identity and properties of the resource`** that the user is attempting to access
 
 * -> Authorization components, including the **`AuthorizeAttribute`** and **`AllowAnonymousAttribute`** attributes, are found in the **Microsoft.AspNetCore.Authorization** namespace
 
@@ -17,6 +17,42 @@
 * -> **`Registered users`** can **view all the approved data** and **can edit/delete their own data**
 * -> **`Managers`** can **approve or reject contact data**; only **approved contacts are visible to users**
 * -> **`Administrators`** can **approve/reject and edit/delete any data**
+
+```r - in the Example:
+//  user "Rick" (rick@example.com) is signed in
+// in the "/Contacts" page of Rick, it display a list of contacts; only the record created by Rick displays "Edit" and "Delete" button 
+// all records will have "Detail" button but when go to "Contacts/Detail" there is no "Approve" or "Reject" button
+// Rick also have a "Create" button to create a new record
+// a user can only see contact records of other users until a "manager" or "administrator" changes the status to "Approved"
+
+// for "manager" role account (manager@contoso.com) signed in
+// each record only have "Detail" button so "manager" cannot "Edit" or "Delete" record; 
+// they will go to "Contacts/Detail" page to "Approve" or "Reject" record
+
+// for "administrator" role account (admin@contoso.com) signed in
+// have all privileges - can read, edit, or delete any contact and change the status of contacts
+```
+
+## Sample App
+* -> the app will follow **Contact** model:
+```cs
+public class Contact
+{
+    public int ContactId { get; set; }
+    public string Name { get; set; }
+    public string Address { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    public string Zip { get; set; }
+    [DataType(DataType.EmailAddress)]
+    public string Email { get; set; }
+}
+```
+
+* _contains the following **authorization handlers**:_
+* -> **`ContactIsOwnerAuthorizationHandler`** - ensures that **a user can only edit their data**
+* -> **`ContactManagerAuthorizationHandler`** - allows **managers to approve or reject contacts**
+* -> **`ContactAdministratorsAuthorizationHandler`** - allows **administrators to approve or reject contacts and to edit/delete contacts**
 
 ============================================================================
 # Secure user data
