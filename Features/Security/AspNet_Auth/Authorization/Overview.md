@@ -1,6 +1,8 @@
 > để Authorize được thì ta cần add role service (**`.AddRole`**) vào Identity (**.AddIdentity**)
 > khi cấu hình **.AddAuthorization** middleware, ta cần nên thêm option **AuthorizationOptions.FallbackPolicy** với **`.equireAuthenticatedUser()`** để require authenticated user cho mọi request
 > và sử dụng **`[AllowAnonymous] attribute`** cho những request không yêu cầu authenticated
+> ta sẽ sử dụng **Secret Manager tool** để chứa **`password`** dùng cho việc development
+> tạo lớp **`SeedData.cs`** để tạo 2 user từ **UserName** với 2 role là **manager** và **admin** rồi tạo thêm các record **Contact** vào và update database
 
 ============================================================================
 # Authorization in ASP.NET Core
@@ -380,7 +382,7 @@ public static void SeedDB(ApplicationDbContext context, string adminID)
 
 ## Create owner, manager, and administrator authorization handlers
 * -> create a **`ContactIsOwnerAuthorizationHandler`** class in the **Authorization folder**
-* -> the **ContactIsOwnerAuthorizationHandler** **`verifies that the user acting on a resource owns the resource`**
+* -> the **ContactIsOwnerAuthorizationHandler** **`verifies`** that the **user acting on a resource** **`owns the resource`**
 * -> the **ContactIsOwnerAuthorizationHandler** calls **`context.Succeed`** if **`the current authenticated user is the contact owner`**
 
 * -> the app **allows contact owners to edit/delete/create their own data**; _ContactIsOwnerAuthorizationHandler_ **`doesn't need to check the operation passed in the requirement parameter`**

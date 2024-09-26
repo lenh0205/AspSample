@@ -1,9 +1,29 @@
 =====================================================================
 # Common
 
+## Tìm user 
+```cs
+// find by 'UserName'
+var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+var user = await userManager.FindByNameAsync(UserName);
+
+// find by 'Id'
+IdentityUser user;
+string uid = user.Id;
+var user = await userManager.FindByIdAsync(uid);
+```
+
 ## Tạo user
 ```cs
-// khởi tạo instance cho IdentityUser
+// Tạo user trong database
+var user = new IdentityUser
+{
+    UserName = UserName,
+    EmailConfirmed = true
+};
+await userManager.CreateAsync(user, testUserPw);
+
+// khởi tạo instance cho 'ApplicationUser' derive from 'IdentityUser'
 var user = Activator.CreateInstance<ApplicationUser>();
 user.Name = Input.Name;
 user.DOB = Input.DOB;
@@ -17,6 +37,28 @@ IdentityResult result = await _userManager.CreateAsync(user, Input.Password);
 if (result.Succeeded) {
     // gửi email xác nhận tài khoản, .....
 }
+```
+
+## Kiểm tra xem 'role' đã tồn tại chưa
+```cs
+string role;
+if (!await roleManager.RoleExistsAsync(role))
+{
+}
+```
+
+## Tạo 'role'
+```cs
+string role;
+var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+IdentityResult IR = roleManager.CreateAsync(new IdentityRole(role));
+```
+
+## Attach "user" với "role"
+```cs
+IdentityUser user;
+string role;
+IdentityResult IR = await userManager.AddToRoleAsync(user, role);
 ```
 
 ## Gửi email để confim registration
