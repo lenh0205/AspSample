@@ -1,3 +1,7 @@
+> để Authorize được thì ta cần add role service (**`.AddRole`**) vào Identity (**.AddIdentity**)
+> khi cấu hình **.AddAuthorization** middleware, ta cần nên thêm option **AuthorizationOptions.FallbackPolicy** với **`.equireAuthenticatedUser()`** để require authenticated user cho mọi request
+> và sử dụng **`[AllowAnonymous] attribute`** cho những request không yêu cầu authenticated
+
 ============================================================================
 # Authorization in ASP.NET Core
 * -> **Authorization** is **`orthogonal and independent`** from **Authentication**. However, **authorization** requires **`an authentication mechanism`**
@@ -53,6 +57,14 @@ public class Contact
 * -> **`ContactIsOwnerAuthorizationHandler`** - ensures that **a user can only edit their data**
 * -> **`ContactManagerAuthorizationHandler`** - allows **managers to approve or reject contacts**
 * -> **`ContactAdministratorsAuthorizationHandler`** - allows **administrators to approve or reject contacts and to edit/delete contacts**
+
+============================================================================
+# The starter and completed app
+* starter app: https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authorization/secure-data/samples/starter6
+* completed app: https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authorization/secure-data/samples/final6 
+
+* -> project sử dụng .NET 6, ASP.NET Core Identity; tạo sẵn model và page **Contact**
+* -> ta chỉ cần chạy migration trước và start app lên là được
 
 ============================================================================
 # Secure user data
@@ -112,12 +124,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
 ```
 
 ## Require authenticated users
+
+### using 'AuthorizationOptions.FallbackPolicy'
 * -> set the **`fallback authorization policy`** to **`requires all users to be authenticated`**, except for **Razor Pages**, **controllers**, or **action methods** with **`an authorization attribute`**
 * -> **`.RequireAuthenticatedUser`** adds **DenyAnonymousAuthorizationRequirement** to the current instance, which **`enforces that the current user is authenticated`**
 
 * _Ex: Razor Pages, controllers, or action methods with [AllowAnonymous] or [Authorize(PolicyName="MyPolicy")] use the **applied authorization attribute** rather than the fallback authorization policy_
 
-* -> is **`applied to all requests`** that **don't explicitly specify an authorization policy**
+* _is **`applied to all requests`** that **don't explicitly specify an authorization policy**_
 * -> for **requests served by endpoint routing**, this includes **`any endpoint that doesn't specify an authorization attribute`**
 * -> for **requests served by other middleware after the authorization middleware** (_such as **`static files`**_), this applies the policy to **`all requests`**
 
@@ -147,6 +161,7 @@ builder.Services.AddAuthorization(options => // this one
 });
 ```
 
+### using 'authorization filter' 
 * -> an **`alternative way` for MVC controllers and Razor Pages to `require all users be authenticated`** is adding **`an authorization filter`**:
 ```cs
 builder.Services.AddDefaultIdentity<IdentityUser>(
@@ -168,6 +183,7 @@ builder.Services.AddControllers(config => // this one
 var app = builder.Build();
 ```
 
+### [AllowAnonymous] for not requiring authenticated users
 * -> add **`AllowAnonymous`** to the **Index** and **Privacy** pages so **`anonymous users can get information about the site before they register`**:
 ```cs
 using Microsoft.AspNetCore.Authorization;
@@ -187,7 +203,6 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-
     }
 }
 ```
