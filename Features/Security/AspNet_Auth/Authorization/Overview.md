@@ -2,7 +2,7 @@
 > khi cấu hình **.AddAuthorization** middleware, ta cần nên thêm option **AuthorizationOptions.FallbackPolicy** với **`.equireAuthenticatedUser()`** để require authenticated user cho mọi request
 > và sử dụng **`[AllowAnonymous] attribute`** cho những request không yêu cầu authenticated
 > ta sẽ sử dụng **Secret Manager tool** để chứa **`password`** dùng cho việc development
-> tạo lớp **`SeedData.cs`** để tạo 2 user từ **UserName** với 2 role là **manager** và **admin** rồi tạo thêm các record **Contact** vào và update database
+> tạo 1 **`Scope Service`** để chạy **`SeedData.cs`** để tạo 2 user từ **UserName** và **password** với 2 role là **manager** và **admin** rồi tạo thêm các record **Contact** với chứa **`userId`** của owner; rồi update database
 
 ============================================================================
 # Authorization in ASP.NET Core
@@ -215,8 +215,10 @@ public class IndexModel : PageModel
 
 * -> set the password from the **project directory** (the directory containing Program.cs)
 * -> if a **weak password** is specified, an **`exception is thrown`** when **SeedData.Initialize** is called
+
 ```bash
 dotnet user-secrets set SeedUserPW <PW>
+// VD: dotnet user-secrets set SeedUserPW "12345aA@" 
 ```
 
 * -> update the app to use the test password:
