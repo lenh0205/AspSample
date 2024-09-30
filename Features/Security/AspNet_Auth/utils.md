@@ -39,6 +39,22 @@ if (result.Succeeded) {
 }
 ```
 
+## get 'ClaimPrincipal user'
+```cs
+// nếu trong razor pages thì ta có thể truy cập nó global vì nó là thuộc tính của "PageModel"
+ClaimPrinciple user = User;
+
+// nếu trong authorization handler
+AuthorizationHandlerContext context;
+ClaimPrincipal user = context.User;
+```
+
+## tìm 'User Id' từ 'ClaimPrincipal'
+```cs
+ClaimPrincipal user;
+var userId = _userManager.GetUserId(user);
+```
+
 ## Kiểm tra xem 'role' đã tồn tại chưa
 ```cs
 string role;
@@ -54,11 +70,35 @@ var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
 IdentityResult IR = roleManager.CreateAsync(new IdentityRole(role));
 ```
 
+## Kiểm tra 'user' có đúng 'role' không ?
+```cs
+ClaimPrinciple user;
+bool result = user.IsInRole(Constants.ContactAdministratorsRole);
+```
+
 ## Attach "user" với "role"
 ```cs
 IdentityUser user;
 string role;
 IdentityResult IR = await userManager.AddToRoleAsync(user, role);
+```
+
+## Mark the specified 'requirement' as "sucess" or "fail" in Authorization Handler
+```cs
+AuthorizationHandlerContext context;
+OperationAuthorizationRequirement requirement;
+
+context.Succeed(requirement);
+context.Fail(requirement);
+```
+
+## check xem "user" có "Authorized" với action này không ?
+* -> để sử dụng thằng này đòi hỏi ta phải đăng ký **`IAuthorizationHandler`**
+```cs
+var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Contact, ContactOperations.Create);
+
+var isAuthorized = User.IsInRole(Constants.ContactManagersRole) 
+                        || User.IsInRole(Constants.ContactAdministratorsRole);
 ```
 
 ## Gửi email để confim registration
