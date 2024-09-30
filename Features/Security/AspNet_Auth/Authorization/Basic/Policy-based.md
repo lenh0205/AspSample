@@ -1,0 +1,262 @@
+========================================================================
+# Policy-based authorization in ASP.NET Core
+* -> underneath the covers, **role-based authorization** and **claims-based authorization** use **`a requirement`**, **`a requirement handler`**, and **`a preconfigured policy`**
+* => these building blocks support the **expression of authorization evaluations in code**; the result is a richer, reusable, testable authorization structure
+
+* -> **an authorization policy** consists of one or more **`requirements`**
+* -> register it as part of the **authorization service configuration**, in the app's Program.cs file:
+```cs
+builder.Services.AddAuthorization(options =>
+{
+    // an "AtLeast21" policy is created
+    options.AddPolicy("AtLeast21", policy =>
+        // has a single requirement—that of a minimum age, which is supplied as a parameter to the requirement
+        policy.Requirements.Add(new MinimumAgeRequirement(21)));
+});
+```
+
+# For Authorization
+* -> use **`IAuthorizationService`**, **`[Authorize(Policy = "Something")]`**, or **`RequireAuthorization("Something")`**
+
+```cs - Ex:  a typical authorization service configuration:
+// Add all of your handlers to DI.
+builder.Services.AddSingleton<IAuthorizationHandler, MyHandler1>();
+// MyHandler2, ...
+
+builder.Services.AddSingleton<IAuthorizationHandler, MyHandlerN>();
+
+// Configure your policies
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy(
+        "Something", 
+        policy => policy.RequireClaim("Permission", "CanViewPage", "CanViewAnything")
+    ));
+```
+
+========================================================================
+# IAuthorizationService
+* -> the primary service that **`determines if authorization is successful`** is "IAuthorizationService":
+```cs
+public interface IAuthorizationService
+{
+    Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, object resource, 
+                                     IEnumerable<IAuthorizationRequirement> requirements);
+
+    Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, object resource, string policyName);
+}
+```
+
+* _the **simplified default implementation** of **`the authorization service`**:_
+```cs
+public async Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, 
+             object resource, IEnumerable<IAuthorizationRequirement> requirements)
+{
+    // Create a tracking context from the authorization inputs.
+    var authContext = _contextFactory.CreateContext(requirements, user, resource);
+
+    // By default this returns an IEnumerable<IAuthorizationHandler> from DI.
+    var handlers = await _handlers.GetHandlersAsync(authContext);
+
+    // Invoke all handlers.
+    foreach (var handler in handlers)
+    {
+        await handler.HandleAsync(authContext);
+    }
+
+    // Check the context, by default success is when all requirements have been met.
+    return _evaluator.Evaluate(authContext);
+}
+```
+
+## IAuthorizationRequirement
+* -> "IAuthorizationRequirement" is **a marker service with no methods**, and **`the mechanism for tracking whether authorization is successful`**
+
+## IAuthorizationHandler
+* -> each "IAuthorizationHandler" is responsible for **`checking if requirements are met`**:
+```cs
+/// <summary>
+/// Classes implementing this interface are able to make a decision if authorization
+/// is allowed.
+/// </summary>
+public interface IAuthorizationHandler
+{
+    /// <summary>
+    /// Makes a decision if authorization is allowed.
+    /// </summary>
+    /// <param name="context">The authorization information.</param>
+    Task HandleAsync(AuthorizationHandlerContext context);
+}
+```
+
+## AuthorizationHandlerContext
+* -> the **`AuthorizationHandlerContext`** class is what **the handler uses to mark whether requirements have been met**:
+```cs
+context.Succeed(requirement)
+```
+
+========================================================================
+# Apply policies to MVC controllers
+* -> apply policies to controllers by using the **[Authorize] attribute with the policy name**:
+```cs
+[Authorize(Policy = "AtLeast21")]
+public class AtLeast21Controller : Controller
+{
+    public IActionResult Index() => View();
+}
+```
+
+* -> if **`multiple policies`** are applied at the **controller** and **action** levels, all policies must pass before access is granted
+```cs
+[Authorize(Policy = "AtLeast21")]
+public class AtLeast21Controller2 : Controller
+{
+    [Authorize(Policy = "IdentificationValidated")]
+    public IActionResult Index() => View();
+}
+```
+
+# Apply policies to Razor Pages
+* -> apply policies to Razor Pages by using the **`[Authorize] attribute with the policy name`**
+* -> policies **`can not be applied at the Razor Page handler level`**, they must be applied to the Page
+* -> **policies can also be applied to Razor Pages** by using **`an authorization convention`**
+
+```cs
+[Authorize(Policy = "AtLeast21")]
+public class AtLeast21Model : PageModel { }
+```
+
+# Apply policies to endpoints
+* -> apply policies to **endpoints** by using **`RequireAuthorization`** with the policy name
+```cs
+app.MapGet("/helloworld", () => "Hello World!").RequireAuthorization("AtLeast21");
+```
+
+========================================================================
+# Requirements
+* -> **an authorization requirement** is **`a collection of data parameters`** that **`a policy can use to evaluate the current user principal`**
+* -> if **an authorization policy** contains **`multiple authorization requirements`**, **`all requirements must pass in order for the policy evaluation to succeed`**
+
+```cs - Ex:
+// in our "AtLeast21" policy, the requirement is a single parameter—the minimum age
+// a requirement implements "IAuthorizationRequirement", which is an empty marker interface
+// a parameterized minimum age requirement could be implemented as follows:
+public class MinimumAgeRequirement : IAuthorizationRequirement
+{
+    public MinimumAgeRequirement(int minimumAge) => MinimumAge = minimumAge;
+    public int MinimumAge { get; }
+}
+```
+
+========================================================================
+# Authorization handlers
+* -> "an authorization handler" is **`responsible for the evaluation of a requirement's properties`**
+* -> "the authorization handler" **`evaluates the requirements against a provided 'AuthorizationHandlerContext'`** to determine **if access is allowed**
+
+* -> **a requirement** can have **`multiple handlers`**
+* -> **a handler** may inherit **`AuthorizationHandler<TRequirement>`**, where TRequirement is the requirement to be handled
+* -> alternatively, **a handler may implement 'IAuthorizationHandler' directly** to **`handle more than one type of requirement`**
+
+## Use a handler for one requirement
+* -> a **`one-to-one relationship`** in which **a handler** handles **a single requirement**
+
+```cs - 
+// determines if the current "user principal" has a "date of birth claim" that has been issued by a known and trusted Issuer
+// Authorization can't occur when the claim is missing, in which case a completed task is returned
+// when a claim is present, the user's age is calculated
+// If the user meets the minimum age defined by the requirement, authorization is considered successful
+// when authorization is successful, "context.Succeed" is invoked with the satisfied requirement as its sole parameter
+
+public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
+{
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
+    {
+        var dateOfBirthClaim = context.User.FindFirst(
+            c => c.Type == ClaimTypes.DateOfBirth && c.Issuer == "http://contoso.com");
+
+        if (dateOfBirthClaim is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var dateOfBirth = Convert.ToDateTime(dateOfBirthClaim.Value);
+        int calculatedAge = DateTime.Today.Year - dateOfBirth.Year;
+        if (dateOfBirth > DateTime.Today.AddYears(-calculatedAge))
+        {
+            calculatedAge--;
+        }
+
+        if (calculatedAge >= requirement.MinimumAge)
+        {
+            context.Succeed(requirement);
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+## Use a handler for multiple requirements
+* -> **`a one-to-many relationship`** in which **a handler** can handle **different types of requirements**
+* -> we traverses **`PendingRequirements`** - a property containing **requirements not marked as successful**
+
+```cs
+//  for a "ReadPermission" requirement, the user must be either an owner or a sponsor to access the requested resource
+// for an "EditPermission" or "DeletePermission" requirement, they must be an owner to access the requested resource.
+public class PermissionHandler : IAuthorizationHandler
+{
+    public Task HandleAsync(AuthorizationHandlerContext context)
+    {
+        var pendingRequirements = context.PendingRequirements.ToList();
+
+        foreach (var requirement in pendingRequirements)
+        {
+            if (requirement is ReadPermission)
+            {
+                if (IsOwner(context.User, context.Resource)
+                    || IsSponsor(context.User, context.Resource))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+            else if (requirement is EditPermission || requirement is DeletePermission)
+            {
+                if (IsOwner(context.User, context.Resource))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static bool IsOwner(ClaimsPrincipal user, object? resource)
+    {
+        // Code omitted for brevity
+        return true;
+    }
+
+    private static bool IsSponsor(ClaimsPrincipal user, object? resource)
+    {
+        // Code omitted for brevity
+        return true;
+    }
+}
+```
+
+## Handler registration
+* -> **register handlers** in the **`services collection during configuration`**
+
+```cs
+builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
+```
+
+========================================================================
+# What should a handler return?
+* -> **a handler indicates success** by calling **`context.Succeed(IAuthorizationRequirement requirement)`**, **passing the requirement that has been successfully validated**
+* -> **a handler doesn't need to handle failures** generally, as **`other handlers for the same requirement may succeed`**
+* -> to **`guarantee failure, even if other requirement handlers succeed`**, call **context.Fail**
+
+* => if a handler calls **context.Succeed** or **context.Fail**, **`all other handlers are still called`**
+* -> this allows requirements to produce side effects, such as logging, which takes place even if another handler has successfully validated or failed a requirement. When set to false, the InvokeHandlersAfterFailure property short-circuits the execution of handlers when context.Fail is called. InvokeHandlersAfterFailure defaults to true, in which case all handlers are called.
