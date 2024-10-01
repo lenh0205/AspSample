@@ -35,7 +35,7 @@ builder.Services.AddAuthorization(options =>
 
 ========================================================================
 # IAuthorizationService
-* -> the primary service that **`determines if authorization is successful`** is "IAuthorizationService":
+* -> the primary service that **`determines if authorization is successful`** is **IAuthorizationService**:
 ```cs
 public interface IAuthorizationService
 {
@@ -156,6 +156,13 @@ public class MinimumAgeRequirement : IAuthorizationRequirement
 * -> **a handler** may inherit **`AuthorizationHandler<TRequirement>`**, where TRequirement is the requirement to be handled
 * -> alternatively, **a handler may implement 'IAuthorizationHandler' directly** to **`handle more than one type of requirement`**
 
+## Handler registration
+* -> **register handlers** in the **`services collection during configuration`**
+
+```cs
+builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
+```
+
 ## Use a handler for one requirement
 * -> a **`one-to-one relationship`** in which **a handler** handles **a single requirement**
 
@@ -245,18 +252,117 @@ public class PermissionHandler : IAuthorizationHandler
 }
 ```
 
-## Handler registration
-* -> **register handlers** in the **`services collection during configuration`**
+========================================================================
+# What should a handler return?
 
-```cs
-builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
+## Final result when calling "context.Fail" or "context.Succeed"
+* -> **`a handler indicates success`** by calling **context.Succeed(IAuthorizationRequirement requirement)**, passing the requirement that has been successfully validated
+* -> **`a handler doesn't need to handle failures`** generally, as **other handlers for the same requirement may succeed**
+* -> to **`guarantee failure, even if other requirement handlers succeed`**, call **context.Fail**
+
+## All handler still called
+* -> if a handler calls **context.Succeed** or **context.Fail**, **`all other handlers are still called`**
+* => this allows requirements to **`produce side effects`** (_such as logging_) which takes place even if another handler has **successfully validated** or **failed a requirement**
+
+* -> **InvokeHandlersAfterFailure** defaults to **`true`**, in which case **`all handlers are called`**
+* -> when set to **`false`**, the **InvokeHandlersAfterFailure** property **`short-circuits the execution of handlers`** when **context.Fail is called**
+
+## Note
+* -> **`Authorization handlers are called`** even if **authentication fails**
+* -> also **`handlers can execute in any order`**, so **do not depend on them being called in any particular order**
+
+========================================================================
+# why would I want multiple handlers for a requirement?
+* -> in cases where we want **evaluation to be on an "OR" basis**, **`implement multiple handlers for a single requirement`**
+* -> ensure that **both handlers are registered**; if **`either handler succeeds when a policy evaluates the requirement`**, the **`policy evaluation succeeds`**
+
+```r - For example:
+// Microsoft has doors that only open with key cards
+// if we leave our key card at home, the receptionist prints a temporary sticker and opens the door for us
+// -> in this scenario, you would have a "single requirement" BuildingEntry, but "multiple handlers" each one examining a single requirement
+```
+```cs - BuildingEntryRequirement.cs
+public class BuildingEntryRequirement : IAuthorizationRequirement { }
+```
+
+```cs - BadgeEntryHandler.cs
+public class BadgeEntryHandler : AuthorizationHandler<BuildingEntryRequirement>
+{
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, BuildingEntryRequirement requirement)
+    {
+        if (context.User.HasClaim(
+            c => c.Type == "BadgeId" && c.Issuer == "https://microsoftsecurity"))
+        {
+            context.Succeed(requirement);
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+```cs - TemporaryStickerHandler.cs
+public class TemporaryStickerHandler : AuthorizationHandler<BuildingEntryRequirement>
+{
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, BuildingEntryRequirement requirement)
+    {
+        if (context.User.HasClaim(
+            c => c.Type == "TemporaryBadgeId" && c.Issuer == "https://microsoftsecurity"))
+        {
+            // Code to check expiration date omitted for brevity.
+            context.Succeed(requirement);
+        }
+
+        return Task.CompletedTask;
+    }
+}
 ```
 
 ========================================================================
-# What should a handler return?
-* -> **a handler indicates success** by calling **`context.Succeed(IAuthorizationRequirement requirement)`**, **passing the requirement that has been successfully validated**
-* -> **a handler doesn't need to handle failures** generally, as **`other handlers for the same requirement may succeed`**
-* -> to **`guarantee failure, even if other requirement handlers succeed`**, call **context.Fail**
+# Use a func to fulfill a policy - policy require simple logic
+* -> there may be situations in which **fulfilling a policy** is **`simple to express in code`**
+* -> it's possible to supply a **`Func<AuthorizationHandlerContext, bool>`** when **configuring a policy** with the **`RequireAssertion`** policy builder
 
-* => if a handler calls **context.Succeed** or **context.Fail**, **`all other handlers are still called`**
-* -> this allows requirements to produce side effects, such as logging, which takes place even if another handler has successfully validated or failed a requirement. When set to false, the InvokeHandlersAfterFailure property short-circuits the execution of handlers when context.Fail is called. InvokeHandlersAfterFailure defaults to true, in which case all handlers are called.
+```cs - the previous "BadgeEntryHandler" could be rewritten as
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("BadgeEntry", policy =>
+        policy.RequireAssertion(context => context.User.HasClaim(c =>
+            (c.Type == "BadgeId" || c.Type == "TemporaryBadgeId")
+            && c.Issuer == "https://microsoftsecurity")));
+});
+```
+
+========================================================================
+# Access MVC request context in handlers
+* -> the **`HandleRequirementAsync`** method has two parameters: an **AuthorizationHandlerContext** and the **TRequirement** being handled
+* -> **frameworks such as MVC or SignalR** are **`free to add any object`** to the **`Resource`** property on the **AuthorizationHandlerContext** to **`pass extra information`**
+
+* -> when using **`endpoint routing`**, **authorization** is typically handled by the **Authorization Middleware**
+* -> in this case, the **Resource** property is **`an instance of HttpContext`**
+* -> **`the context can be used to access the current endpoint`**, which can be used to **probe the underlying resource to which we're routing**
+
+```cs - For example:
+if (context.Resource is HttpContext httpContext)
+{
+    var endpoint = httpContext.GetEndpoint();
+    var actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+    // ...
+}
+```
+
+
+* -> with traditional routing, or when authorization happens as part of MVC's authorization filter, the value of Resource is an AuthorizationFilterContext instance. This property provides access to HttpContext, RouteData, and everything else provided by MVC and Razor Pages.
+
+The use of the Resource property is framework-specific. Using information in the Resource property limits your authorization policies to particular frameworks. Cast the Resource property using the is keyword, and then confirm the cast has succeeded to ensure your code doesn't crash with an InvalidCastException when run on other frameworks:
+
+```cs
+using Microsoft.AspNetCore.Mvc.Filters;
+
+if (context.Resource is AuthorizationFilterContext mvcContext)
+{
+    // Examine MVC-specific things like routing data.
+}
+```
