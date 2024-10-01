@@ -1,0 +1,2 @@
+# Authorize with a specific scheme in ASP.NET Core
+* -> In some scenarios, such as Single Page Applications (SPAs), it's common to use multiple authentication methods. For example, the app may use cookie-based authentication to log in and JWT bearer authentication for JavaScript requests. In some cases, the app may have multiple instances of an authentication handler

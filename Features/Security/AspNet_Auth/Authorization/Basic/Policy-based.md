@@ -340,6 +340,7 @@ builder.Services.AddAuthorization(options =>
 * -> the **`HandleRequirementAsync`** method has two parameters: an **AuthorizationHandlerContext** and the **TRequirement** being handled
 * -> **frameworks such as MVC or SignalR** are **`free to add any object`** to the **`Resource`** property on the **AuthorizationHandlerContext** to **`pass extra information`**
 
+## HttpContext
 * -> when using **`endpoint routing`**, **authorization** is typically handled by the **Authorization Middleware**
 * -> in this case, the **Resource** property is **`an instance of HttpContext`**
 * -> **`the context can be used to access the current endpoint`**, which can be used to **probe the underlying resource to which we're routing**
@@ -353,10 +354,9 @@ if (context.Resource is HttpContext httpContext)
 }
 ```
 
-
-* -> with traditional routing, or when authorization happens as part of MVC's authorization filter, the value of Resource is an AuthorizationFilterContext instance. This property provides access to HttpContext, RouteData, and everything else provided by MVC and Razor Pages.
-
-The use of the Resource property is framework-specific. Using information in the Resource property limits your authorization policies to particular frameworks. Cast the Resource property using the is keyword, and then confirm the cast has succeeded to ensure your code doesn't crash with an InvalidCastException when run on other frameworks:
+## AuthorizationFilterContext
+* -> with **traditional routing (routes.MapRoute())**, or when authorization happens as **part of MVC's authorization filter**, the value of **`Resource`** is **`an AuthorizationFilterContext instance`**
+* -> this property **`provides access`** to **HttpContext**, **RouteData**, and **everything else provided by MVC and Razor Pages**
 
 ```cs
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -366,3 +366,79 @@ if (context.Resource is AuthorizationFilterContext mvcContext)
     // Examine MVC-specific things like routing data.
 }
 ```
+
+## the use of the 'Resource' property is "framework-specific"
+* -> using information in the Resource property **`limits our authorization policies to particular frameworks`** (_MVC / Razor /...._)
+* -> **cast the 'Resource' property** using the **`is`** keyword, and then confirm the cast has succeeded to ensure our code doesn't crash with an **`InvalidCastException`** when run on other frameworks
+
+========================================================================
+# Globally require all users to be authenticated
+ * -> using **`FallbackPolicy`** orr **`authorization filter in MVC or Razor pages`**
+
+```cs - FallbackPolicy
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+```
+
+========================================================================
+# Authorization with external service sample
+* -> sample code: https://github.com/dotnet/AspNetCore.Docs.Samples/tree/main/samples/aspnetcore-authz-with-ext-authz-service
+* -> the sample **Contoso.API project** is secured with **Azure AD**
+* -> an "additional authorization check" from the **Contoso.Security.API project** returns **`a payload describing`** whether the **Contoso.API client app** can **`invoke the "GetWeather" API`**
+
+* => shows how to **`implement additional authorization requirements`** with **`an external authorization service`**
+
+## Configure the sample
+* -> create an **`application registration`** in our **Microsoft Entra ID tenant**
+* -> assign it an **`AppRole`**
+* -> under **API permissions**, add the **AppRole** as **`a permission`** and **`grant Admin consent`**
+* _note that in this setup, this **app registration** represents both **`the API`** and **`the client`** invoking the API; however, we can create two app registrations if we like_
+* _if we are using this setup, be sure to only **perform the API permissions, add AppRole as a permission step** for **`only the client`**; only the client app registration **`requires a client secret to be generated`**_
+
+* _configure the **Contoso.API** project with the following settings:_
+```json
+{
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "Domain": "<Tenant name from AAD properties>.onmicrosoft.com">,
+    "TenantId": "<Tenant Id from AAD properties>",
+    "ClientId": "<Client Id from App Registration representing the API>"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+```
+
+* _configure **Contoso.Security.API** with the following settings:_
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "AllowedClients": [
+    "<Use the appropriate Client Id representing the Client calling the API>"
+  ]
+}
+```
+
+Open the ContosoAPI.collection.json file and configure an environment with the following:
+
+ClientId: Client Id from app registration representing the client calling the API.
+clientSecret: Client Secret from app registration representing the client calling the API.
+TenantId: Tenant Id from AAD properties
+Extract the commands from the ContosoAPI.collection.json file and use them to construct cURL commands to test the app.
+
+Run the solution and use cURL to invoke the API. You can add breakpoints in the Contoso.Security.API.SecurityPolicyController and observe the client Id is being passed in that is used to assert whether it is allowed to Get Weather.
