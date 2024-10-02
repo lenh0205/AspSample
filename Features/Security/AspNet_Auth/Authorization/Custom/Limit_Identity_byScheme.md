@@ -104,6 +104,9 @@ public class RegistrationController : Controller
 * -> **add all authentication schemes** we'd like to accept
 * -> however, **`only one`** **JWT bearer authentication** can by registered with the default authentication scheme **`JwtBearerDefaults.AuthenticationScheme`**
 * -> additional authentication has to be **registered with a unique authentication scheme**
+* -> as **the default authorization policy is `overridden`**, it's possible to use the **[Authorize] attribute** in controllers; the controller then accepts requests with **`JWT issued by the first or second issuer`**
+
+* -> there's an **`issue`** when using multiple authentication schemes: https://github.com/dotnet/aspnetcore/issues/26002
 
 ```cs
 var builder = WebApplication.CreateBuilder(args);
@@ -138,4 +141,65 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+```
+
+* _uses **Azure Active Directory B2C** and another **Azure Active Directory tenant**:_
+* -> **ForwardDefaultSelector** is used to **select a `default scheme` for the current request** that **`authentication handlers should forward all authentication operations to by default`**
+* -> **the default forwarding logic** checks the most specific **`ForwardAuthenticate`**, **`ForwardChallenge`**, **`ForwardForbid`**, **`ForwardSignIn`**, and **`ForwardSignOut`** setting first, 
+* -> followed by checking the **`ForwardDefaultSelector`**, followed by **`ForwardDefault`**
+* -> the **`first non null result`** is used as **the target scheme to forward to**
+
+```cs
+var builder = WebApplication.CreateBuilder(args);
+
+// Authentication
+builder.Services.AddAuthentication(options => // this one
+{
+    options.DefaultScheme = "B2C_OR_AAD";
+    options.DefaultChallengeScheme = "B2C_OR_AAD";
+})
+.AddJwtBearer("B2C", jwtOptions =>
+{
+    jwtOptions.MetadataAddress = "B2C-MetadataAddress";
+    jwtOptions.Authority = "B2C-Authority";
+    jwtOptions.Audience = "B2C-Audience";
+})
+.AddJwtBearer("AAD", jwtOptions =>
+{
+    jwtOptions.MetadataAddress = "AAD-MetadataAddress";
+    jwtOptions.Authority = "AAD-Authority";
+    jwtOptions.Audience = "AAD-Audience";
+    jwtOptions.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidAudiences = builder.Configuration.GetSection("ValidAudiences").Get<string[]>(),
+        ValidIssuers = builder.Configuration.GetSection("ValidIssuers").Get<string[]>()
+    };
+})
+.AddPolicyScheme("B2C_OR_AAD", "B2C_OR_AAD", options =>
+{
+    options.ForwardDefaultSelector = context =>
+    {
+        string authorization = context.Request.Headers[HeaderNames.Authorization];
+        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+        {
+            var token = authorization.Substring("Bearer ".Length).Trim();
+            var jwtHandler = new JwtSecurityTokenHandler();
+
+            return (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Issuer.Equals("B2C-Authority"))
+                ? "B2C" : "AAD";
+        }
+        return "AAD";
+    };
+});
+
+builder.Services.AddAuthentication()
+        .AddIdentityServerJwt();
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+var app = builder.Build();
 ```
