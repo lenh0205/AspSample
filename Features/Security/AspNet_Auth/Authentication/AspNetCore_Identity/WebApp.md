@@ -1,6 +1,5 @@
-=====================================================================
-# Summary
-* -> đầu tiên là cấu hình
+> ASP.NET Core Identity sử dụng **`cookie-based authentication`** by default - rất phù hợp với **Web Application**
+> vậy nên nó sẽ cấu hình sẵn những option mặc định về **Identity** và **cookie** ta có thể ghi đè bằng **`builder.Services.Configure<IdentityOptions>()`** và **`builder.Services.ConfigureApplicationCookie()`**
 
 =====================================================================
 # Create a Web app with authentication
@@ -30,6 +29,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 
+// ta có thể tách code ra như này hoặc config trực tiếp trong .AddIdentity()
 // this is the default option of Identity (tức là ta không cấu hình thì mặc định Identity đã cấu hình vậy rồi)
 // the "builder.Services.Configure" will DI a "Singleton" instance of "IdentityOptions" and allow to config it in here
 // this service will be used internally by Identity to store configuration options for identity system
@@ -54,6 +54,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = false;
 });
 
+// "ConfigureApplicationCookie" is an extension of ASP.NET Core Identity to config cookie option
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Cookie settings
@@ -73,10 +74,21 @@ app.UseAuthentication();
 app.UseAuthorization();
 ```
 
-## Scaffold Register, Login, LogOut, and RegisterConfirmation
+## Usage:
+```cs
+[Authorize]
+public class HomeController : Controller
+{
+}
+```
+
+=====================================================================
+> scaffold lại những page của Identity nếu ta muốn custom chúng
+
+# Scaffold Register, Login, LogOut, and RegisterConfirmation
 * -> ta sẽ ghi đề lại các page **Register, Login, LogOut, and RegisterConfirmation** sử dụng **`Identity Scaffolder`** (_xem `Features/Security/AspNet_Auth/AspNet_Core_Identity/Scaffold_Identity.md` để hiểu_)
 
-### Register
+## Register
 * -> when a user clicks the _"Register" button_ on the _Register page_, the **`RegisterModel.OnPostAsync`** action is invoked
 * -> đầu tiên từ những form Input (_ngoại trừ `password`_) ta tạo 1 object **`IdentityUser`**
 * -> rồi pass **IdentityUser** này cùng **password** vào **`UserManager.CreateAsync()`** để create **user** đó trong backing store (_database mà chứa mấy cái bảng của ASP.NET Core Identity như "AspNetUsers",..._)
@@ -84,7 +96,7 @@ app.UseAuthorization();
 * -> rồi gửi **email** theo địa chỉ user đã nhập với nội dung là 1 lời nhắn là "please confirm your account by clicking" **đường dẫn ta vừa tạo**
 * -> đồng thời nó sẽ redirect ta tới page **`/Account/RegisterConfirmation`** với 2 query params là **email** và **returnUrl**
 
-### Disable default account verification
+## Disable default account verification
 * -> user is redirected to the **RegisterConfirmation.OnGetAsync** where they can **`select a link to have the account confirmed`** (_tạo bởi EmailConfirmationUrl = Url.Page("/Account/ConfirmEmail", .....)_)
 * -> nhưng ta sẽ cần bỏ cái link này đi; nó chỉ dùng cho testing vì nó là automatic account verification 
 * -> trên production, it require a confirmed account and prevent immediate login at registration
@@ -94,7 +106,7 @@ app.UseAuthorization();
 DisplayConfirmAccountLink = false;
 ```
 
-### Log in
+## Log in
 * -> when the form on the Login page is submitted, the **`OnPostAsync`** action is called
 * -> nó sẽ chạy **`_signInManager.PasswordSignInAsync`** để login với **email** và **password**; kết quả sẽ có 3 trường hợp
 * -> case 1 **`result.Succeeded`**, nó sẽ redirect tới **returnUrl**

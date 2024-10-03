@@ -17,4 +17,5 @@
 * -> **Identity (ASP.NET Core Identity)** is typically configured using a **`SQL Server database`** to store **`user names, passwords, and profile data`**
 * -> _ASP.NET Core Identity_ **`adds user interface (UI) login functionality to ASP.NET Core web apps`**
 
-*  => _to secure **web APIs and SPAs**, use one of these options: **`Duende Identity Server`**, **`Microsoft Entra ID`**, **`Azure Active Directory B2C`**_
+## Web APIs with SPAs
+*  -> _to secure this model, use one of these options: **`Duende Identity Server`**, **`Microsoft Entra ID`**, **`Azure Active Directory B2C`**_
