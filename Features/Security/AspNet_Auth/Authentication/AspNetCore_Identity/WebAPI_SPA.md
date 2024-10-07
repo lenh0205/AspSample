@@ -243,6 +243,12 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 ## Summary
 * -> về cơ bản thì app chia thành 3 loại route cơ bản **public** (_VD: /Home_), **protected** (_Ex: /fetch-data_) và **ApiAuthorzationRoutes** (_Ex: /authentication/login, /authentication/login-callback_)
 
+* -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
+* -> 
+
+* -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
+* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
+
 * -> **`protected route`** sẽ được bảo vệ bởi **`AuthorizeRoute`** component
 * -> ngay khi component này **ComponentDidMount**
 
