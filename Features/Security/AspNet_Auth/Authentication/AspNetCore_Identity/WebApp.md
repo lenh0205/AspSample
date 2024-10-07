@@ -92,7 +92,7 @@ public class HomeController : Controller
 * -> when a user clicks the _"Register" button_ on the _Register page_, the **`RegisterModel.OnPostAsync`** action is invoked
 * -> đầu tiên từ những form Input (_ngoại trừ `password`_) ta tạo 1 object **`IdentityUser`**
 * -> rồi pass **IdentityUser** này cùng **password** vào **`UserManager.CreateAsync()`** để create **user** đó trong backing store (_database mà chứa mấy cái bảng của ASP.NET Core Identity như "AspNetUsers",..._)
-* -> nếu success thì ta sẽ dùng **UserManager** để lấy **`userId`** và **`email confirm token`** của **user** đó, rồi sử dụng làm **query param** để tạo đường dẫn với enpoint là **`/Account/ConfirmEmail`**
+* -> nếu success thì ta sẽ dùng **UserManager** để lấy **`userId`** và generate **`email confirm token`** cho **user** đó, rồi sử dụng làm **query param** để tạo đường dẫn với enpoint là **`/Account/ConfirmEmail`**
 * -> rồi gửi **email** theo địa chỉ user đã nhập với nội dung là 1 lời nhắn là "please confirm your account by clicking" **đường dẫn ta vừa tạo**
 * -> đồng thời nó sẽ redirect ta tới page **`/Account/RegisterConfirmation`** với 2 query params là **email** và **returnUrl**
 
@@ -103,7 +103,19 @@ public class HomeController : Controller
 * _tức là nếu ta dùng cái link được tạo mặc định thì sau khi `Register` ta `Login` thì nó sẽ success ngày; nếu không có cái link mà ta `Login` ngay thì nó sẽ báo lỗi_
 
 ```cs
-DisplayConfirmAccountLink = false;
+[AllowAnonymous]
+public class RegisterConfirmationModel : PageModel
+{
+  public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
+  {
+    // ....
+    DisplayConfirmAccountLink = false;
+    if (DisplayConfirmAccountLink)
+    {
+
+    }
+  }
+}
 ```
 
 ## Log in

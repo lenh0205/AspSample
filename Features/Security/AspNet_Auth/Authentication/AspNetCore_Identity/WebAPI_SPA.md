@@ -1,11 +1,12 @@
 =====================================================================
 # using Identity to secure a Web API backend for SPAs
-* -> ta sẽ sử dụng **ASP.NET Core templates** that offer **`authentication in Single Page Apps (SPAs)`** using the **support for API authorization**
+* -> ta sẽ sử dụng **ASP.NET Core templates** that offer **`authentication in Single Page Apps (SPAs)`** using the **support for API authorization (`API Authorization`)**
 * -> in this project, the **`ASP.NET Core Identity`** is for **authenticating** and **storing users**, combined with **`Duende Identity Server`** for **implementing OpenID Connect**
 
 * => tức là ta dựng 1 project WebAPI đóng cả vai trò là **`Resource Server`** và **`Authorization Server`**
 * _sử dụng JWT_
-* _nhưng nó sẽ không hỗ trợ những thứ như **consent** or **federation**_
+* _nhưng những **ASP.NET Core support** này chỉ tập trụng vào **`first party`**;_
+* _nó sẽ không hỗ trợ những thứ như **consent** or **federation**; để hỗ trợ những thứ như này ta cần 1 **`IdentityServer`** thực sự_
 
 =====================================================================
 # Create an app with API authorization support
@@ -70,10 +71,10 @@ app.Run();
 * -> additionally, this method **registers `an <<ApplicationName>>API API resource` with `a default scope of <<ApplicationName>>API` to IdentityServer**
 * -> and configures the **JWT Bearer token middleware** to **`validate JWT tokens issued by IdentityServer for the app`**
 
-## Authentication middleware
+## Authentication middleware - .UseAuthentication()
 * -> responsible for **`validating the request credentials`** and **`setting the user on the request context`**
 
-## IdentityServer middleware
+## IdentityServer middleware - .UseIdentityServer()
 * -> **`exposes the OpenID Connect endpoints`**
 
 ## OidcConfigurationController
@@ -100,12 +101,14 @@ app.Run();
 * -> there are several profiles available như **SPA**, **IdentityServerJwt** (_xem phần **`Application profiles`** bên dưới để hiểu thêm_)
 
 ```json
-"IdentityServer": {
-  "Clients": {
-    "angularindividualpreview3final": {
-      "Profile": "IdentityServerSPA"
+{
+    "IdentityServer": {
+        "Clients": {
+            "IdentitySPA": {
+            "Profile": "IdentityServerSPA"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -120,20 +123,6 @@ app.Run();
   }
 }
 ```
-
-=====================================================================
-# SPA Client - React App
-* -> the support for authentication and API authorization in the React template resides in the **`ClientApp/src/components/api-authorization`** directory
-
-* _4 components:_
-* -> **Login.js** - handles the **`app's login flow`**
-* -> **Logout.js** - handles the **`app's logout flow`**
-* -> **LoginMenu.js** - a widget that displays one of these sets of links: **`User profile management and log out links`** when the **user is authenticated**, **`Registration and log in links`** when the **user isn't authenticated**
-* -> **AuthorizeRoute.js** - a route component that requires a user to be authenticated before rendering the component indicated in the Component parameter
-
-* an exported **'authService' instance** of class AuthorizeService (_AuthorizeService.js_)
-* -> handles the **`lower-level details of the authentication process`**
-* -> and **`exposes information about the authenticated user`** to the rest of the app for consumption
 
 =====================================================================
 # Customize the API authentication handler
@@ -164,37 +153,10 @@ builder.Services.Configure<JwtBearerOptions>(
 ```
 
 =====================================================================
-# Protect a client-side route (React)
-* -> **`protect a client-side route`** by using the **"AuthorizeRoute" component** (_custom component_) instead of the **plain 'Route' component (react-router-dom)**
-
-* _just the client, this **doesn't protect the actual endpoint** (which still requires an **`[Authorize] attribute`** applied to it)_
-* _**user-friendly only** - prevents the user from navigating to the given client-side route when it `isn't authenticated`_
-
-```js - For example: the "fetch-data" route is configured within the "App" component
-<AuthorizeRoute path='/fetch-data' component={FetchData} />
-```
-
-# Authenticate API requests (React)
-* -> **authenticating requests with React** is done by first **importing the `authService` instance** from the AuthorizeService
-* -> the **`access token`** is **retrieved from the "authService"** and is **attached to the request**
-* _in React components, this work is typically done in the `componentDidMount` lifecycle method or as the result from some `user interaction`_
-
-```cs - Retrieve and attach the access token to the response
-async populateWeatherData() {
-  const token = await authService.getAccessToken();
-  const response = await fetch('api/SampleData/WeatherForecasts', {
-    headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
-  });
-  const data = await response.json();
-  this.setState({ forecasts: data, loading: false });
-}
-```
-
-=====================================================================
 > Other configuration options
 
 # Application profiles
-* -> these are the **`predefined configurations`** supported by Microsoft for apps that further define their parameters
+* -> "Application profiles" are the **predefined configurations for apps** that **`further define their parameters`**
 
 ## IdentityServerSPA - represents a 'SPA' hosted alongside 'IdentityServer' as a single unit
 * -> the **`redirect_uri`** defaults to **/authentication/login-callback**
@@ -214,10 +176,12 @@ async populateWeatherData() {
 ## API - represents an 'API' that isn't hosted with 'IdentityServer'
 * -> the app is configured to have **`a single scope`** that **defaults to the app name**
 
+
 # Configuration through 'AppSettings'
 * -> configure the apps through the **`configuration system`** by adding them to the list of **Clients** or **Resources**
 
-```json - Configure each client's "redirect_uri" and "post_logout_redirect_uri" property
+* -> configure each **`client`**'s **redirect_uri** and **post_logout_redirect_uri** property
+```json 
 {
     "IdentityServer": {
         "Clients": {
@@ -231,7 +195,8 @@ async populateWeatherData() {
 }
 ```
 
-```json - when configuring resources, we can configure the scopes for the resource
+* -> when configuring **`resources`** (_resource server_), we can configure the **scopes** for the resource
+```json - 
 {
     "IdentityServer": {
         "Resources": {
@@ -258,6 +223,53 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
     options.ApiResources.AddApiResource("MyExternalApi", resource =>
         resource.WithScopes("a", "b", "c"));
 });
+```
+
+=====================================================================
+# SPA Client - React App
+* -> the support for authentication and API authorization in the React template resides in the **`ClientApp/src/components/api-authorization`** directory
+
+* _4 components:_
+* -> **Login.js** - handles the **`app's login flow`**
+* -> **Logout.js** - handles the **`app's logout flow`**
+* -> **LoginMenu.js** - a widget that displays one of these sets of links: **`User profile management and log out links`** when the **user is authenticated**, **`Registration and log in links`** when the **user isn't authenticated**
+* -> **AuthorizeRoute.js** - a route component that requires a user to be authenticated before rendering the component indicated in the Component parameter
+
+* an exported **'authService' instance** of class AuthorizeService (_AuthorizeService.js_)
+* -> handles the **`lower-level details of the authentication process`**
+* -> and **`exposes information about the authenticated user`** to the rest of the app for consumption
+
+
+## Summary
+* -> về cơ bản thì app chia thành 3 loại route cơ bản **public** (_VD: /Home_), **protected** (_Ex: /fetch-data_) và **ApiAuthorzationRoutes** (_Ex: /authentication/login, /authentication/login-callback_)
+
+* -> **`protected route`** sẽ được bảo vệ bởi **`AuthorizeRoute`** component
+* -> ngay khi component này **ComponentDidMount**
+
+## Protect a client-side route (React)
+* -> **`protect a client-side route`** by using the **"AuthorizeRoute" component** (_custom component_) instead of the **plain 'Route' component (react-router-dom)**
+
+* _just the client, this **doesn't protect the actual endpoint** (which still requires an **`[Authorize] attribute`** applied to it)_
+* _**user-friendly only** - prevents the user from navigating to the given client-side route when it `isn't authenticated`_
+
+```js - For example: the "fetch-data" route is configured within the "App" component
+<AuthorizeRoute path='/fetch-data' component={FetchData} />
+```
+
+## Authenticate API requests (React)
+* -> **authenticating requests with React** is done by first **importing the `authService` instance** from the AuthorizeService
+* -> the **`access token`** is **retrieved from the "authService"** and is **attached to the request**
+* _in React components, this work is typically done in the `componentDidMount` lifecycle method or as the result from some `user interaction`_
+
+```cs - Retrieve and attach the access token to the response
+async populateWeatherData() {
+  const token = await authService.getAccessToken();
+  const response = await fetch('api/SampleData/WeatherForecasts', {
+    headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
+  });
+  const data = await response.json();
+  this.setState({ forecasts: data, loading: false });
+}
 ```
 
 =====================================================================
