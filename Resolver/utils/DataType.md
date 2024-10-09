@@ -32,9 +32,9 @@ students.Add(113, new StudentName { FirstName="Andy", LastName="Ruth", ID=198 })
 var test = students[111]; // { "id": 211, "firstName": "Sachin", "lastName": "Karnik" }
 var test1 = students[222]; // KeyNotFoundException
 
-// -> to avoid Exception
+// -> to avoid Exception:
 var existed = students.ContainsKey(222); // check if key existed
-students.TryGetValue(222, out result);
+var existed = students.TryGetValue(222, out value);
 ```
 
 ```cs - Loop

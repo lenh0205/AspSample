@@ -254,17 +254,150 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 <AuthorizeRoute path='/fetch-data' component={FetchData} />
 ```
 
+### ApiAuthorzationRoutes
+* -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
+* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
+
 ## AuthorizeService
 * -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
 * -> nó sẽ cần node package **`oidc-client`** - cung cấp **OpenID Connect (OIDC) and OAuth2 protocol support** cho `browser-based Javascript client application`
-* -> cụ thể thì ta sẽ sử dụng class **`UserManager`** cung cấp bởi thư viện đó: **const userManager = new UserManager(settings);**
+* -> cụ thể thì ta sẽ tạo instance của class **`UserManager`** cung cấp bởi thư viện "oidc-client", sau đó sử dụng những method của nó để thực hiện các Auth action
 
-### Oidc-client function
+### UserManager ('Oidc-client' API support)
+* -> ta sẽ cần gọi endpoint **`_configuration/{clientId}`** của **IdentityServer** để nó lấy những **`client parameters`** dựa trên **clientId** (`IdentitySPA` in this case) ta truyền (_ClientRequestParametersProvider.GetClientParameters(HttpContext, clientId);_)
+* -> ta sẽ dùng object chứa những client parameter được trả về này để khởi tạo **UserManager**
+
+```js
+let response = await fetch(ApplicationPaths.ApiAuthorizationClientConfigurationUrl);
+if (!response.ok) {
+    throw new Error(`Could not load settings for '${ApplicationName}'`);
+}
+let settings = await response.json();
+settings.automaticSilentRenew = true;
+settings.includeIdTokenInSilentRenew = true;
+settings.userStore = new WebStorageStateStore({
+    prefix: ApplicationName
+});
+
+this.userManager = new UserManager(settings);
+
+this.userManager.events.addUserSignedOut(async () => {
+    await this.userManager.removeUser();
+    this.updateState(undefined);
+});
+```
+
+### ReturnUrl
+```js
+getReturnUrl(state) {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = params.get(QueryParameterNames.ReturnUrl);
+    if (fromQuery && !fromQuery.startsWith(`${window.location.origin}/`)) {
+        // This is an extra check to prevent open redirects.
+        throw new Error("Invalid return url. The return url needs to have the same origin as the current page.")
+    }
+    return (state && state.returnUrl) || fromQuery || `${window.location.origin}/`;
+}
+```
+
+### Sign In ('Oidc-client' API support)
+* -> **`userManager.signinSilent`** sign in using **iframe** instead of visible UI changes, typically used to **renew tokens** (_or check if the **user is already authenticated**_); this maintaining a user's session without interrupting their experience
+* -> **`userManager.signinPopup`** opens a **popup window** for authentication, this keep the user on the **current page while authenticating**; 
+* -> **`userManager.signinRedirect`** - the most common approach for **traditional web applications**; redirects the user to the **identity provider's login page** (_after authentication, the user is redirected back to our application_)
+
+* _but not all `browser / device` support **popup**, also some `enviroment and policy` might restrict **iframe** too; so the **redirect method** necessary_
+
+```js - get "user" base on "signinSilent"
+// ----------> Main Execute:
+const returnUrl = this.getReturnUrl();
+const result = await authService.signIn({ returnUrl });
+
+// ----------> Business:
+switch (result.status) {
+    case AuthenticationResultStatus.Redirect:
+        break;
+    case AuthenticationResultStatus.Success:
+        await this.navigateToReturnUrl(returnUrl);
+        break;
+    case AuthenticationResultStatus.Fail:
+        this.setState({ message: result.message }); // hiện message ra UI khi login fail
+        break;
+    default:
+        throw new Error(`Invalid status result ${result.status}.`);
+}
+
+// ----------> Params:
+createArguments(state) {
+    return { 
+        useReplaceToNavigate: true, // ensures that the redirect doesn't create a new entry in the browser's history stack
+        data: state 
+    };
+}
+
+// ----------> Main Function:
+async signIn(state) {
+    await this.ensureUserManagerInitialized();
+    try 
+    {
+      const silentUser = await this.userManager.signinSilent(this.createArguments());
+      this.updateState(silentUser);
+      return this.success(state);
+    } 
+    catch (silentError) 
+    {
+      // User might not be authenticated, fallback to popup authentication
+      console.log("Silent authentication error: ", silentError);
+
+      try 
+      {
+        if (this._popUpDisabled) {
+          throw new Error('Popup disabled. Change \'AuthorizeService.js:AuthorizeService._popupDisabled\' to false to enable it.')
+        }
+
+        const popUpUser = await this.userManager.signinPopup(this.createArguments());
+        this.updateState(popUpUser);
+        return this.success(state);
+      } 
+      catch (popUpError) 
+      {
+        if (popUpError.message === "Popup window closed") {
+          // The user explicitly cancelled the login action by closing an opened popup.
+          return this.error("The user closed the window.");
+        } else if (!this._popUpDisabled) {
+          console.log("Popup authentication error: ", popUpError);
+        }
+
+        // PopUps might be blocked by the user, fallback to redirect
+        try 
+        {
+          await this.userManager.signinRedirect(this.createArguments(state));
+          return this.redirect();
+        } 
+        catch (redirectError) 
+        {
+          console.log("Redirect authentication error: ", redirectError);
+          return this.error(redirectError);
+        }
+      }
+    }
+}
+
+// ----------> Return:
+success(state) {
+    return { status: AuthenticationResultStatus.Success, state };
+}
+
+// --------> Update Authen state:
+updateState(user) {
+    this._user = user;
+    this._isAuthenticated = !!this._user;
+    this.notifySubscribers();
+}
+```
+
+### Sign Out ('Oidc-client' API support)
 * -> event **`userManager.events.addUserSignedOut`** sẽ cho phép ta làm hành động gì đó khi **a user `signs out` from the OP (OpenID Provider - Authorization Server)**
 * -> method **`userManager.removeUser`** cho phép **remove from any storage the currently `authenticated user`**
-
-* -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
-* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
 
 ## Authenticate API requests (React)
 * -> **authenticating requests with React** is done by first **importing the `authService` instance** from the AuthorizeService
