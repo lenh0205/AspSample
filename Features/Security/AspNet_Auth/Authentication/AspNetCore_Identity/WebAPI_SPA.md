@@ -227,6 +227,8 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 
 =====================================================================
 # SPA Client - React App
+
+## Introduce
 * -> the support for authentication and API authorization in the React template resides in the **`ClientApp/src/components/api-authorization`** directory
 
 * _4 components:_
@@ -239,21 +241,11 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 * -> handles the **`lower-level details of the authentication process`**
 * -> and **`exposes information about the authenticated user`** to the rest of the app for consumption
 
-
-## Summary
+## Routes
 * -> về cơ bản thì app chia thành 3 loại route cơ bản **public** (_VD: /Home_), **protected** (_Ex: /fetch-data_) và **ApiAuthorzationRoutes** (_Ex: /authentication/login, /authentication/login-callback_)
 
-* -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
-* -> 
-
-* -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
-* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
-
-* -> **`protected route`** sẽ được bảo vệ bởi **`AuthorizeRoute`** component
-* -> ngay khi component này **ComponentDidMount**
-
-## Protect a client-side route (React)
-* -> **`protect a client-side route`** by using the **"AuthorizeRoute" component** (_custom component_) instead of the **plain 'Route' component (react-router-dom)**
+### Protect a client-side route (React)
+* -> **protect a client-side route** by using the **`AuthorizeRoute` component** (_custom component_) instead of the **plain 'Route' component (react-router-dom)**
 
 * _just the client, this **doesn't protect the actual endpoint** (which still requires an **`[Authorize] attribute`** applied to it)_
 * _**user-friendly only** - prevents the user from navigating to the given client-side route when it `isn't authenticated`_
@@ -261,6 +253,18 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 ```js - For example: the "fetch-data" route is configured within the "App" component
 <AuthorizeRoute path='/fetch-data' component={FetchData} />
 ```
+
+## AuthorizeService
+* -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
+* -> nó sẽ cần node package **`oidc-client`** - cung cấp **OpenID Connect (OIDC) and OAuth2 protocol support** cho `browser-based Javascript client application`
+* -> cụ thể thì ta sẽ sử dụng class **`UserManager`** cung cấp bởi thư viện đó: **const userManager = new UserManager(settings);**
+
+### Oidc-client function
+* -> event **`userManager.events.addUserSignedOut`** sẽ cho phép ta làm hành động gì đó khi **a user `signs out` from the OP (OpenID Provider - Authorization Server)**
+* -> method **`userManager.removeUser`** cho phép **remove from any storage the currently `authenticated user`**
+
+* -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
+* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
 
 ## Authenticate API requests (React)
 * -> **authenticating requests with React** is done by first **importing the `authService` instance** from the AuthorizeService

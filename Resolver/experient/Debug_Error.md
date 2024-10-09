@@ -239,7 +239,7 @@ Ví dụ Migration cần drop 1 Table nhưng Table đó không tồn tại trong
 
 # FE - Network Error; AxiosError: Network Error at XMLHttpRequest.handleError hiện ngay trên UI
 * do **`try/catch`** sai cách
-```
+```cs
 const DataBinding = () => {
     try {
         axiosServices.guiGet("TraCuuVanBanDen/GetCboData").then((response: any) => console.log(response));
