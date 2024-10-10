@@ -251,13 +251,118 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 * _**user-friendly only** - prevents the user from navigating to the given client-side route when it `isn't authenticated`_
 
 ```js - For example: the "fetch-data" route is configured within the "App" component
+// Usage
 <AuthorizeRoute path='/fetch-data' component={FetchData} />
+
+// maintain state
+this.state = {
+    ready: false,
+    authenticated: false
+};
+componentDidMount() {
+    this._subscription = authService.subscribe(() => {
+        this.setState({ ready: false, authenticated: false });
+
+        const authenticated = await authService.isAuthenticated();
+        this.setState({ ready: true, authenticated });
+    });
+    
+    // populate authentication state:
+    const authenticated = await authService.isAuthenticated();
+    this.setState({ ready: true, authenticated });
+}
+
+// protect component - render UI
+render() {
+    const { ready, authenticated } = this.state;
+
+    // create 'redirectUrl' after 'login'
+    var link = document.createElement("a");
+    link.href = this.props.path; // Ex: '/fetch-data'
+    const returnUrl = `${link.protocol}//${link.host}${link.pathname}${link.search}${link.hash}`;
+    const redirectUrl = `/authentication/login?returnUrl=${encodeURIComponent(returnUrl)}`;
+
+    if (!ready) {
+      return <div></div>;
+    } else {
+      const { element } = this.props;
+      return authenticated 
+        ? element // directly render component if user is authenticated
+        : <Navigate replace to={redirectUrl} />; // redirect user to "login" page if user haven't authenticated
+    }
+  }
+```
+
+```js - VD: protected "FetchData" component try to access protected resource
+[Authorize]
+[ApiController]
+[Route("[controller]")]
+public class WeatherForecastController : ControllerBase
+{}
+
+// so it need to pass "AccessToken" in the Authorization header Bearer scheme of request
+componentDidMount() {
+    const token = await authService.getAccessToken();
+    const response = await fetch('weatherforecast', {
+        headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    this.setState({ forecasts: data, loading: false });
+}
 ```
 
 ### ApiAuthorzationRoutes
 * -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
 
-* -> với trang **/authentication/login**, component **`Login.js`** sẽ chạy logic login trong **ComponentDidMount** 
+* -> ví dụ với trang **/authentication/login**, component **`Login.js`** sẽ chạy logic login trong **ComponentDidMount**
+```js
+// App.js
+<Route path="/authentication/login" element={<Login action={ELoginActions.Login} />}/>
+<Route path="/authentication/register" element={<Login action={ELoginActions.Register} />}/>
+
+// LoginMenu.js
+import { NavItem, NavLink } from 'reactstrap';
+import { Link } from 'react-router-dom';
+
+// -----> navigation bar for "anonymous user"
+anonymousView() {
+    return (
+        <Fragment>
+            <NavItem>
+                <NavLink tag={Link} className="text-dark" to='/authentication/register'>Register</NavLink>
+            </NavItem>
+            <NavItem>
+                <NavLink tag={Link} className="text-dark" to='/authentication/login'>Login</NavLink>
+            </NavItem>
+        </Fragment>
+    );
+}
+
+componentWillUnmount() {
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated,
+      userName: user && user.name
+    });
+}
+
+// navigation bar for "authenticated user"
+authenticatedView(userName, profilePath, logoutPath, logoutState) {
+    return (
+        <Fragment>
+            <NavItem>
+                <NavLink tag={Link} className="text-dark" to='/authentication/profile'>
+                    Hello {userName}
+                </NavLink>
+            </NavItem>
+            <NavItem>
+                <NavLink replace tag={Link} className="text-dark" to='/authentication/logout' state={{ local: true }}>
+                    Logout
+                </NavLink>
+            </NavItem>
+    </Fragment>);
+}
+``` 
 
 ## AuthorizeService
 * -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
@@ -307,8 +412,27 @@ updateState(user) {
 }
 ```
 
-```cs - cách lấy "user"
+```js - access user information
+const userName = user.name;
+```
 
+```js - cách lấy "_user"
+async getUser() { // cụ thể là "user profile"
+    if (this._user && this._user.profile) {
+      return this._user.profile;
+    }
+
+    await this.ensureUserManagerInitialized();
+    const user = await this.userManager.getUser();
+    return user && user.profile; 
+}
+```
+
+```js - cách lấy "_isAuthenticated"
+async isAuthenticated() {
+    const user = await this.getUser();
+    return !!user;
+}
 ```
 
 ### Common Function
@@ -324,6 +448,19 @@ getReturnUrl(state) {
     }
     return (state && state.returnUrl) || fromQuery || `${window.location.origin}/`;
 }
+```
+
+## Register
+* -> redirect to **IdentityServer UI page**
+
+```js
+// ----------> Main Execute:
+const apiAuthorizationPath = `Identity/Account/Register?returnUrl=${encodeURI('/authentication/login')}`
+const redirectUrl = `${window.location.origin}/${apiAuthorizationPath}`;
+// It's important that we do a replace here so that when the user hits the back arrow 
+// on the browser they get sent back to where it was on the app instead of to 
+// an endpoint on this component
+window.location.replace(redirectUrl);
 ```
 
 ### Sign In ('Oidc-client' API support)
@@ -435,22 +572,6 @@ navigateToReturnUrl(returnUrl) {
 ### Sign Out ('Oidc-client' API support)
 * -> event **`userManager.events.addUserSignedOut`** sẽ cho phép ta làm hành động gì đó khi **a user `signs out` from the OP (OpenID Provider - Authorization Server)**
 * -> method **`userManager.removeUser`** cho phép **remove from any storage the currently `authenticated user`**
-
-## Authenticate API requests (React)
-* -> **authenticating requests with React** is done by first **importing the `authService` instance** from the AuthorizeService
-* -> the **`access token`** is **retrieved from the "authService"** and is **attached to the request**
-* _in React components, this work is typically done in the `componentDidMount` lifecycle method or as the result from some `user interaction`_
-
-```cs - Retrieve and attach the access token to the response
-async populateWeatherData() {
-  const token = await authService.getAccessToken();
-  const response = await fetch('api/SampleData/WeatherForecasts', {
-    headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
-  });
-  const data = await response.json();
-  this.setState({ forecasts: data, loading: false });
-}
-```
 
 =====================================================================
 # "Deploy to production" requirements
