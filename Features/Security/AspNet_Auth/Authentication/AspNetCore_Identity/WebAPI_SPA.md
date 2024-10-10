@@ -256,7 +256,8 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 
 ### ApiAuthorzationRoutes
 * -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
-* -> với trang **/authentication/login**, component **`Login`** sẽ chạy logic login trong **ComponentDidMount** 
+
+* -> với trang **/authentication/login**, component **`Login.js`** sẽ chạy logic login trong **ComponentDidMount** 
 
 ## AuthorizeService
 * -> ta sẽ tạo 1 class **`AuthorizeService`** để handle các logic liên quan đến **Auth**
@@ -264,7 +265,8 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 * -> cụ thể thì ta sẽ tạo instance của class **`UserManager`** cung cấp bởi thư viện "oidc-client", sau đó sử dụng những method của nó để thực hiện các Auth action
 
 ### UserManager ('Oidc-client' API support)
-* -> ta sẽ cần gọi endpoint **`_configuration/{clientId}`** của **IdentityServer** để nó lấy những **`client parameters`** dựa trên **clientId** (`IdentitySPA` in this case) ta truyền (_ClientRequestParametersProvider.GetClientParameters(HttpContext, clientId);_)
+* -> ta sẽ cần gọi endpoint **`_configuration/{clientId}`** của **IdentityServer** để nó lấy những **`client parameters`** 
+* -> ta sẽ cần pass **clientId** (`IdentitySPA` in this case) vào **`ClientRequestParametersProvider.GetClientParameters(HttpContext, clientId)`;**
 * -> ta sẽ dùng object chứa những client parameter được trả về này để khởi tạo **UserManager**
 
 ```js
@@ -287,11 +289,35 @@ this.userManager.events.addUserSignedOut(async () => {
 });
 ```
 
-### ReturnUrl
-```js
+### maintain "State"
+* -> mục đích chính nhất của **AuthorizeService** vẫn là maintain các **auth state**
+* -> state quan trọng nhất của **AuthorizeService** vẫn là **`user`**
+```js 
+// state
+_callbacks = [];
+_nextSubscriptionId = 0;
+_user = null;
+_isAuthenticated = false;
+
+// update critical state:
+updateState(user) {
+    this._user = user;
+    this._isAuthenticated = !!this._user;
+    this.notifySubscribers();
+}
+```
+
+```cs - cách lấy "user"
+
+```
+
+### Common Function
+
+```js - ReturnUrl
 getReturnUrl(state) {
-    const params = new URLSearchParams(window.location.search);
-    const fromQuery = params.get(QueryParameterNames.ReturnUrl);
+    const queryString = window.location.search; // returns the querystring part of a URL
+    const params = new URLSearchParams(queryString); // tranfer queryString into an oject
+    const fromQuery = params.get("returnUrl"); // get value of "returnUrl" query parameter
     if (fromQuery && !fromQuery.startsWith(`${window.location.origin}/`)) {
         // This is an extra check to prevent open redirects.
         throw new Error("Invalid return url. The return url needs to have the same origin as the current page.")
@@ -308,33 +334,26 @@ getReturnUrl(state) {
 * _but not all `browser / device` support **popup**, also some `enviroment and policy` might restrict **iframe** too; so the **redirect method** necessary_
 
 ```js - get "user" base on "signinSilent"
-// ----------> Main Execute:
-const returnUrl = this.getReturnUrl();
-const result = await authService.signIn({ returnUrl });
-
-// ----------> Business:
-switch (result.status) {
-    case AuthenticationResultStatus.Redirect:
-        break;
-    case AuthenticationResultStatus.Success:
-        await this.navigateToReturnUrl(returnUrl);
-        break;
-    case AuthenticationResultStatus.Fail:
-        this.setState({ message: result.message }); // hiện message ra UI khi login fail
-        break;
-    default:
-        throw new Error(`Invalid status result ${result.status}.`);
-}
-
 // ----------> Params:
-createArguments(state) {
+createArguments(state) { // create parameter for signin methods of 'oidc-client'
     return { 
-        useReplaceToNavigate: true, // ensures that the redirect doesn't create a new entry in the browser's history stack
+        // ensures that the redirect doesn't create a new entry in the browser's history stack
+        // only need this field for processing "silent signin" and "popup signin" 
+        useReplaceToNavigate: true, 
+
+        // the value of "state" is basically { returnUrl }
+        // the "redirect signin" of 'oidc-client" need this in addition to process properly
         data: state 
     };
 }
+const returnUrl = this.getReturnUrl();
+
+
+// ----------> Main Execute:
+const result = await authService.signIn({ returnUrl });
 
 // ----------> Main Function:
+// ----------> Target: update Authen state by call "updateState" method
 async signIn(state) {
     await this.ensureUserManagerInitialized();
     try 
@@ -382,16 +401,34 @@ async signIn(state) {
     }
 }
 
-// ----------> Return:
-success(state) {
+// ----------> Return (result):
+success(state) { // for "Silent SignIn" and "Popup SignIn"
     return { status: AuthenticationResultStatus.Success, state };
 }
+error(message) { // for "Popup SignIn"
+    return { status: AuthenticationResultStatus.Fail, message };
+}
+redirect() { // for "Redirect Login"
+    return { status: AuthenticationResultStatus.Redirect };
+}
 
-// --------> Update Authen state:
-updateState(user) {
-    this._user = user;
-    this._isAuthenticated = !!this._user;
-    this.notifySubscribers();
+// ----------> Business:
+switch (result.status) {
+    case AuthenticationResultStatus.Redirect:
+        break;
+    case AuthenticationResultStatus.Success:
+        await this.navigateToReturnUrl(returnUrl);
+        break;
+    case AuthenticationResultStatus.Fail:
+        this.setState({ message: result.message }); // hiện message ra UI khi login fail
+        break;
+    default:
+        throw new Error(`Invalid status result ${result.status}.`);
+}
+navigateToReturnUrl(returnUrl) {
+    // It's important that we do a replace here so that we remove the callback uri with the
+    // fragment containing the tokens from the browser history.
+    window.location.replace(returnUrl);
 }
 ```
 
