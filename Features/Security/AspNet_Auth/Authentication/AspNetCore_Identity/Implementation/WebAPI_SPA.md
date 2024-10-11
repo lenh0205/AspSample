@@ -1,3 +1,10 @@
+> những page của IdentityServer mà SPA redirect đến để thực hiện Auth đều là **ASP.NET Core Identity Default UI**
+> redirect được thực hiện bằng **window.location.replace(redirectUrl);** để đảm bảo nó không ghi Browser history
+
+> vẫn chưa biết IdentityServer trả về authorization code cho client nhận và lưu như thế nào ?
+> vẫn chưa biết client lấy access_token ? và client lưu cái access_token như thế nào và ở đâu ?
+> Resource server muốn validate token thì cần có key, cái key này đang ở đâu?
+
 =====================================================================
 # using Identity to secure a Web API backend for SPAs
 * -> ta sẽ sử dụng **ASP.NET Core templates** that offer **`authentication in Single Page Apps (SPAs)`** using the **support for API authorization (`API Authorization`)**
@@ -41,8 +48,8 @@ builder.Services.AddRazorPages();
 
 app.UseRouting();
 
-app.UseAuthentication();
-app.UseIdentityServer();
+app.UseAuthentication(); // authentication middleware
+app.UseIdentityServer(); // IdentityServer middleware
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -226,6 +233,8 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 ```
 
 =====================================================================
+> ta sẽ cần cài thư viện **`oidc-client`**: https://authts.github.io/oidc-client-ts/classes/UserManager.html#signinCallback
+
 # SPA Client - React App
 
 ## Introduce
@@ -244,7 +253,7 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 ## Routes
 * -> về cơ bản thì app chia thành 3 loại route cơ bản **public** (_VD: /Home_), **protected** (_Ex: /fetch-data_) và **ApiAuthorzationRoutes** (_Ex: /authentication/login, /authentication/login-callback_)
 
-### Protect a client-side route (React)
+### Protect a client-side route - for accessing protected resources
 * -> **protect a client-side route** by using the **`AuthorizeRoute` component** (_custom component_) instead of the **plain 'Route' component (react-router-dom)**
 
 * _just the client, this **doesn't protect the actual endpoint** (which still requires an **`[Authorize] attribute`** applied to it)_
@@ -311,11 +320,26 @@ componentDidMount() {
 }
 ```
 
-### ApiAuthorzationRoutes
+### ApiAuthorzationRoutes - interact with IdentityServer
 * -> hầu hết các **ApiAuthorzationRoutes** sẽ trả về **`Login`** hoặc **`Logout`** component
 
-* -> ví dụ với trang **/authentication/login**, component **`Login.js`** sẽ chạy logic login trong **ComponentDidMount**
+* _ví dụ với trang **/authentication/login**, component **`Login.js`** sẽ chạy logic login trong **ComponentDidMount**_
+* _ngay khi user open app trong 1 tab, 1 component sẽ check xem user đã `authenticated` cũng như thử lấy `user information`; ở đây là component LoginMenu.js_
 ```js
+componentDidMount() {
+    this._subscription = authService.subscribe(() => this.populateState());
+    this.populateState();
+}
+async populateState() {
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+        isAuthenticated,
+        userName: user && user.name
+    });
+}
+```
+
+```js - navigate to ApiAuthorzationRoutes
 // App.js
 <Route path="/authentication/login" element={<Login action={ELoginActions.Login} />}/>
 <Route path="/authentication/register" element={<Login action={ELoginActions.Register} />}/>
@@ -435,6 +459,14 @@ async isAuthenticated() {
 }
 ```
 
+### AccessToken
+```cs
+async getAccessToken() {
+    const user = await this.userManager.getUser();
+    return user && user.access_token;
+}
+```
+
 ### Common Function
 
 ```js - ReturnUrl
@@ -450,19 +482,6 @@ getReturnUrl(state) {
 }
 ```
 
-## Register
-* -> redirect to **IdentityServer UI page**
-
-```js
-// ----------> Main Execute:
-const apiAuthorizationPath = `Identity/Account/Register?returnUrl=${encodeURI('/authentication/login')}`
-const redirectUrl = `${window.location.origin}/${apiAuthorizationPath}`;
-// It's important that we do a replace here so that when the user hits the back arrow 
-// on the browser they get sent back to where it was on the app instead of to 
-// an endpoint on this component
-window.location.replace(redirectUrl);
-```
-
 ### Sign In ('Oidc-client' API support)
 * -> **`userManager.signinSilent`** sign in using **iframe** instead of visible UI changes, typically used to **renew tokens** (_or check if the **user is already authenticated**_); this maintaining a user's session without interrupting their experience
 * -> **`userManager.signinPopup`** opens a **popup window** for authentication, this keep the user on the **current page while authenticating**; 
@@ -470,7 +489,7 @@ window.location.replace(redirectUrl);
 
 * _but not all `browser / device` support **popup**, also some `enviroment and policy` might restrict **iframe** too; so the **redirect method** necessary_
 
-```js - get "user" base on "signinSilent"
+```js - "signin" action
 // ----------> Params:
 createArguments(state) { // create parameter for signin methods of 'oidc-client'
     return { 
@@ -523,11 +542,14 @@ async signIn(state) {
           console.log("Popup authentication error: ", popUpError);
         }
 
-        // PopUps might be blocked by the user, fallback to redirect
+        // PopUps might be blocked by the user, fallback to redirect 
         try 
         {
+          // thằng này sẽ redirect trang của ta đến https://localhost:44486/Identity/Account/Login?ReturnUrl=..."
+          // "ReturnUrl" sẽ là /connect/authorize/callback?client_id=IdentitySPA&redirect_uri=...&response_type=code&scope=...&code_challenge=...&code_challenge_method=...&response_mode=query
+          // "redirect_uri" sẽ là "https://localhost:44486//authentication/login-callback"
           await this.userManager.signinRedirect(this.createArguments(state));
-          return this.redirect();
+          return this.redirect(); // thực ra hiện tại hàm này không làm gì cả
         } 
         catch (redirectError) 
         {
@@ -569,9 +591,140 @@ navigateToReturnUrl(returnUrl) {
 }
 ```
 
+### Login Callback
+* -> để redirect ngược từ trang của IdentityServer về trang của client (**`/authentication/login-callback`**) sau khi Login 
+
+```js
+// ----------> Main Execute:
+const url = window.location.href;
+const result = await authService.completeSignIn(url);
+
+// ----------> Main Function
+async completeSignIn(url) {
+    try {
+        await this.ensureUserManagerInitialized();
+        const user = await this.userManager.signinCallback(url);
+        this.updateState(user);
+        return this.success(user && user.state);
+    } catch (error) {
+        console.log('There was an error signing in: ', error);
+        return this.error('There was an error signing in.');
+    }
+}
+
+// ----------> Business:
+switch (result.status) {
+    case AuthenticationResultStatus.Redirect:
+        // There should not be any redirects as the only time completeSignIn finishes
+        // is when we are doing a redirect sign in flow.
+        throw new Error('Should not redirect.');
+    case AuthenticationResultStatus.Success:
+        await this.navigateToReturnUrl(this.getReturnUrl(result.state));
+        break;
+    case AuthenticationResultStatus.Fail:
+        this.setState({ message: result.message });
+        break;
+    default:
+        throw new Error(`Invalid authentication result status '${result.status}'.`);
+}
+```
+
+### Register
+* -> redirect to **IdentityServer UI page**
+
+```js
+const apiAuthorizationPath = `Identity/Account/Register?returnUrl=${encodeURI('/authentication/login')}`
+const redirectUrl = `${window.location.origin}/${apiAuthorizationPath}`;
+// It's important that we do a replace here so that when the user hits the back arrow 
+// on the browser they get sent back to where it was on the app instead of to 
+// an endpoint on this component
+window.location.replace(redirectUrl);
+```
+
+### User Profile
+* -> redirect to **IdentityServer UI page**
+
+```js
+const apiAuthorizationPath = 'Identity/Account/Manage'
+const redirectUrl = `${window.location.origin}/${apiAuthorizationPath}`;
+// It's important that we do a replace here so that when the user hits the back arrow 
+// on the browser they get sent back to where it was on the app instead of to 
+// an endpoint on this component
+window.location.replace(redirectUrl);
+```
+
 ### Sign Out ('Oidc-client' API support)
 * -> event **`userManager.events.addUserSignedOut`** sẽ cho phép ta làm hành động gì đó khi **a user `signs out` from the OP (OpenID Provider - Authorization Server)**
 * -> method **`userManager.removeUser`** cho phép **remove from any storage the currently `authenticated user`**
+
+```js - "signout" action
+// ----------> Main Execute:
+const isauthenticated = await authService.isAuthenticated();
+if (isauthenticated) {
+    const result = await authService.signOut({ returnUrl: this.getReturnUrl() });
+}
+
+// ----------> Main Function:
+// ----------> Target: update Authen state by call "updateState" method
+// We try to sign out the user in two different ways:
+  // 1) We try to do a sign-out using a PopUp Window. This might fail if there is a
+  //    Pop-Up blocker or the user has disabled PopUps.
+  // 2) If the method above fails, we redirect the browser to the IdP to perform a traditional
+  //    post logout redirect flow.
+async signOut(state) {
+    await this.ensureUserManagerInitialized();
+    try {
+        if (this._popUpDisabled) {
+            throw new Error('Popup disabled. Change \'AuthorizeService.js:AuthorizeService._popupDisabled\' to false to enable it.')
+        }
+
+        await this.userManager.signoutPopup(this.createArguments());
+        this.updateState(undefined);
+        return this.success(state);
+    } 
+    catch (popupSignOutError) {
+        console.log("Popup signout error: ", popupSignOutError);
+        try {
+            await this.userManager.signoutRedirect(this.createArguments(state));
+            return this.redirect(); // thực ra hiện tại hàm này không làm gì cả
+        } 
+        catch (redirectSignOutError) {
+            console.log("Redirect signout error: ", redirectSignOutError);
+            return this.error(redirectSignOutError);
+        }
+    }
+}
+
+// ----------> Return (result):
+success(state) { // for "Popup SignOut"
+    return { status: AuthenticationResultStatus.Success, state };
+}
+error(message) { // for "Redirect SignOut"
+    return { status: AuthenticationResultStatus.Fail, message };
+}
+redirect() { // for "Redirect SignOut"
+    return { status: AuthenticationResultStatus.Redirect };
+}
+
+// ----------> Business:
+switch (result.status) {
+    case AuthenticationResultStatus.Redirect:
+        break;
+    case AuthenticationResultStatus.Success:
+        await this.navigateToReturnUrl(returnUrl);
+        break;
+    case AuthenticationResultStatus.Fail:
+        this.setState({ message: result.message });
+        break;
+    default:
+        throw new Error("Invalid authentication result status.");
+    }
+navigateToReturnUrl(returnUrl) {
+    // It's important that we do a replace here so that we remove the callback uri with the
+    // fragment containing the tokens from the browser history.
+    window.location.replace(returnUrl);
+}
+```
 
 =====================================================================
 # "Deploy to production" requirements

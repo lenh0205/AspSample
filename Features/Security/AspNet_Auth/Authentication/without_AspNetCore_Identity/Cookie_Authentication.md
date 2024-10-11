@@ -1,9 +1,9 @@
 ====================================================================
 # Use cookie authentication without ASP.NET Core Identity
 * -> **ASP.NET Core Identity** is a **`complete, full-featured authentication provider`** for creating and maintaining logins
-* -> a **`cookie-based authentication provider`** without **ASP.NET Core Identity** can be used
+* -> however, a **`cookie-based authentication provider`** without **ASP.NET Core Identity** can be used
 
-# Example:
+# Sample App:
 ```r
 // the user account for the hypothetical user, Maria Rodriguez, is hardcoded into the app
 // use the Email address "maria.rodriguez@contoso.com" and "any password" to sign in the user
