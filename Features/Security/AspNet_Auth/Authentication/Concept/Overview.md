@@ -25,7 +25,7 @@
 ## Authentication Scheme
 * -> the **`registered authentication handlers`** and **`their configuration options`** are called **schemes**
 * -> so the **authentication scheme** can **`select which authentication handler`** is responsible for **generating the correct set of claims**
-* -> "Schemes" are useful as **`a mechanism for referring`** to the **authentication, challenge, and forbid behaviors** of **`the associated handler`**
+* => "Schemes" are useful as **`a mechanism for referring`** to the **authentication, challenge, and forbid behaviors** of **`the associated handler`**
 
 ```r - Example: 
 // 1 "authorization policy" can use "scheme names" to "specify which authentication scheme (or schemes)"  should be "used to authenticate the user"
@@ -42,5 +42,5 @@
 * _i **`multi-tenant`** refers to a single instance of an application serves multiple customers (tenants)_
 * _i Ex: có nhiều company đang sử dụng application của ta, thì ta cần đảm bảo data of Company A should not be accessible to Company B_
 
-* -> while it's possible for customers to **`write one using the built-in features`**, it's recommend customers consider **Orchard Core**, **ABP Framework**, or **Finbuckle.MultiTenant** for multi-tenant authentication
+* -> while it's possible for customers to **`write one using the built-in features`**, it's recommend customers consider **Orchard Core**, **ABP Framework**, or **Finbuckle.MultiTenant** for "multi-tenant authentication"
 

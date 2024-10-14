@@ -1,3 +1,10 @@
+> mà ClaimPriciple là cái quần què gì ?
+
+====================================================================
+# Summary
+* -> nói chung là ta sẽ cần **.AddCookie** để thêm cookie service
+* -> ta sẽ login bằng **`HttpContext.SignInAsync()`** với tham số là **scheme** ta chọn và **ClaimPriciple**
+
 ====================================================================
 # Use cookie authentication without ASP.NET Core Identity
 * -> **ASP.NET Core Identity** is a **`complete, full-featured authentication provider`** for creating and maintaining logins
@@ -52,8 +59,9 @@ app.Run();
 ## Default Authentication scheme
 * -> **AuthenticationScheme passed to AddAuthentication** sets the **`default authentication scheme`** for the app
 * -> _AuthenticationScheme is useful_ when there are **`multiple instances of cookie authentication`** and the app needs to authorize with a specific scheme
-* -> setting the **AuthenticationScheme** to **CookieAuthenticationDefaults.AuthenticationScheme** provides a value of **Cookies** (_a normal string_) for the scheme
-* -> however, any string value can be **`used that distinguishes the scheme`**
+
+* -> setting the **`AuthenticationScheme`** to **CookieAuthenticationDefaults.AuthenticationScheme** provides **a value of Cookies** (_a normal string_) for the scheme
+* -> however, **`any string`** value can be used that **distinguishes the scheme**
 
 * -> the **app's authentication scheme** is different from the **app's cookie authentication scheme**
 * -> when **`a cookie authentication scheme isn't provided to AddCookie`**, it uses **CookieAuthenticationDefaults.AuthenticationScheme**
@@ -68,19 +76,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
         options.SlidingExpiration = true;
         options.AccessDeniedPath = "/Forbidden/";
-    });s
+    });
 ```
-
 
 ====================================================================
 # Cookie Policy Middleware
 * -> the **Cookie Policy Middleware UseCookiePolicy** **`enables "cookie policy" capabilities`**
 
-* _use **`CookiePolicyOptions`** provided to the Cookie Policy Middleware to
+* _use **`CookiePolicyOptions`** provided to the Cookie Policy Middleware to_
 * -> **`control global characteristics of cookie processing`** 
 * -> and **`hook into cookie processing handlers when cookies are appended or deleted`**
 
+## MinimumSameSitePolicy
+* -> the **MinimumSameSitePolicy** can **`affect the setting of 'Cookie.SameSite' in 'CookieAuthenticationOptions'`**
 * -> the default **MinimumSameSitePolicy** value is **`SameSiteMode.Lax`** to **`permit OAuth2 authentication`**
+
 * -> set the **MinimumSameSitePolicy = SameSiteMode.Strict** to strictly enforce a **`same-site policy`**
 * -> although **`this setting breaks OAuth2 and other cross-origin authentication schemes`**,
 * -> it **`elevates the level of cookie security`** for other types of apps that **don't rely on cross-origin request processing**
@@ -94,8 +104,6 @@ var cookiePolicyOptions = new CookiePolicyOptions
 app.UseCookiePolicy(cookiePolicyOptions);
 ```
 
-
-* -> the **MinimumSameSitePolicy** can **`affect the setting of 'Cookie.SameSite' in 'CookieAuthenticationOptions'`**
 ```cs
 // tức là trong trường hợp cả "MinimumSameSitePolicy" và "Cookie.SameSite" đều setting cho SameSiteMode thì kết quả cuối cũng sẽ là
 +-----------------------+-----------------------+-------------------------------------+
@@ -117,14 +125,15 @@ app.UseCookiePolicy(cookiePolicyOptions);
 
 ====================================================================
 # Create an authentication cookie
-* -> **`to create a cookie holding user information`**, construct a **`ClaimsPrincipal`**; the **user information** is **`serialized and stored in the cookie`**
-* -> create a **`ClaimsIdentity`** with any required **`Claims`** and call **`SignInAsync`** to **sign in the user**
+* -> construct a **`ClaimsPrincipal`** **to `create a cookie` holding user information**; the **user information** is **`serialized and stored in the cookie`**
+* -> create a **`ClaimsIdentity`** with any **`required Claims`** and call **`SignInAsync`** to **sign in the user**
 
 * -> **`ASP.NET Core's Data Protection`** system is used for **encryption**
 * -> for **an app hosted on multiple machines**, **load balancing across apps**, or **using a web farm**, configure data protection to **`use the same key ring and app identifier`**
 
 * -> **SignInAsync** **`creates an encrypted cookie`** and **`adds it to the current response`** (_if AuthenticationScheme isn't specified, the default scheme is used_)
 * -> **RedirectUri** is only **`used on a few specific paths by default`**, for example, the login path and logout paths
+
 ```cs - Login.cshtml.cs
 public async Task<IActionResult> OnPostAsync(string returnUrl = null)
 {
@@ -216,7 +225,7 @@ public async Task OnGetAsync(string returnUrl = null)
 }
 ```
 
-* -> if **CookieAuthenticationDefaults.AuthenticationScheme** or **Cookies** isn't used as the "scheme", supply the scheme used when **`configuring the authentication provider`**s
+* -> if **CookieAuthenticationDefaults.AuthenticationScheme** (or "Cookies") isn't used as the "scheme", **`supply the scheme used when configuring the authentication provider`**
 * -> otherwise, the **`default scheme is used`**
 * _For example: if "ContosoCookie" is used as the scheme, supply the scheme used when configuring the authentication provider_
 

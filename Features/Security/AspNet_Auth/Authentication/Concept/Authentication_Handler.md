@@ -14,7 +14,7 @@
 * -> have methods for challenge and forbid actions for when users attempt to access resources: **`forbid`** - they're **authenticated but unauthorized to access**, **`challenge`** - when they're **unauthenticated**
 
 ## Authenticate
-* -> **`an authentication scheme's authenticate action`** is responsible for construct **`user's identity`** based on **request context**
+* -> **an authentication scheme's `authenticate action`** is responsible for **`construct user's identity`** based on **request context**
 * -> it returns an **`AuthenticateResult`** indicating whether **authentication was successful**, if so, the **`user's identity in an authentication ticket (AuthenticationTicket objects)`**_
 
 ```r Authenticate examples include:_
