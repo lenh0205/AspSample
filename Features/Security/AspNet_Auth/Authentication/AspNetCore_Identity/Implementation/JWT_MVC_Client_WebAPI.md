@@ -1,37 +1,17 @@
+> project này là MVC nhưng tách biệt thành 2 phần là Client và Web API
+
+===================================================================
 # Initial project
-* -> chọn Template ASP.NET Core Web App (Model-View-Controller) 
-* -> với "Authentication type", thì thường ta sẽ chọn "Individual Accounts" (_Identity library will be added to this project_)
-* nhưng hiện tại ta sẽ chọn "None" và sẽ import library and UI later
+* -> tạo project với **`ASP.NET Core Web App (Model-View-Controller)`** template không khởi tạo sẵn với **ASP.NET Core Identity**
+* -> sau đó ta sẽ bắt đầu **Scaffold Identity** (xem `~\Features\Security\AspNet_Auth\Authentication\AspNetCore_Identity\Custom\Scaffold_Identity.md`)
 
-# Add Identity Library to project
-* right-click vào project -> Add -> New Scaffolded Item -> chọn "Identity" -> Add
-* nó sẽ hiện cho ta 1 window bao gồm 1 list những Razor pages của ASP.NET Core Identity mà ta muốn customize;
-* ta sẽ tạm chọn "Login" và "Register"; những pages còn lại sẽ được load trực tiếp từ Identity UI library với default behaviors and features
-* tiếp theo trong window đó, ta sẽ dùng "Select a Layout Page" để chọn Layout cho những views mà ta đã chọn: chọn Views/Shared/_Layout.cshtml -> OK
-* tiếp theo chọn DbContext -> click vào "+" -> cho nó cái tên (_VD: AuthDbContext_) -> Add
-* tiếp chọn a "model" class cho user -> click vào "+" -> cho nó cái tên (_VD: ApplicationUser_) -> Add
-
-* => h nó sẽ installing required packages bao gồm:
-- Microsoft.AspNetCore.Identity.EntityFrameworkCore
-- Microsoft.AspNetCore.Identity.UI
-- Microsoft.EntityFrameworkCore.SqlServer
-- Microsoft.VisualStudio.Web.CodeGeneration.Design
-
-* => Microsoft.AspNetCore.Identity.UI is the main package added to UI; contains the Razor pages nêu trên
-
-* => có thêm thư mục Areas/Identity/Pages với những Razor views for respective views "Login.cshtml" và "Register.cshtml"
-* => có thêm thư mục Areas/Identity/Data với 2 model "ApplicationUser.cs" và "AuthDbContext.cs"
-* => file "program.cs" sẽ có thay đổi đôi chút
-
-# Configure Program.cs
-* -> add support for Razor pages (_in order to view Razor pages "/Login" and "/Register"_)
+* -> configure **Program.cs**
 ```cs
+// add support for Razor pages of Identity (like "/Login" and "/Register")
 // by default, newly created MVC project only have "builder.Services.AddControllersWithViews()" for supporting the conventional Controller with seperate Views
 builder.Services.AddRazorPages()
-```
 
-* to add routes for Identity UI Razor pages into application:
-```cs
+// add routes for Identity UI Razor pages into application:
 // by default, we have the routes for the default conventional MVC Controller:
 app.MapControllerRoute(
     name: "default",
@@ -42,10 +22,9 @@ app.MapControllerRoute(
 app.MapRazorPages();
 ```
 
-* -> _h ta thử start project, rồi truy cập ".../identity/Account/Login" để thấy "Login" page; truy cập ".../identity/Account/Register" để thấy "Register" page
-
+===================================================================
 # Customize UI
-```cs - ta sẽ bỏ cả "Login" form và "Register" form inside a bootstrap
+```cs - Tạo "_AuthLayout.cshtml" để bỏ cả "Login" form và "Register" form inside a bootstrap
 // -> inside the "Areas/Identity/Pages", create a layout page specific to both the pages "Login" and "Register" containing a Tab control
 // -> right-click on folder, Add -> New Item -> chọn "Razor Layout" -> nhập "_AuthLayout.cshtml"
 
@@ -55,13 +34,14 @@ app.MapRazorPages();
     Layout="/Views/Shared/_Layout.cshtml";
 }
 
-// ->  set "_AuthLayout.cshtml" as layout for "/Login" and "/Register"
-
+// ->  set "_AuthLayout.cshtml" as layout for "/Login"
 // Register.cshtml
 @{
     ViewData["Title"] = "Register";
     Layout = "~/Areas/Identity/Pages/_AuthLayout.cshtml";
 }
+
+// ->  set "_AuthLayout.cshtml" as layout for "/Register"
 // Login.cshtml
 @{
     ViewData["Title"] = "Log in";
@@ -69,7 +49,7 @@ app.MapRazorPages();
 }
 ```
 
-
+===================================================================
 # Lấy Resorces
 ```js - Nhấn button để gọi 1 AJAX request, kết quả trả về được render ra màn hình
 <div class="mt-4">

@@ -1,17 +1,18 @@
-=======================================================================
-> Ví dụ này đòi hỏi ta phải thao tác tay với Postman để copy paste token
+> vì project này là WebAPI và chưa có client - nên ví dụ này đòi hỏi ta phải thao tác tay với Postman để copy paste token
 > để có thể `Authenticate` và `Authorize`, thì JWT đòi hỏi phải chứa **user info**, **role**, **expire time**
+> Lưu ý: "refresh token" cần được lưu trong database còn "access token" thì không 
 
+=======================================================================
 # Token-based Authentication
+* -> **Login action** sẽ kiểm tra `usename-password` gửi tới với cái đã lưu trong `Database`; nếu oke thì **`generate 1 Token cho user`** 
+* -> user sau này khi gửi request sẽ đính kèm `token` vào **Authorization header**_
+* -> server sẽ có 1 **middleware** sử dụng **`secret key`** để kiểm tra tính hợp lệ của token này
 
-## Content
-* _`/Login` action kiểm `usename-password` gửi tới với cái đã lưu trong `Database`_
-* _nếu oke thì generate 1 cái `Token` cho user; user sau này khi gửi request sẽ đính kèm `token` vào **Authorization header**_
-* _server sẽ có 1 **`middleware`** sử dụng **secret key** để kiểm tra tính hợp lệ của token này_
 * _nếu token is **invalid** hoặc **expired** thì nó sẽ trả về **`403: UnAuthorized`**_
 * _khi ta `decode` token này ra ta sẽ thấy 3 phần `Header.Payload.Signature`_
 
-## Thêm 'secret key' vào config appsetting
+=======================================================================
+# Lưu 'secret key' (sử dụng config appsetting và tạo class để truy xuất nó)
 
 ```json - appsettings.json
 {
@@ -38,7 +39,8 @@ public class AppSettings
 services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 ```
 
-## Đăng ký Auth
+=======================================================================
+# Cấu hình Authentication với JWT 
 * -> install **System.IdentityModel.Tokens.Jwt**
 * -> install **Microsoft.AspNetCore.Authentication.JwtBearer** 
 
@@ -50,7 +52,7 @@ var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
 builder.Services
     .AddAuthentication(option => { // sử dụng lại Authen nào ? (cookie-base, jwt bearer, ...)
         // import "JwtBearerDefaults" from "Microsoft.AspNetCore.Authentication.JwtBearer"
-        options.DefaultAuthentcateSheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateSheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultScheme = JwtBearerDefaults.AuthentcationScheme;
     })
@@ -79,8 +81,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 ```
 
-
-## Login Action
+=======================================================================
+# Tạo "User" table
 
 ```cs - ~/Data/Users.cs - table "Users" in database
 [Table("NguoiDung")]
@@ -117,20 +119,11 @@ public class MyDbContext : DbContext
 }
 ```
 
-```cs - ~/Models/LoginModel.cs
-public class LoginModel
-{
-    [Required]
-    [MaxLength(50)]
-    public string UserName { get; set; }
+=======================================================================
+# Login Action - generate token for user
+* -> create a controller to handle Auth action
 
-    [Required]
-    [MaxLength(250)]
-    public string Password { get; set; }
-}
-```
-
-```cs - controller for handle Auth action
+```cs - 
 [ApiController]
 [Route("[controller]")]
 public class AuthController : ControllerBase
@@ -171,57 +164,80 @@ public class AuthController : ControllerBase
 
         return new JsonResult(accessToken);
     }
-
-    private string GenerateJSONWebToken(Claim[] claims)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler(); // import from "System.IdentityModel.Tokens.Jwt"
-
-        // import "SymmetricSecurityKey" from "System.IdentityModel.Tokens"
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret)); 
-        // hoặc: var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
-
-        // import "SigningCredentials" from "System.IdentityModel.Tokens"
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256); // signing
-
-        // import "SecurityTokenDescriptor" from "Microsoft.IdentityMode.Tokens"
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-           Subject = new ClaimIdentity(claims), // from "System.Security.Claims.ClaimsIdentity"
-           Expires = DateTime.UtcNow.AddMinutes(20),
-           SigningCredentials = new SigningCredentials(
-               new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        // hoặc
-        // var token = new JwtSecurityToken  // import from "System.IdentityModel.Tokens.Jwt"
-        // {
-        //     issuer: "https://abc",
-        //     audience: "https://abc",
-        //     expires: DateTime.UtcNow.AddMinutes(20),
-        //     SigningCredentials: credentials,
-        //     claims: claims
-        // };
-
-        return tokenHandler.WriteToken(token);
-    }
-
-    private List<Users> CreateDummyUsers() // Database
-    {
-        List<Users> userList = new List<Users> 
-        {
-            new Users { UserName = "a", Password = "a", Role = "Admin" },
-            new Users { UserName = "b", Password = "b", Role = "Manager" },
-            new Users { UserName = "c", Password = "c", Role = "Developer" }
-        }
-        return userList;
-    }
 }
 ```
 
+```cs - helper method
+private string GenerateJSONWebToken(Claim[] claims)
+{
+    // import "SymmetricSecurityKey" from "System.IdentityModel.Tokens"
+    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret)); 
+    // hoặc: var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
+
+    // import "SigningCredentials" from "System.IdentityModel.Tokens"
+    var signingCredentials =  new SigningCredentials(
+            new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);// signing
+
+    // import "SecurityTokenDescriptor" from "Microsoft.IdentityMode.Tokens"
+    var tokenDescriptor = new SecurityTokenDescriptor
+    {
+        Subject = new ClaimIdentity(claims), // from "System.Security.Claims.ClaimsIdentity"
+        Expires = DateTime.UtcNow.AddMinutes(20),
+        SigningCredentials = signingCredentials
+    };
+
+    var tokenHandler = new JwtSecurityTokenHandler(); // import from "System.IdentityModel.Tokens.Jwt"
+    var token = tokenHandler.CreateToken(tokenDescriptor);
+
+    // hoặc
+    // var token = new JwtSecurityToken  // import from "System.IdentityModel.Tokens.Jwt"
+    // {
+    //     issuer: "https://abc",
+    //     audience: "https://abc",
+    //     expires: DateTime.UtcNow.AddMinutes(20),
+    //     SigningCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256),
+    //     claims: claims
+    // };
+
+    return tokenHandler.WriteToken(token);
+}
+
+private List<Users> CreateDummyUsers() // Database
+{
+    List<Users> userList = new List<Users> 
+    {
+        new Users { UserName = "a", Password = "a", Role = "Admin" },
+        new Users { UserName = "b", Password = "b", Role = "Manager" },
+        new Users { UserName = "c", Password = "c", Role = "Developer" }
+    }
+    return userList;
+}
+```
+
+```cs - ~/Models/LoginModel.cs
+public class LoginModel
+{
+    [Required]
+    [MaxLength(50)]
+    public string UserName { get; set; }
+
+    [Required]
+    [MaxLength(250)]
+    public string Password { get; set; }
+}
+```
+
+=======================================================================
 ## Usage
 
-```cs
+```js - client send request
+// gọi "/Login" action để lấy được token rồi copy bỏ vô Postman để gửi request:
+axios.get('https://url', {}, { 
+    Authorization: `Bearer ${token}` 
+});
+```
+
+```cs - apply "authentication" to endpoint
 [Authorize] // make every actions in HomeController require "Authentication"
 [ApiController]
 [Route("[controller]")]
@@ -242,17 +258,22 @@ public class LoaiController : ControllerBase
 }
 ```
 
-```js - send request
-// gọi "/Login" action để lấy được token rồi copy bỏ vô Postman để gửi request:
-axios.get('https://url', {}, { 
-    Authorization: `Bearer ${token}` 
-});
+```cs - apply authorize
+[Authorize(Roles = "Admin")] // require "Authentication"; and "Authorization" with Role = "Admin"
+[ApiController]
+[Route("[controller]")]
+public class HomeController : ControllerBase
+{
+}
+// -> vậy nên giờ để truy cập được action trong "AdminController" đòi hỏi ta phải login bằng "username" là "a" và "password" là "a" (vì thằng "a" này đang có Role là "Admin")
+// -> nếu không nó sẽ trả về 403: Forbidden
 ```
 
 =======================================================================
+> đây là phần mở rộng để tránh việc ta phải copy paste `token` để test
 > ta sẽ sử dụng 'cookie' và 'middleware' để tự động set và check `token`
 
-# combine 'Cookie' 
+#  add 'token' to'Cookie' when 'login' success  
 
 ```cs - modify "Login" action
 [ApiController]
@@ -280,7 +301,7 @@ public class AuthController : ControllerBase
 }
 ```
 
-# Create a custom "Middleware" for automatically check "token" in cookie
+# Create a custom "Middleware" for processing "token" in cookie before authentication 
 * -> _vì ta đã sử dụng **HttpOnly**, nên các client app không thể sử dụng `Javascript` để đọc giá trị từ `cookie`, vậy nên cũng không thể tạo ra `Authorization header - Bearer Token` được_
 * -> _mà server thì đang kiểm tra token thông qua **Authorization Bearer**_
 * -> _vậy nên tại server ,trước khi kiểm tra token nó sẽ can thiệp vào `HttpRequest` object trước đó 
@@ -314,27 +335,26 @@ app.Routing();
 app.UseMiddleware<JWTInHeaderMiddleware>();
 ```
 
-```cs - check quyền "Admin"
-[Authorize(Roles = "Admin")] // require "Authentication"; and "Authorization" with Role = "Admin"
-[ApiController]
-[Route("[controller]")]
-public class HomeController : ControllerBase
-{
-}
-// -> vậy nên giờ để truy cập được action trong "AdminController" đòi hỏi ta phải login bằng "username" là "a" và "password" là "a" (vì thằng "a" này đang có Role là "Admin")
-// -> nếu không nó sẽ trả về 403: Forbidden
-```
-
 =======================================================================
-
-# 'refresh token' in Authentication
+# 'Refresh token' in Authentication
 * -> client gửi **access token** cho server để trả về **protected resource**; nhưng token này có thời hạn nhất định khi đó thì **`đòi hỏi user login lại`**
 * -> để tránh điều này, thì khi user (client) **`login success`** thì **Authorization server** sẽ trả về 1 bộ **access token & refresh token**
 * -> khi cần **`tạo mới 1 bộ "access token - refresh token"`** thì client sẽ gửi **refresh token** này cho **Authorization Server**
 
 * trong App client của ta (React, Vue, ...) ta sẽ cần kiểm tra thời gian expire của token để gửi lên
 
-# Tạo token Model
+## Time to use "refresh token" in SPA + WebAPI
+* -> **`SPA`** should be the one **handles the token refresh process**
+* -> because **SPA** is responsible for **`storing the tokens`**; knows when it **`received the tokens`** and **`can track their expiration`**
+* -> the **Web API** should remain **`stateless`** and only validate the tokens it receives
+
+* -> time to use a refresh token is **`shortly before the access token expires`** - this approach, often called **proactive token refresh** to helps ensure uninterrupted user experience
+* -> **SPA** will **`automatically initiate the refresh process`** when **the access token is close to expiring**
+
+* -> for best practice, we should also have **Reactive (on-demand) Refresh token mechanism** 
+* -> if **an API call fails due to an expired token** (_usually a 401 Unauthorized response_), the SPA should will **`attempt a token refresh`**, and then **`retry the original request`**
+
+## Tạo Token Model
 ```cs - ~/Models/TokenModel.cs
 public class TokenModel
 {
@@ -343,7 +363,7 @@ public class TokenModel
 }
 ```
 
-# Tạo Entity
+## Tạo 'RefreshToken' Entity và lưu nó vào database
 ```cs - ~/Data/RefreshToken.cs
 [Table("RefreshToken")]
 public class RefreshToken
@@ -369,8 +389,11 @@ public class MyDbContext : DbContext
 }
 ```
 
-# action to create new "access token" and "refresh token" 
-```cs
+## update AuthController to integrate "refresh token"
+* -> giờ **Login action** sẽ trả về 1 cặp **`Access Token - Refresh Token`**
+* -> ta sẽ thêm 1 **endpoint** để **`renew và trả về cặp token`** - thằng này cần truyền vào cặp token cũ
+
+```cs - main endpoint
 [ApiController]
 [Route("[controller]")]
 public class AuthController : ControllerBase
@@ -385,6 +408,7 @@ public class AuthController : ControllerBase
         return new JsonResult(accessToken);
     }
 
+    // method này làm nhiệm vụ validate token và generate bộ toke mới
     [HttpPost("RenewToken")]
     public async Task<IActionResult> RenewToken(TokenModel model)
     {
@@ -431,7 +455,7 @@ public class AuthController : ControllerBase
                 x => x.Token == model.RefreshToken);
             if (storedRefreshToken) return new JsonResult("Refresh token doesn't exist");
 
-            // check 5: check if "refresh token is used / revoked ?
+            // check 5: check if "refresh token" is used / revoked ?
             if (storedRefreshToken.IsUsed) return new JsonResult("Refresh token has been used");
             if (storedRefreshToken.IsRevoked) return new JsonResult("Refresh token has been revoked");
 
@@ -458,7 +482,10 @@ public class AuthController : ControllerBase
             return BadRequest("something went wrong")
         }
     }
+}
+```
 
+```cs - helper method
     private async Task<TokenModel> GenerateJSONWebToken(Users user)
     {
         var claims = new Claim[]
@@ -517,247 +544,5 @@ public class AuthController : ControllerBase
         dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
         return dateTimeInterval;
     }
-}
 ```
 
-=======================================================================
-> ASP.NET Core Identity hỗ trợ 1 số UI; cung cấp các **`identity model`** cho phép ta customize 
-> https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-8.0
-> ta sẽ sử dụng Role-based authorization; và Identity đã hỗ trợ cho ta sẵn 1 số Role
-
-# ASP.NET Core Identity
-* -> install **Microsoft.AspNetCore.Identity**
-
-## Tạo 'user' model
-
-```cs - ~/Data/ApplicationUser.cs
-using Microsoft.AspNetCore.Identity;
-
-public class ApplicationUser : IdentityUser
-{
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-}
-```
-
-## Modify 'DbContext'
-* -> install **Microsoft.AspNetCore.Identity.EntityFrameworkCore**
-
-```cs
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-
-public class MyDbContext : IdentityDbContext<ApplicationUser> // chỉ định lớp quản lý user là 'ApplicationUser'
-{
-    public DbSet<Book> Books { get; set; }
-}
-```
-
-## Cấu hình service sử dụng Identity
-* -> install **Microsoft.AspNetCore.Authentication.JwtBearer**
-
-```cs - program.cs
-builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>() // add "Identity" service
-    .AddEntityFrameworkStores<MyDbContext>() // chứa 1 số bảng của "Identity"
-    .AddDefaultTokenProvider();
-
-builder.Services.AddDbContext<MyDbContext>(options => {
-    options.UseSqlServer(builder.Configuration.GetConnectString("myDb"))});
-
-```
-
-## Migration
-* -> **Add-Migration AddIdentity** - ta sẽ thấy nó tạo 1 list bảng **`AspNetRoles`**, **`AspNetUsers`**, **`AspNetRoleClaims`**, **`AspNetUserClaims`**, **`AspNetUserLogins`**, **`AspNetUserRoles`**, **`AspNetUserTokens`**
-* -> **update-database** - vào SSMS để xem diagram biểu thị mối quan hệ của những bảng này
-
-## Tạo Model cho "login" và "signup"
-
-```cs - ~/Model/
-public class SignInModel 
-{
-    [Required, EmailAddress]
-    public string Email { get; set; } = null!;
-
-    [Required]
-    public string Password { get; set; } = null!;
-}
-
-public class SignUpModel
-{
-    [Required]
-    public string FirstName { get; set; } = null!;
-
-    [Required]
-    public string LastName { get; set; } = null!;
-
-    [Required, EmailAddress]
-    public string Email { get; set; } = null!;
-
-    [Required]
-    public string Password { get; set; } = null!;
-
-    [Required]
-    public string ConfirmPassword { get; set; } = null!;
-}
-```
-
-## Role
-```cs - ~/Helper/AppRole.cs
-public static class AppRole
-{
-    public const string Admin = "Administrator";
-    public const string Customer = "Customer";
-    public const string Manager = "Manager";
-    public const string Accountant = "Accountant";
-    public const string HR = "Human Resource";
-    public const string Warehouse = "Warehose staff";
-}
-```
-
-## Repositories
-
-```cs - ~/Repositories/IAccountRepository.cs
-public interface IAccountRepository
-{
-    public Task<IdentityResult> SignUpAsync(SignUpModel model);
-    public Task<string> SignInAsync(SignInModel model); // trả về token 
-}
-
-public class AccountRepository : IAccountRepository
-{
-    private readonly UserManager<ApplicationUser> userManager;
-    private readonly SignInManager<ApplciationUser> signInManager;
-    private readonly RoleManager<IdentityRole> roleManager;
-    private readonly IConfiguration configuration;
-
-    // "UserManager", "SignInManager" là service cung cấp bởi Identity
-    public AccountRepository(
-        UserManager<ApplicationUser> userManager, 
-        SignInManager<ApplciationUser> signInManager,
-        RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
-    )
-    {
-        this.userManager = userManager;
-        this.signInManager = signInManager;
-        this.roleManager = roleManager;
-        this.configuration = configuration;
-    }
-
-    public Task<string> SignInAsync(SignInModel model)
-    {
-        // kiểm tra tính hợp lệ của user credential
-        var user = await userManager.FindByEmailAsync(model.Email);
-        var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
-        if (user == null || !passwordValid) return string.Empty;
-        
-        var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Email, model.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        // lấy ra list "role" gắn với user tướng ứng; 
-        // từ đó tạo 1 list "claim" với type là "Role" và giá trị là từng role của user
-        // thêm list claim đó vào list claim hiện có
-        var userRoles = await userManager.GetRolesAsync(user);
-        foreach(var role in userRoles)
-        {
-            authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-        }
-
-        var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
-
-        var token = new JwtSecurityToken(
-            issuer: configuration["JWT:ValidIssuer"],
-            audience: configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddMinutes(20),
-            claims: authClaims,
-            signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
-        );
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public async Task<IdentityResult> SignUpAsync(SignUpModel model)
-    {
-        var user = new ApplicationUser
-        {
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Email = model.Email,
-            UserName = model.Email
-        };
-
-        // 'userManager' tự động lưu vào "AspNetUsers" table 
-        // nó cũng sẽ hash password cho ta luôn
-        var result = await userManager.CreateAsync(user, model.Password);
-
-        if (result.Succeeded)
-        {
-            // add role default cho user là "Customer"
-            // chỉ thêm duy nhất trong lần đầu có 1 request chạy vô đây
-            // kiểm tra role "Customer" đã có (trong DB của Identity) chưa
-            if (!await roleManager.RoleExistAsync(AppRole.Customer))
-            {
-                // chưa có thì tạo rồi lưu vào bảng 'AspNetRoles' của 'Identity'
-                await roleManager.CreateAsync(new IdentityRole(AppRole.Customer));
-            }
-
-            // thêm dữ liệu vào bảng 'AspNetUserRoles'
-            await userManager.AddToRoleAsync(user, AppRole.Customer)
-        }
-
-        return result;
-    }
-}
-```
-
-```cs
-// program.cs
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
-// Controllers
-[Route("api/[controller]")]
-[ApiController]
-public class AccountsController : ControllerBase
-{
-    private readonly IAccountRepository accountRepo;
-
-    public AccountsController(IAccountRepository repo)
-    {
-        accountRepo = repo;
-    }
-
-    [HttpPost("SignUp")]
-    public async Task<IActionResult> SignUp (SignUpModel signUpModel)
-    {
-        var result = await accountRepo.SignUpAsync(SignUpModel);
-        if (result.Succeeded) return Ok(result.Succeeded);
-        return StatusCode(500);
-    }
-
-    [HttpPost("SignIn")]
-    public async Task<IActionResult> SignIn(SignInModel signInModel)
-    {
-        var result = await accountRepo.SignInAsync(signInModel);
-        if (string.IsNullOrEmpty(result)) return Unauthorized();
-        return Ok(result);
-    }
-}
-```
-
-## Usage
-
-```cs
-[HttpGet]
-[Authorize] // require "authen" only
-public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
-{
-}
-
-[HttpGet("{id}")]
-[Authorize(Roles = AppRole.Customer)] // require "author" by role
-public async Task<ActionResult<Book>> GetBook(int id)
-{
-}
-```

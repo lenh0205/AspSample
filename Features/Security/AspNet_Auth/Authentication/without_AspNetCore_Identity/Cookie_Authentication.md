@@ -124,11 +124,11 @@ app.UseCookiePolicy(cookiePolicyOptions);
 ```
 
 ====================================================================
-# Create an authentication cookie
+# Create an authentication cookie - Login
 * -> construct a **`ClaimsPrincipal`** **to `create a cookie` holding user information**; the **user information** is **`serialized and stored in the cookie`**
 * -> create a **`ClaimsIdentity`** with any **`required Claims`** and call **`SignInAsync`** to **sign in the user**
 
-* -> **`ASP.NET Core's Data Protection`** system is used for **encryption**
+* -> **`ASP.NET Core's Data Protection system`** is used for **encryption**
 * -> for **an app hosted on multiple machines**, **load balancing across apps**, or **using a web farm**, configure data protection to **`use the same key ring and app identifier`**
 
 * -> **SignInAsync** **`creates an encrypted cookie`** and **`adds it to the current response`** (_if AuthenticationScheme isn't specified, the default scheme is used_)
@@ -142,7 +142,7 @@ public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     if (ModelState.IsValid)
     {
         // Use Input.Email and Input.Password to authenticate the user
-        // with your custom authentication logic.
+        // with our custom authentication logic.
         //
         // For demonstration purposes, the sample validates the user
         // on the email address maria.rodriguez@contoso.com with 
@@ -206,7 +206,6 @@ public async Task<IActionResult> OnPostAsync(string returnUrl = null)
 }
 ```
 
-====================================================================
 # Sign out
 * -> to **`sign out the current user`** and **`delete their cookie`**, call **SignOutAsync**:
 ```cs

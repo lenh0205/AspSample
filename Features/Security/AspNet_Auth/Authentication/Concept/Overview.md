@@ -42,5 +42,6 @@
 * _i **`multi-tenant`** refers to a single instance of an application serves multiple customers (tenants)_
 * _i Ex: có nhiều company đang sử dụng application của ta, thì ta cần đảm bảo data of Company A should not be accessible to Company B_
 
-* -> while it's possible for customers to **`write one using the built-in features`**, it's recommend customers consider **Orchard Core**, **ABP Framework**, or **Finbuckle.MultiTenant** for "multi-tenant authentication"
+* -> while it's possible for customers to **`write one using the built-in features`**, 
+* -> it's recommend customers consider **Orchard Core**, **ABP Framework**, or **Finbuckle.MultiTenant** for "multi-tenant authentication"
 

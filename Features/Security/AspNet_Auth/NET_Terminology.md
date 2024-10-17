@@ -1,11 +1,40 @@
-> with the rise of `ASP.NET Core over ASP.NET 4.x`, the built in authentication has undergone a shift from **role-based access control (RBAC)** to **claim-based access control (CBAC)**
-> the most notable change is the **`User` property on `HttpContext`** is now of type **ClaimsPrincipal** instead of **IPrincipal**
+> **`Lockout`** - refers to a security feature that **temporarily disables a user's account** after **a certain number of failed login attempts**
 
-> ClaimIdentity và ClaimPrincipal mặc định được sử dụng trong cơ chế Auth của .NET? đều được sử dụng trong cả Cookie-based và Token-based? còn ở trong ASP.NET Core Identity thì sao ?
+=======================================================================
+# claims-based access control
+* -> with the rise of `ASP.NET Core over ASP.NET 4.x`, the built in authentication has undergone a shift from **role-based access control (RBAC)** to **claim-based access control (CBAC)**
+* -> the most notable change is the **`User` property on `HttpContext`** is now of type **ClaimsPrincipal** instead of **IPrincipal**
 
-https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claimsprincipal?view=net-8.0
-https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claimsprincipal.claims?view=net-8.0
-https://stackoverflow.com/questions/32584074/whats-the-role-of-the-claimsprincipal-why-does-it-have-multiple-identities
+* -> regardless of whether it's **cookie-based** or **token-based** auth, when **`user is authenticated`** the **authentication middleware** will creates a **`ClaimPrincipal`** that represent authenticated user
+* -> the **ClaimPrincipal** and **ClaimIdentity** class are fundamental to the **`claims-based identity model`** used in ASP.NET Core for processing auth
+
+* => provides **`a consistent way`** to **handle `user identity` and `claims` across different `authentication schemes`**
+
+# role-based access control
+* -> before ASP.NET 4.5, ASP.NET primarily used a role-based access control
+* -> there key interface are **`IPrincipal`** and **`IIdentity`**
+
+```cs
+if (User.IsInRole("Admin"))
+{
+    // Perform admin actions
+}
+```
+
+## "ClaimsPrincipal" and "ClaimsIdentity"
+* -> is indeed implemented the existing **IPrincipal** and **IIdentity** interfaces for **`backwards compatibility`**
+
+* -> however, it's more flexible as **claims** can **`represent any type of user information, not just roles`**
+* -> easier to **add custom claims** without **`modifying the underlying security system`**
+* -> is modern **standardization** as Claims-based identity aligns with modern authentication protocols like **`OAuth`** and **`OpenID Connect`**
+
+```cs
+// use the same method of "role-based access control" in "claims-based access control"
+if (User.IsInRole("Admin")) // This actually checks for a role claim
+{
+    // Perform admin actions
+}
+```
 
 =======================================================================
 # Claim
@@ -113,63 +142,7 @@ if (HttpContext.Current.User is ClaimsPrincipal principal)
 }
 ```
 
-```py
-import math
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-
-class HLRItem:
-    def __init__(self, content):
-        self.content = content
-        self.last_reviewed = 0
-        self.total_reviews = 0
-        self.correct_reviews = 0
-
-    def review(self, correct, current_time):
-        delta = current_time - self.last_reviewed
-        self.last_reviewed = current_time
-        self.total_reviews += 1
-        if correct:
-            self.correct_reviews += 1
-        return delta, correct
-
-class HLR:
-    def __init__(self):
-        self.model = LogisticRegression()
-
-    def train(self, data):
-        X = np.array([[math.log(delta), p] for delta, p in data])
-        y = np.array([correct for _, correct in data])
-        self.model.fit(X, y)
-
-    def predict_recall_probability(self, delta, p):
-        return self.model.predict_proba([[math.log(delta), p]])[0][1]
-
-    def calculate_half_life(self, p):
-        return math.exp((-math.log(0.5) - self.model.intercept_[0] - self.model.coef_[0][1] * p) / self.model.coef_[0][0])
-
-def main():
-    hlr = HLR()
-    item = HLRItem("What is the capital of France?")
-
-    # Simulate some review data
-    data = [
-        item.review(True, 1),  # Correct after 1 day
-        item.review(True, 3),  # Correct after 2 more days
-        item.review(False, 7),  # Incorrect after 4 more days
-        item.review(True, 9),  # Correct after 2 more days
-    ]
-
-    hlr.train(data)
-
-    p = item.correct_reviews / item.total_reviews
-    half_life = hlr.calculate_half_life(p)
-    print(f"Estimated half-life for this item: {half_life:.2f} days")
-
-    next_review_time = 14  # Predict recall probability after 14 days
-    prob = hlr.predict_recall_probability(next_review_time - item.last_reviewed, p)
-    print(f"Probability of correct recall after {next_review_time} days: {prob:.2f}")
-
-if __name__ == "__main__":
-    main()
+```cs - access a specific claim in action controller
+var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+var email = User.FindFirst(ClaimTypes.Email)?.Value;
 ```

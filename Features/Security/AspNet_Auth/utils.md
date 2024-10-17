@@ -13,7 +13,7 @@ string uid = user.Id;
 var user = await userManager.FindByIdAsync(uid);
 ```
 
-## Tạo user
+## Tạo user / Identity
 ```cs
 // Tạo user trong database
 var user = new IdentityUser
@@ -21,7 +21,7 @@ var user = new IdentityUser
     UserName = UserName,
     EmailConfirmed = true
 };
-await userManager.CreateAsync(user, testUserPassword);
+IdentityResult result = await userManager.CreateAsync(user, testUserPassword);
 ```
 
 ```cs
@@ -43,7 +43,7 @@ if (result.Succeeded) {
 
 ## get 'ClaimPrincipal user'
 ```cs
-// nếu trong razor pages thì ta có thể truy cập nó global vì nó là thuộc tính của "PageModel"
+// nếu trong razor pages hoặc Controller thì ta có thể truy cập "User" global variable
 ClaimPrinciple user = User;
 
 // nếu trong authorization handler
@@ -103,14 +103,43 @@ var isAuthorized = User.IsInRole(Constants.ContactManagersRole)
                         || User.IsInRole(Constants.ContactAdministratorsRole);
 ```
 
+=====================================================================
+# Tạo "ClaimPrincipal" và attach nó vào cơ chế authentication
+* -> xem `~/Features\Security\AspNet_Auth\Authentication\without_AspNetCore_Identity\Cookie_Authentication.md` để hiểu thêm
+
+```cs - for "cookie-based authentication"
+var user = await CreateIdentityUser(Input.Email, Input.Password);
+var claims = new List<Claim> 
+{
+    new Claim(ClaimTypes.Name, user.Email),
+    new Claim("FullName", user.FullName),
+    new Claim(ClaimTypes.Role, "Administrator"),
+};
+var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+var authProperties = new AuthenticationProperties {};
+
+// default way to sign in a user when using cookie-based authentication 
+// (without full identity system like using "ASP.NET Core Identity")
+// to create and manage authentication cookies -> store it in server session -> send sessionID to the client in a cookie
+await HttpContext.SignInAsync( 
+    CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+```
+
+============================================================
 ## Login / Sign In
+* -> the **_signInManager.SignInAsync** or **_signInManager.PasswordSignInAsync** is indeed call **`HttpContext.SignInAsync`** under the hood (_after performing some additional operations_)
+
 ```cs
-// nếu muốn mark user as logged in  - Ví dụ tự động login ngay sau khi register thành công:
+// this method sign in a user directly - used when we have already authenticated the user 
+// and for "cookie-based authentication" only
+// Ex: after user registration, external authentication providers, two-factor authentication
 ApplicationUser user; // cần có đầy đủ thông tin
 await _signInManager.SignInAsync(user, isPersistent: false);
 
-// nếu có trang "/Login" riêng:
-var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+// used for the traditional username/email and password login scenario
+SignInResult result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 if (result.Succeeded)
 {
     _logger.LogInformation("User logged in.");
