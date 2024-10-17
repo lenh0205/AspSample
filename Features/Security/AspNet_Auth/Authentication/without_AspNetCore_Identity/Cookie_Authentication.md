@@ -1,5 +1,3 @@
-> mà ClaimPriciple là cái quần què gì ?
-
 ====================================================================
 # Summary
 * -> nói chung là ta sẽ cần **.AddCookie** để thêm cookie service
@@ -131,6 +129,14 @@ app.UseCookiePolicy(cookiePolicyOptions);
 * -> **`ASP.NET Core's Data Protection system`** is used for **encryption**
 * -> for **an app hosted on multiple machines**, **load balancing across apps**, or **using a web farm**, configure data protection to **`use the same key ring and app identifier`**
 
+## AuthenticationTicket - cookie-based auth tickets
+* _a data structure that encapsulates the **user's identity** and **additional authentication-related information**_
+* -> allows for **`stateless authentication`** - where the **server doesn't need to store session information**; by containing all necessary information within the ticket
+* -> helps manage **`authenticated user sessions`** (_different from traditional server-side sessions_) by including information like "expiration time"
+
+* _thằng này cũng hơi giống như JWT object trong JWT Authentication - cũng chứa claim và authen data; nhưng về cơ chế sử dụng thì khác nhau_
+
+## Login
 * -> **SignInAsync** **`creates an encrypted cookie`** and **`adds it to the current response`** (_if AuthenticationScheme isn't specified, the default scheme is used_)
 * -> **RedirectUri** is only **`used on a few specific paths by default`**, for example, the login path and logout paths
 
@@ -190,6 +196,9 @@ public async Task<IActionResult> OnPostAsync(string returnUrl = null)
             // redirect response value.
         };
 
+        // a new cookie is create -> cookie is configured with security settings (HttpOnly, Secure flag, ...)
+        // create an authentication ticket -> serialize -> encrypted and signed -> store in cookie
+        // cookie is added to the HTTP response
         await HttpContext.SignInAsync( // this one
             CookieAuthenticationDefaults.AuthenticationScheme, 
             new ClaimsPrincipal(claimsIdentity), 
@@ -206,7 +215,7 @@ public async Task<IActionResult> OnPostAsync(string returnUrl = null)
 }
 ```
 
-# Sign out
+## Sign out
 * -> to **`sign out the current user`** and **`delete their cookie`**, call **SignOutAsync**:
 ```cs
 public async Task OnGetAsync(string returnUrl = null)

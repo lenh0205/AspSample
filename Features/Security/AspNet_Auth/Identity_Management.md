@@ -15,7 +15,6 @@
 * _however, in other scenarios a server or service that manages authentication and identity may be beneficial_
 
 ===================================================================
-
 # Basic identity management with 'ASP.NET Core Identity'
 * -> **ASP.NET Core** ships with a **`built-in authentication provider: ASP.NET Core Identity`**
 * -> the provider includes the **`APIs`**, **`UI`**, and **`backend database`** configuration 

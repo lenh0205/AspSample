@@ -106,7 +106,29 @@ ClaimsIdentity userIdentity = new ClaimsIdentity(
 * -> _ClaimsPrincipal_ provides a handful of **helper methods / properties to check things** (_such as if a claim exists using **HasClaim()**_) in **`any of the associated identities`**
 * -> when working **within an API controller** in ASP.NET we can **`access the current principal`** via the **`User` property**
 
-```r - Example:
+```cs
+public class ClaimsPrincipal 
+{
+  public IEnumerable<ClaimsIdentity> { get; } // a collection of ClaimsIdentity objects
+  public IEnumerable<Claim> Claims { get; } //  all of the claims from all of the claims identities
+  public ClaimsIdentity Identity { get; }
+
+  // .... some properties have been omitted
+}
+```
+
+```r - Practical Example:
+// Principal = "User"
+// Identity = "Driver's License, Passport, Credit Card, Google Account, Facebook Account, RSA SecurID, Finger print, Facial recognition, etc"
+
+// if we are pulled over by the police, they dont verify us are who us claim to be, based on our driver license alone
+// they also need to see our face, otherwise we could show anyones else driver license
+
+// => hence it makes sense, why authentication can and sometimes should be based on multiple identities
+// => that is why 1 ClaimsPrincipal can have any number of ClaimsIdentity
+```
+
+```r - Code Example:
 // returning back to our previous example of the API, 
 // what would happen if we wanted to also "identify the device being used by the user" to ensure it is whitelisted
 // -> sure we could add a new Claim with device IP address, or agent string to the user identity, 
@@ -116,17 +138,15 @@ ClaimsIdentity userIdentity = new ClaimsIdentity(
 ```
 
 ```cs - seperating the "user claims" from the "device claims" into two seperate identities
-public class ClaimsPrincipal 
-{
-  public IEnumerable<Claim> Claims { get; }
-  public IEnumerable<ClaimsIdentity> { get; }
-  public ClaimsIdentity Identity { get; }
-
-  // .... some properties have been omitted
-}
+ClaimsIdentity deviceIdentity = new ClaimsIdentity(
+  new Claim[] {
+    new Claim("IP", "192.168.1.1"),
+    new Claim("Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0")
+  }
+);
 ```
 
-```cs - using a ClaimsPrincipal
+```cs - create a ClaimsPrincipal
 // -> group the "user identity" and "device identity" into one context 
 // -> without having to duplicate any info
 var principal = new ClaimsPrincipal(new IIdentity[] { userIdentity, deviceIdentity });
