@@ -1,3 +1,4 @@
+> nói chung là cấu hình `Authentication Middleware` để sử dụng các loại scheme khác nhau (_Ex: `.AddCookie()` và `.AddGoogle()`_) cho các loại request khác nhau
 
 # Policy schemes in ASP.NET Core
 * -> _Authentication policy schemes_ make it easier to have **`a single logical authentication scheme potentially use multiple approaches`**
@@ -10,7 +11,7 @@
 ```
 
 * -> **all authentication schemes** that use **`derived AuthenticationSchemeOptions`** and the **`associated AuthenticationHandler<TOptions>`**:
-* -> are **`automatically policy schemes`** in ASP.NET Core 2.1 and later and can be **`enabled via configuring the scheme's options`**
+* -> are automatically **`policy schemes`** in ASP.NET Core 2.1 and later; and can be **`enabled via configuring the scheme's options`**
 
 ```cs - AuthenticationSchemeOptions
 public class AuthenticationSchemeOptions

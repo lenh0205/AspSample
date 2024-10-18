@@ -2,6 +2,7 @@
 > redirect được thực hiện bằng **window.location.replace(redirectUrl);** để đảm bảo nó không ghi Browser history
 
 > vẫn chưa biết IdentityServer trả về authorization code cho client nhận và lưu như thế nào ?
+> hiện tại không biết có sử dụng "id_token" không ?
 > vẫn chưa biết client lấy access_token ? và client lưu cái access_token như thế nào và ở đâu ?
 > Resource server muốn validate token thì cần có key, cái key này đang ở đâu?
 

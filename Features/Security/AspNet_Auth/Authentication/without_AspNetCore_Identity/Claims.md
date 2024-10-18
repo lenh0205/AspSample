@@ -1,7 +1,8 @@
+> Mapping, customizing, and transforming claims in ASP.NET Core
+ 
 ===================================================================
-# Mapping, customizing, and transforming claims in ASP.NET Core
+# "claims" in ASP.NET Core
 * -> **Claims** can be **`created from any user or identity data`** which can be **issued using `a trusted identity provider` or `ASP.NET Core identity`**
-
 * -> **a claim** is **`a name value pair`** that **`represents what the subject is`**, **not what the subject can do**
 
 ===================================================================

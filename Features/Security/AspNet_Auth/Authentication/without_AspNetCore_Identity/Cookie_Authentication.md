@@ -1,3 +1,5 @@
+> cần nhớ authentication session tạo bởi việc gọi `HttpContext.SignInAsync` khác với tradition session của server
+
 ====================================================================
 # Summary
 * -> nói chung là ta sẽ cần **.AddCookie** để thêm cookie service
@@ -237,25 +239,46 @@ public async Task OnGetAsync(string returnUrl = null)
 * -> otherwise, the **`default scheme is used`**
 * _For example: if "ContosoCookie" is used as the scheme, supply the scheme used when configuring the authentication provider_
 
+## Browser closed
 * -> when the **`browser closes`** it **`automatically deletes session based cookies (non-persistent cookies)`**
 * -> but **`no cookies are cleared when an individual tab is closed`**; the server is not notified of tab or browser close events
 
 ====================================================================
 # React to back-end changes
-* -> once a cookie is created, the **`cookie is the single source of identity`**; if **a user account is disabled in back-end systems**:
+* -> once a cookie is created, the **`cookie is the single source of identity`**; 
+
+## Revoked users - a user account is disabled in back-end systems
 * -> the **app's cookie authentication system** **`continues to process requests based on the authentication cookie`**
 * -> **`the user remains signed into the app`** as long as **the authentication cookie is valid**
+* _ý là việc authenticate các request khác vẫn hoạt động bình thường_
 
-* -> the **`ValidatePrincipal` event** can be used to **`intercept and override validation of the cookie identity`**
-* -> **`validating the cookie on every request`** mitigates the risk of **revoked users accessing the app**
-* -> however, validating authentication cookies for all users on every request can result in **a large performance penalty for the app**
+```r - Practical Example:
+// "Account suspension": An admin disables a users account due to policy violations, but the user still has an active session.
+// "Security breach": If a users account is compromised, it might be disabled as a precaution, but their existing sessions remain active
+// "Employee termination": In a corporate setting, when an employee is terminated, their account might be disabled immediately, but their active sessions dont automatically end.
+// "Subscription expiration": In a SaaS application, a users subscription might expire, requiring account deactivation, but their session remains active.
+```
 
-* -> one approach to **cookie validation** is based on **`keeping track of when the user database changes`**
-* -> if the **database hasn't been changed since the user's cookie was issued**, there's **no need to re-authenticate the user if their `cookie is still valid`**
-* -> in the sample app, the database is implemented in "IUserRepository" and stores a **`LastChanged`** value (_when a user is updated in the database, the LastChanged value is set to the current time_)
+## cookie validation for "revoked user"
+* -> **`ValidatePrincipal` event** can be used to intercept and override **`validation of the cookie identity`**
+* -> **validating the cookie on every request** mitigates the risk of **`revoked users accessing the app`**
+* => one approach to **cookie validation** is based on **`keeping track of when the user database changes`**
+* => if the **`database hasn't been changed since the user's cookie was issued`**, there's **no need to re-authenticate the user if their `cookie is still valid`**
 
-* -> in order to **`invalidate a cookie when the database changes`** based on the **LastChanged** value
-* -> create the **cookie** with a **`LastChanged claim`** containing the current "LastChanged" value from the database:
+* -> however, validating authentication cookies for all users on every request can result in **a large `performance` penalty for the app**
+* _vì mỗi lần nó validate request là mỗi lần nó phải query `User` table để lấy `LastChanged` field value_
+* _rồi dùng nó só sánh với giá trị `LastChanged claim` của cookie (thời điểm mà cookie được issue)_
+* _vì mỗi lần ta update user state thì giá trị của field `LastChanged` của `User` table sẽ được update, nên ta sẽ cần validate trên từng request_
+
+## Sample Code - invalidate cookie of "revoked user"
+* -> in the sample app, the **database** is implemented in "IUserRepository" and stores a **`LastChanged`** value 
+* -> when **a user is updated in the database**, the "LastChanged value" is **`set to the current time`**
+
+* -> in order to **`invalidate a cookie when the database changes`** based on the **LastChanged** value, we have to create the **cookie** with a **`LastChanged claim`** 
+* -> that contain the **`current "LastChanged" value from the database`**
+
+### Create authenticated cookie with "LastChanged" claim
+
 ```cs 
 var claims = new List<Claim>
 {
@@ -272,7 +295,10 @@ await HttpContext.SignInAsync(
     new ClaimsPrincipal(claimsIdentity));
 ```
 
-* _to implement an override for the **ValidatePrincipal event**, we create a class that derives from **`CookieAuthenticationEvents`** that overload a method with signature **`ValidatePrincipal(CookieValidatePrincipalContext)`**_
+### define and register "ValidatePrincipal" event to Cookie Authentication Service
+
+* _to implement an override for the **'ValidatePrincipal' event**, we create a class that derives from **`CookieAuthenticationEvents`**_
+* _that overload a method with signature **ValidatePrincipal(CookieValidatePrincipalContext)**_
 ```cs
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -288,15 +314,15 @@ public class CustomCookieAuthenticationEvents : CookieAuthenticationEvents
 
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {
-        var userPrincipal = context.Principal;
+        ClaimsPrincipal userPrincipal = context.Principal;
 
         // Look for the LastChanged claim.
         var lastChanged = (from c in userPrincipal.Claims
                            where c.Type == "LastChanged"
                            select c.Value).FirstOrDefault();
 
-        if (string.IsNullOrEmpty(lastChanged) ||
-            !_userRepository.ValidateLastChanged(lastChanged))
+        // check if user's data in databased has changed since the authentication cookie was issued
+        if (string.IsNullOrEmpty(lastChanged) || !_userRepository.ValidateLastChanged(lastChanged))
         {
             context.RejectPrincipal();
 
@@ -326,6 +352,11 @@ builder.Services.AddScoped<CustomCookieAuthenticationEvents>();
 var app = builder.Build();
 ```
 
+### Improve Performance approach
+* -> Consider caching user data or using a more efficient storage mechanism for last-changed timestamps.
+* -> track specific types of changes rather than any change
+
+## update "user" without destructering principal 
 * -> consider a situation in which the **user's name is updated** - **`a decision that doesn't affect security in any way`**
 * -> if we want to **`non-destructively update the user principal`**, call **context.ReplacePrincipal** and set the **context.ShouldRenew** property to true
 
