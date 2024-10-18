@@ -209,10 +209,8 @@ services.AddAuthorization(options =>
 ```cs
 build.Services.AddAuthentication(options =>
 {
-	options.DefaultScheme =
-		CookieAuthenticationDefaults.AuthenticationScheme;
-	options.DefaultChallengeScheme =
-		OpenIdConnectDefaults.AuthenticationScheme;
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
 .AddCookie()
 .AddOpenIdConnect(options =>
@@ -376,10 +374,8 @@ builder.Services.AddSingleton<IAuthorizationHandler, RequireMfaHandler>();
 
 builder.Services.AddAuthentication(options =>
 {
-	options.DefaultScheme =
-		CookieAuthenticationDefaults.AuthenticationScheme;
-	options.DefaultChallengeScheme =
-		OpenIdConnectDefaults.AuthenticationScheme;
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
 .AddCookie()
 .AddOpenIdConnect(options =>

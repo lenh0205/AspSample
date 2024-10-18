@@ -68,7 +68,7 @@ services.AddIdentity<IdentityUser, IdentityRole>()
 * => to **`disable automatically` using the `single authentication scheme` as the `DefaultScheme`**, call **AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme")**
 
 ### use multiple default scheme
-* -> it's also possible to **`specify different default schemes`** to use for **authenticate**, **challenge**, and **forbid** actions
+* -> it's also possible to **`specify different default schemes`** to use for **authenticate**, **challenge**, and **forbid** actions (xem `~\Features\Security\AspNet_Auth\NET_Terminology.md` để hiểu)
 
 ### the default scheme is not specified
 * -> there's **`no automatic probing of schemes`**; if **`the default scheme isn't specified`**, the **scheme must be specified in the `authorize attribute`**

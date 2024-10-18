@@ -127,6 +127,7 @@ public class AuthorizeIndexPageHandlerFilter : IAsyncPageFilter, IOrderedFilter
         var httpContext = actionContext.HttpContext;
         var authenticateResult = await policyEvaluator.AuthenticateAsync(policy, httpContext);
         var authorizeResult = await policyEvaluator.AuthorizeAsync(policy, authenticateResult, httpContext, actionContext.ActionDescriptor);
+        
         if (authorizeResult.Challenged)
         {
             if (policy.AuthenticationSchemes.Count > 0)

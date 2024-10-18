@@ -25,7 +25,7 @@
 ## Authentication Scheme
 * -> the **`registered authentication handlers`** and **`their configuration options`** are called **schemes**
 * -> so the **authentication scheme** can **`select which authentication handler`** is responsible for **generating the correct set of claims**
-* => "Schemes" are useful as **`a mechanism for referring`** to the **authentication, challenge, and forbid behaviors** of **`the associated handler`**
+* => "Schemes" are useful as **`a mechanism for referring`** to the **authentication, challenge, and forbid behaviors** of **`the associated handler`** (xem `~\Features\Security\AspNet_Auth\NET_Terminology.md` để hiểu)
 
 ```r - Example: 
 // 1 "authorization policy" can use "scheme names" to "specify which authentication scheme (or schemes)"  should be "used to authenticate the user"
@@ -35,6 +35,46 @@
 * -> the **Authentication middleware is added in 'Program.cs'** by calling **`UseAuthentication`**
 * -> _calling .UseAuthentication()_ **registers the middleware** that **`uses the previously registered authentication schemes`**
 * -> _calling .UseAuthentication()_ **`before any middleware that depends on users being authenticated`**
+
+### Authentication Service
+* -> _xem `~\Features\Security\AspNet_Auth\NET_Terminology.md` để hiểu về **authenticate**, **challenge**, **forbid**_
+* -> còn **`DefaultScheme`** is **catch-all default** that sets the scheme for **all authentication actions (`authenticate, challenge, forbid, sign in, sign out`)** if a more specific default isn't set
+
+
+```cs
+options.DefaultScheme = "SomeScheme";
+// <=>
+options.DefaultAuthenticateScheme = "SomeScheme";
+options.DefaultChallengeScheme = "SomeScheme";
+options.DefaultForbidScheme = "SomeScheme";
+options.DefaultSignInScheme = "SomeScheme";
+options.DefaultSignOutScheme = "SomeScheme";
+```
+
+```cs - Ex:
+services.AddAuthentication(options =>
+{
+    // JWT Bearer will be used for authentication:
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+    // Cookies will be used for challenges - might redirecting to login page
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddJwtBearer();
+
+services.AddAuthentication(options =>
+{
+    // JWT Bearer is used for authentication
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+
+    // OpenID Connect is used for challenges, which might redirect the user to an external identity provider
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddJwtBearer()
+.AddOpenIdConnect();
+```
+
 
 ======================================================================
 # Authentication providers per tenant

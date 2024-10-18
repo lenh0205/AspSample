@@ -171,9 +171,6 @@ The preceding handler validates the operation using the resource, the user's ide
 ==============================================================================
 # Challenge and forbid with an operational resource handler
 
-
-
-
 * -> to call **an operational resource handler**, **`specify the operation`** when **invoking AuthorizeAsync** in **our page handler or action**
 
 * -> if **authorization succeeds**, the page for viewing the document is returned

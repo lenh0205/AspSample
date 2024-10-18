@@ -76,6 +76,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
         options.SlidingExpiration = true;
         options.AccessDeniedPath = "/Forbidden/";
+        //options.LoginPath = "/Account/Login";
+        //options.LogoutPath = "/Account/Logout";
+        //options.Cookie.Name = "YourAppCookie";
+        //options.Cookie.HttpOnly = true;
+        //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 ```
 
