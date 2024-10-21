@@ -4,6 +4,9 @@
 > trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 ShareService để kế thừa
 
 > cái gì làm nên sự phân biệt giữa controller này và controller kia ? (không lẽ là model)
+> https://github.com/ardalis/CleanArchitecture/tree/main
+> https://github.com/iayti/CleanArchitecture/tree/master/src/Apps/CleanArchitecture.Api
+> https://github.com/iammukeshm/CleanArchitecture.WebApi/blob/master/Application/Interfaces/IAccountService.cs
 
 ```cs
 public interface IBusinessService<T> {}
