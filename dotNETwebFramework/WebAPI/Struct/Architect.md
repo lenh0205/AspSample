@@ -1,13 +1,29 @@
-/// Architect
-// -> Controller (derive Generic Controller) use Seed Service 
-// -> Seed Service access Service property 
-// -> Service property return Service
-// -> Service has methods use Unit Of Work
-// -> Unit Of Work access Repository property 
-// -> Repository property return Repository 
-// -> Repository (derive Generic Repository) has methods solve DAL
+> đúng là không nên viết hết logic trong controller vì như vậy khá khó nhìn vậy nên ta sẽ cho 1 lớp nữa là lớp Services
+> lớp này sẽ sử dụng UnitOfWork tuỳ ý để truy cập đến các repository khác nhau; thiết nghĩ nên DI scope thằng này
+> UnitOfWork sẽ cần được DI DbContext
+> trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 ShareService để kế thừa
 
+> cái gì làm nên sự phân biệt giữa controller này và controller kia ? (không lẽ là model)
 
+```cs
+public interface IBusinessService<T> {}
+
+public class VanBanDenService : IBusinessService<VanBanDen>, IVanBanDenService
+{
+    
+}
+```
+
+# Flow
+* -> Controller (derive Generic Controller) use Seed Service 
+* -> Seed Service access Service property 
+* -> Service property return Service
+* -> Service has methods use Unit Of Work
+* -> Unit Of Work access Repository property 
+* -> Repository property return Repository 
+* -> Repository (derive Generic Repository) has methods solve DAL
+
+```cs
 /// <summary>
 /// Controller (Apply for direct interaction with "T" model in Database)
 /// </summary>
@@ -77,3 +93,4 @@ public class VanBanDiController : ControllerBase
 
     //....
 }
+```
