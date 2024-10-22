@@ -1,22 +1,41 @@
+==================================================================================
+# Fundermental
+
+## Lifetime
+* _for in-depth understanding: `https://web.archive.org/web/20200724100912/http://stephenwalther.com/archive/2008/03/18/asp-net-mvc-in-depth-the-life-of-an-asp-net-mvc-request`_
+* _but in overview, the life-cycle steps will include:_
+
+1. the **`RouteTable`** is Created - this first step happens **only once when an ASP.NET application first starts** (**`singleton`**) (_the RouteTable maps URLs to handlers_)
+
+2. **whenever a request is made** (basically **`scoped`**), The **`UrlRoutingModule`** intercepts every request, creates and executes the right handler
+
+3. the **`MvcHandler`** (basically **`scoped`**) **creates a controller**, passes the controller a ControllerContext, and executes the controller
+
+4. the **`Controller`** (basically **`scoped`**) determines which method to execute, builds a list of parameters, and executes the method
+
+5. typically, a controller method calls RenderView() to render content back to the browser. The Controller.RenderView() method delegates its work to a particular ViewEngine
+
+## Summary 
 > đúng là không nên viết hết logic trong controller vì như vậy khá khó nhìn vậy nên ta sẽ cho 1 lớp nữa là lớp Services
-> lớp này sẽ sử dụng UnitOfWork tuỳ ý để truy cập đến các repository khác nhau; thiết nghĩ nên DI scope thằng này
+> lớp Service này đơn giản là tách logic ra cho dễ nhìn nên ta sẽ không viết interface và config DI từng thằng vào controller sẽ không hợp lý
+> vậy nên ta sẽ tạo 1 thằng Factory để tạo từng Service cần thiết tương ứng với từng Controller cụ thể; vì controller là Scoped nên ta cũng sẽ DI Factory là Scoped
+> ta sẽ truy cập cập service trong Factory dưới dạng property, nhưng ta sẽ không tạo sẵn instance cho các service (s/d **=**) mà chỉ tạo instance khi access property (s/d **=>**)
+> Interface của Factory sẽ có property với type là interface của Service, còn Implement của Factory sẽ có property với type là implement của service
+> đồng thời khi khởi tạo instance cho service ta cần pass IServiceProvider mà Factory nhận được thông qua DI; đồng thời cache lại instance để tránh tạo lại mỗi lần access property trong 1 Scope
+> các logic method, property xài chung giữa các service thì ta sẽ bỏ vào abstract class BaseService  
+> còn những member riêng thì ta sẽ để riêng - việc này đảm bảo khi ta truy cập service từ Factory nó sẽ cho ta biết method cụ thể của service đó
+
+> các lớp service cần có khả năng sử dụng UnitOfWork để truy cập bất cứ repository nào 1 cách tuỳ ý; vậy nên ta sẽ DI scope thằng này
 > UnitOfWork sẽ cần được DI DbContext
 > trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 ShareService để kế thừa
 
+## Reference
 > cái gì làm nên sự phân biệt giữa controller này và controller kia ? (không lẽ là model)
 > https://github.com/ardalis/CleanArchitecture/tree/main
 > https://github.com/iayti/CleanArchitecture/tree/master/src/Apps/CleanArchitecture.Api
 > https://github.com/iammukeshm/CleanArchitecture.WebApi/blob/master/Application/Interfaces/IAccountService.cs
 
-```cs
-public interface IBusinessService<T> {}
-
-public class VanBanDenService : IBusinessService<VanBanDen>, IVanBanDenService
-{
-    
-}
-```
-
+==================================================================================
 # Flow
 * -> Controller (derive Generic Controller) use Seed Service 
 * -> Seed Service access Service property 

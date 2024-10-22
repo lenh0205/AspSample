@@ -26,6 +26,9 @@ var students = new Dictionary<int, StudentName>();
 students.Add(111, new StudentName { FirstName="Sachin", LastName="Karnik", ID=211 });
 students.Add(112, new StudentName { FirstName="Dina", LastName="Salimzianova", ID=317 });
 students.Add(113, new StudentName { FirstName="Andy", LastName="Ruth", ID=198 });
+
+// throw Exception if try to "Add()" the key that exist:
+students.Add(113, new StudentName { FirstName="Daa", LastName="Ruu", ID=296 });
 ```
 
 ```cs - access
@@ -43,8 +46,10 @@ foreach(KeyValuePair<int, StudentName> kvp in students) {
 }
 ```
 
-```cs - update
-if(students.ContainsKey(222)) students[222] = new StudentName { FirstName="Season", LastName="Bell", ID=344 };
+```cs - update / assign
+// if the key is not existed, create a new entry in Dictionary
+// if the key is existed, update to new value
+students[222] = new StudentName { FirstName="Season", LastName="Bell", ID=344 };
 ```
 
 ```cs - Remove
