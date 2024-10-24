@@ -17,10 +17,10 @@
 
 ## Summary 
 > đúng là không nên viết hết logic trong controller vì như vậy khá khó nhìn vậy nên ta sẽ cho 1 lớp nữa là lớp Services
-> lớp Service này đơn giản là tách logic ra cho dễ nhìn nên ta sẽ không viết interface và config DI từng thằng vào controller sẽ không hợp lý
-> vậy nên tạo 1 Factory để tạo ra những class cùng tính chất (business service) khá là hợp lý - từn service tương ứng với từng Controller cụ thể; vì controller là Scoped nên ta cũng sẽ DI Factory là Scoped
-> ta sẽ truy cập cập service trong Factory dưới dạng property, nhưng ta sẽ không tạo sẵn instance cho các service (s/d **=**) mà chỉ tạo instance khi access property (s/d **=>**)
-> Interface của Factory sẽ có property với type là interface của Service, còn Implement của Factory sẽ có property với type là interface của service nhưng ta sẽ gán giá trị bằng implement của service
+> lớp Service này đơn giản là tách logic ra cho dễ nhìn và việc config DI từng thằng service vào controller sẽ không hợp lý
+> vậy nên tạo 1 Factory để tạo ra những class cùng tính chất (business service) khá là hợp lý - từng service tương ứng với từng Controller cụ thể; vì controller là Scoped nên ta cũng sẽ DI Factory là Scoped
+> ta sẽ truy cập service trong Factory dưới dạng property, nhưng ta sẽ không tạo sẵn instance cho các service (s/d **=**) mà chỉ tạo instance khi access property (s/d **=>**)
+> Interface của Factory sẽ có property với type là interface của Service, còn Implement property của Factory sẽ type là interface của service nhưng ta sẽ gán giá trị bằng implement của service
 > đồng thời khi khởi tạo instance cho service ta cần pass IServiceProvider mà Factory nhận được thông qua DI; đồng thời cache lại instance để tránh tạo lại mỗi lần access property trong 1 Scope
 
 > 1 thằng service sẽ cần kế thừa interface của chính nó và base class; và interface của nó sẽ cần kết thừa interface của base class
@@ -29,9 +29,7 @@
 
 > các lớp service cần có khả năng sử dụng UnitOfWork để truy cập bất cứ repository nào 1 cách tuỳ ý; vậy nên ta sẽ DI scope thằng này
 > UnitOfWork sẽ cần được DI DbContext
-> trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 ShareService để kế thừa
-
-> DbContext có lifetime là gì ?
+> trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 BaseService để kế thừa
 
 > nếu ApplicationDbContext : DbContext vậy thì typeof(ApplicationDbContext) == typeof(DbContext) ? có thể pass ApplicationDbContext instance cho method(DbContext db) ?
 
@@ -39,9 +37,20 @@
 > hình như xài readonly thì không thể xài getter setter
 > interface cannot contain field ? vậy liệu ta có thể để 1 property là readonly (sử dụng getter) nhưng vẫn có thể set giá trị nó trong constructor
 
+> tại sao trong interface cần để method là public ? và khi implement lại có thể để private ?
 
 ## Note
+* -> ta cần viết interface cho 1 class khi muốn sử dụng method hoặc property của class đó; nó đảm bảo ta có thể thay bằng một implementation khác của interface đó khi cần thiết
+* -> base class nên được viết bằng abstract class để đảm bảo nó chỉ để kế thừa không thể khởi tạo, tạo sẵn 1 số method dùng chung cho thằng còn, tạo abstract method để bắt thằng con phải implement
+
+* -> khi viết interface cho 1 abstract class (dùng làm base class), ta chỉ định nghĩa những public method của abstract class, ta sẽ không định nghĩa protected method 
+* -> điều này đảm bảo khi ta DI interface của derived class mà kế thừa interface của base class, ta vẫn có thể truy cập đến những public method; 
+* -> còn protected method của base class chỉ được dùng nội trong method của derived class
+
+* -> DbContext có lifetime là Scoped; Controller sẽ là Scoped; ILogger sẽ là Singleton
+
 * -> đối với việc DI 1 Factory, ta cần xem Factory này sẽ tạo ra những instances với lifetime như thế nào ?
+* -> Factory cho thằng BusinessHandler hơi khác một
 
 * -> tác dụng thật của UnitOfWork là share DbContext và method SaveChange của nó (tạo 1 Transaction)
 * -> sau khi dùng nhiều repository để update dữ liệu, ta sẽ gọi SaveChange 1 lần trên UnitOfWork để lưu tất cả thay đổi; thay vì gọi SaveChange trên mỗi Repository
