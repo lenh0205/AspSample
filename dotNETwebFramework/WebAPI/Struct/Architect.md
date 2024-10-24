@@ -39,9 +39,15 @@
 > hình như xài readonly thì không thể xài getter setter
 > interface cannot contain field ? vậy liệu ta có thể để 1 property là readonly (sử dụng getter) nhưng vẫn có thể set giá trị nó trong constructor
 
+
 ## Note
 * -> đối với việc DI 1 Factory, ta cần xem Factory này sẽ tạo ra những instances với lifetime như thế nào ?
 
+* -> tác dụng thật của UnitOfWork là share DbContext và method SaveChange của nó (tạo 1 Transaction)
+* -> sau khi dùng nhiều repository để update dữ liệu, ta sẽ gọi SaveChange 1 lần trên UnitOfWork để lưu tất cả thay đổi; thay vì gọi SaveChange trên mỗi Repository
+* -> trong 1 số trường hợp ví dụ như cần lưu database ngay để thằng khác lấy được dữ liệu, ta sẽ cần sử dụng "Database.BeginTransaction()" để tạo 1 transaction để quản lý 1 scope cụ thể
+
+* -> nếu dùng DI để inject DbContext thì trong Dipose method của UnitOfWork ta có thể không cần gọi _dbContext.Dispose(); nhưng ta vẫn nên để vậy để sử dụng UnitOfWork trong trường hợp không có DI
 
 ## Reference
 > cái gì làm nên sự phân biệt giữa controller này và controller kia ? (không lẽ là model)
