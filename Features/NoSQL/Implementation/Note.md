@@ -32,6 +32,7 @@ services.AddSingleton<IMongoClient>(s =>
 # UnitOfWork
 * -> Unit Of Work will be responsible for performing the transactions that the Repositories have made. For this work to be done, a Mongo Context must be created. This Context will be the connection between the Repository and UoW.
 * -> https://github.com/brunobritodev/MongoDB-RepositoryUoWPatterns
+* -> https://blog.jmorbegoso.com/post/unit-of-work-pattern-in-csharp-using-mongodb/
 
 # Transaction
 https://www.mongodb.com/developer/languages/csharp/transactions-csharp-dotnet/
