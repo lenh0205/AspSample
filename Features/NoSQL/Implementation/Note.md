@@ -30,10 +30,26 @@ services.AddSingleton<IMongoClient>(s =>
 * -> because Mongo already has that with the **IClientSessionHandle**
 
 # UnitOfWork
-* -> Unit Of Work will be responsible for performing the transactions that the Repositories have made. For this work to be done, a Mongo Context must be created. This Context will be the connection between the Repository and UoW.
+* -> Unit Of Work will be responsible for performing the transactions that the Repositories have made. For this work to be done, a Mongo Context must be created
+* -> this Context will be the connection between the Repository and UoW.
 * -> https://github.com/brunobritodev/MongoDB-RepositoryUoWPatterns
 * -> https://blog.jmorbegoso.com/post/unit-of-work-pattern-in-csharp-using-mongodb/
+
+## Draft
+* -> khi ta call .InsertOneAsync() trên mongo collection, nó sẽ ghi vào database ngay lập tức
+* -> vì vậy ta thay vì Repository sẽ thực thi trực tiếp, nó sẽ làm nhiệm vụ add Func mà thực thi .InsertOneAsync() vào 1 List<Func>
+* -> và khi UnitOfWork SaveChange ta sẽ thực thi toàn bộ List callback này trong MongoClient.StartSessionAsync().StartTransaction();
+
+* -> đầu tiên là ta sẽ xây dựng 1 lớp MongoDbContext, 
+* -> bao gồm các state là MongoClient, Database, Session, List<Func<Task>>
+* -> nó sẽ cần có logic khởi tạo MongoClient() rồi truy cập đến database
+* -> tạo 1 Method để cung cấp cho Repository các mongo Collection
+* -> tạo 1 Method để add các Func của Repository chứa các database operation 
+* -> tạo Method SaveChange để tạo Session đồng thời tạo Transaction để thực thi các Func
+
+* -> ta chỉ cần inject cái DbContext này vào UnitOfWork để nó có thể s/d hàm SaveChange; và inject DbContext vào Repository để truy cập vào Collection tương ứng
 
 # Transaction
 https://www.mongodb.com/developer/languages/csharp/transactions-csharp-dotnet/
 https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/transactions/
+
