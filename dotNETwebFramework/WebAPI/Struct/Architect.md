@@ -26,6 +26,7 @@
 > 1 thằng service sẽ cần kế thừa interface của chính nó và base class; và interface của nó sẽ cần kết thừa interface của base class
 > các logic method, property xài chung giữa các service thì ta sẽ bỏ vào abstract class BaseService  
 > còn những member riêng thì ta sẽ để riêng - việc này đảm bảo khi ta truy cập service từ Factory nó sẽ cho ta biết method cụ thể của service đó
+> và đồng thời khi ta move 1 method từ 1 class cụ thể vào base class để cho các service sử dụng chung thì cũng không bị ảnh hưởng
 
 > các lớp service cần có khả năng sử dụng UnitOfWork để truy cập bất cứ repository nào 1 cách tuỳ ý; vậy nên ta sẽ DI scope thằng này
 > UnitOfWork sẽ cần được DI DbContext

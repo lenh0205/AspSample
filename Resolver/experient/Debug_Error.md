@@ -187,6 +187,13 @@ var matchEntities = _context.MucLucs.ToList().Where(mucluc => lstMucLuc.Any(x =>
 * -> rất có thể các file **`bootstrap`** cũng như **`jquery`** đã mất đi
 * -> ta có thể start 1 project MVC rồi copy các file đã mất qua
 
+## BE - IIS - Lỗi double escape sequence
+* -> khi ta truy cập 1 virtual path đến 1 file vật lý server bởi IIS với tên có ký tự đặc biệt
+* -> theo RFC 2396, **`reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","`** 
+* (_https://stackoverflow.com/questions/7739233/double-escape-sequence-inside-a-url-the-request-filtering-module-is-configured_)
+* (_https://www.rfc-editor.org/rfc/rfc2396#section-2.2_)
+
+
 ==============================================================
 
 # DB - Exception The database operation was expected to affect 1 row(s), but actually affected 0 row(s);
