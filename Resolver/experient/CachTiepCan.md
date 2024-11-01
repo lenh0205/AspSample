@@ -56,3 +56,12 @@
 * vì với `Server-side rendering` toàn bộ dữ liệu được giấu đi dưới server, chỉ những dữ liệu render UI mới public
 * Ta có thể sẽ cần `Mapping` lại filter đi những `personal field`, map lại `field name`,...
 * đồng thời giảm load cho băng thông
+
+=======================================================================
+# Viết 1 trang UI phải tái sử dụng nhiều lần (ẩn hiện, disable các control khác nhau)
+* -> nếu các logic để điều chỉnh display của từng control trở nên phức tạp, ta nên gom tất cả logic bên trong 1 function và expose các biến display cho từng control
+
+* -> nếu ta sử dụng 1 biến mode để điều chỉnh UI cho từng trang thì cần thiết kế dạng object phân cấp 
+* _Ví dụ mode `Parent` sẽ chứa mode `Children` và mode `SecondChilren`: const modeVanBan = { Parent: ["Chilren", "SecondChilren"] }_ 
+* -> thì khi đó nếu một trang đang chạy với mode `Children` bình thường, nếu ta h muốn ẩn một nút cụ thể ta chỉ cần tạo ra mode `Parent` và gán cho trang đó
+* -> ta sẽ tạo 1 method check phải là mode là `Parent` thì sẽ ẩn nút đó; còn các nút còn lại sẽ chạy như bình thường vì các nút hiện tại chỉ đang check dựa trên mode `Children` mà `Parent` là cha của mode `Children`

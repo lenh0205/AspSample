@@ -67,8 +67,8 @@ all("Xin Chào"); // Output: Xin Chào  Waring: Xin Chào  Info: Xin Chào  Xin 
 
 ## Action & Func
 * là 2 mẫu delegate định nghĩa sẵn giúp ta định nghĩa biến kiểu delegate (_mà không phải khai báo kiểu delegate 1 cách rõ ràng_) 
-* -> Func đại diện cho delegate có kiểu trả về 
-* -> Action đại diện cho delegate không có kiểu trả về 
+* -> **Func** đại diện cho **`delegate có kiểu trả về`** 
+* -> **Action** đại diện cho **`delegate không có kiểu trả về`** 
 
 ```cs - Func
 delegate bool DelegateName(int a, string b);
