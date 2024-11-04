@@ -127,7 +127,7 @@ try
 finally { Monitor.Exit (_locker); }
 ```
 
-## the lockTaken overloads
+## the 'lockTaken' overloads
 
 ### Problem
 * -> _the code that we just demonstrated is **exactly what the C# 1.0, 2.0, and 3.0 compilers produce in translating a lock statement**; however, there's **`a subtle vulnerability`** in this code_
@@ -139,7 +139,149 @@ finally { Monitor.Exit (_locker); }
 * => this will result in **`a leaked lock`**
 
 ### Solution
-* -> to avoid this danger, **CLR 4.0's designers** added the following overload to **Monitor.Enter** (**`lockTaken` overload**):
-```cs
+* -> to avoid this danger, **CLR 4.0's designers** added the following overload to **Monitor.Enter** (**`lockTaken` overload**)
+* -> "lockTaken" is **`false`** after this method if (and only if) **the 'Enter' method throws an exception and the lock was not taken**
+
+```cs - lockTaken
 public static void Enter (object obj, ref bool lockTaken);
 ```
+
+```cs -  the correct pattern of use (which is exactly how C# 4.0 translates a lock statement):
+bool lockTaken = false;
+try
+{
+  Monitor.Enter (_locker, ref lockTaken);
+  // Do your stuff...
+}
+finally { if (lockTaken) Monitor.Exit (_locker); }
+```
+
+## TryEnter
+* -> **Monitor** also provides a **`TryEnter`** method that **allows a timeout to be specified**, either in **milliseconds** or as a **TimeSpan**
+* -> the method then returns **`true`** if **a lock was obtained**, or **`false`** if **no lock was obtained because the method timed out**
+
+* -> "TryEnter" can also be **called with no argument**, **`which "tests" the lock`**, **`timing out immediately if the lock can't be obtained right away`**
+* -> as with the **Enter** method, it’s overloaded in CLR 4.0 to **`accept a 'lockTaken' argument`**
+
+====================================================================
+# Choosing the Synchronization Object
+* -> **`any object visible to each of the partaking threads`** can be used as **a synchronizing object**, subject to one hard rule: it **`must be a reference type`**
+
+* -> the **synchronizing object** is typically **`private`** (because this helps to encapsulate the locking logic) and is typically **`an instance or static field`**
+* -> the **synchronizing object** can **`double as the object it’s protecting`**, as the _list field does in the following example:
+```cs
+class ThreadSafe
+{
+  List <string> _list = new List <string>();
+ 
+  void Test()
+  {
+    lock (_list)
+    {
+      _list.Add ("Item 1");
+      // ...
+    }
+  }
+}
+```
+
+* -> **a field dedicated for the purpose of locking** (such as _locker, in the example prior) allows **`precise control over the scope and granularity of the lock`**
+* -> the containing object (**`this`**) — or even its type — **can also be used as a synchronization object**:
+```cs
+lock (this) { ... }
+// or
+lock (typeof (Widget)) { ... }    // For protecting access to statics
+```
+
+* => the disadvantage of locking in this way is that we're **not encapsulating the locking logic**, so it becomes **`harder to prevent deadlocking and excessive blocking`**
+* => **a lock on a type** may also **`seep through application domain boundaries`** (within the same process)
+
+* => **Locking** **`doesn't restrict access to the synchronizing object`** itself in any way
+* => in other words, **x.ToString()** will not block because another thread has called lock(x); both threads must call lock(x) in order for blocking to occur
+
+====================================================================
+# When to Lock
+* -> as **`a basic rule`**, we need to **`lock around accessing any writable shared field`**
+* -> even in the simplest case — an assignment operation on a single field — we must consider **`synchronization`**
+
+```cs - neither the "Increment" nor the "Assign" method is thread-safe:
+class ThreadUnsafe
+{
+  static int _x;
+  static void Increment() { _x++; }
+  static void Assign()    { _x = 123; }
+}
+```
+
+```cs - thread-safe versions of "Increment" and "Assign":
+class ThreadSafe
+{
+  static readonly object _locker = new object();
+  static int _x;
+ 
+  static void Increment() { lock (_locker) _x++; }
+  static void Assign()    { lock (_locker) _x = 123; }
+}
+```
+
+====================================================================
+# ­Locking and Atomicity
+* -> if **a group of variables** are **always read and written within the same lock**, we can say **`the variables are read and written atomically`** 
+
+* _let’s suppose fields x and y are always read and assigned within a lock on object locker:_
+* -> one can say x and y are **accessed atomically**, because **`the code block cannot be divided or preempted by the actions of another thread`** in such a way that it will change x or y and invalidate its outcome
+* -> we'll never get a division-by-zero error, providing x and y are **`always accessed within this same exclusive lock`**
+```cs
+lock (locker) { if (x != 0) y /= x; }
+```
+
+* -> **`Instruction atomicity`** is a different, although analogous concept: **an instruction is atomic** if it **`executes indivisibly on the underlying processor`**
+
+====================================================================
+# Nested Locking
+* -> **a thread** can **`repeatedly lock the same object in a nested (reentrant) fashion`**
+* -> in these scenarios, **the object is unlocked** only when **`the outermost lock statement has exited`** — or **`a matching number of 'Monitor.Exit' statements have executed`**
+
+* -> **nested locking** is useful when **`one method calls another within a lock`**
+* -> **a thread** can **`block on only the first (outermost) lock`**
+
+```cs
+lock (locker)
+  lock (locker)
+    lock (locker)
+    {
+       // Do something...
+    }
+
+// or 
+Monitor.Enter (locker); Monitor.Enter (locker);  Monitor.Enter (locker); 
+// Do something...
+Monitor.Exit (locker);  Monitor.Exit (locker);   Monitor.Exit (locker);
+```
+
+====================================================================
+# Deadlocks
+* -> **a deadlock** happens when **`two threads each wait for a resource held by the other, so neither can proceed`**
+
+```cs - the easiest way to illustrate this is with two locks:
+object locker1 = new object();
+object locker2 = new object();
+ 
+new Thread (() => {
+                    lock (locker1)
+                    {
+                      Thread.Sleep (1000);
+                      lock (locker2);      // Deadlock
+                    }
+                  }).Start();
+
+lock (locker2)
+{
+  Thread.Sleep (1000);
+  lock (locker1);                          // Deadlock
+}
+```
+
+## CLR
+* -> in a standard hosting environment, the **CLR** is not like **SQL Server** and **`does not automatically detect and resolve deadlocks by terminating one of the offenders`**
+* -> **a threading deadlock** causes **`participating threads to block indefinitely`**, unless we've specified a locking timeout. (Under the SQL CLR integration host, however, deadlocks are automatically detected and a [catchable] exception is thrown on one of the threads.)
