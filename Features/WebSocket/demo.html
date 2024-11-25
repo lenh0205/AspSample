@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #chat {
+            height: 300px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        #messageForm {
+            display: flex;
+        }
+        #messageInput {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <div id="chat"></div>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        // Khởi tạo WebSocket và gán các sự kiện
+        // -> WebSocket Echo Server là 1 free very simple endpoint server cho phép ta test our websocket and SSE clients easily 
+        // -> https://websocket.org/tools/websocket-echo-server
+        const socket = new WebSocket('wss://echo.websocket.org');
+    
+        socket.addEventListener('open', (event) => {
+            addMessage('Connected to the server');
+        });
+
+        socket.addEventListener('message', (event) => { // client bắt event .send của server bắn tới
+            addMessage(`Server: ${event.data}`); // in ra màn hình message server gửi tới
+        });
+
+        socket.addEventListener('close', (event) => {
+            addMessage('Disconnected from the server');
+        });
+
+        socket.addEventListener('error', (event) => {
+            addMessage('Error: ' + event.message);
+        });
+
+
+        // get Element
+        const chat = document.getElementById('chat');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+
+        // xử lý sự kiện submit
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.send(message);
+                addMessage(`You: ${message}`);
+                messageInput.value = '';
+            }
+        });
+        
+        // in message ra màn hình
+        function addMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>

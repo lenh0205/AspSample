@@ -107,7 +107,7 @@ if (!module.parent) {
 * -> _if the server replies "yes"_, then the **`talk continues in WebSocket protocol, which is not HTTP at all`**
 
 ## Browser Header
-* **`Note`**: _can’t use XMLHttpRequest or fetch to make this kind of HTTP-request, because **JavaScript is not allowed to set these headers**_
+* **`Note`**: _can’t use "XMLHttpRequest" or "fetch" to make this kind of HTTP-request, because **JavaScript is not allowed to set these headers**_
 
 * _browser headers for a request made by new WebSocket("wss://my-url"):_
 * **Origin** 
