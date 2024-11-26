@@ -1,6 +1,11 @@
 > **original project type in .NET** designed to be a rapid application development enviroment for **`desktop applications`**
 > sau này có thêm WPF, UWP, MAUI
 
+=====================================================================
+# publish WinForms project as '.msi' file
+* -> VSIX Installer -> click **Modify** để chạy 
+
+=====================================================================
 ## Use case
 * -> nó cho phép trả xây dựng app rất nhanh nhưng sẽ kèm với 1 số bất lợi lâu dài; vậy nên sẽ phù hợp đối khi cần triền khai thử 1 ý tưởng 
 
@@ -58,3 +63,16 @@ public partial class Form1 : Form
 
 * -> vì cơ bản, **a window form** has split class behind it - gồm các **partial class** khác nhau cùng tên cho phép đặt code ở 2 nơi khác nhau nhưng form cùng 1 class
 * -> **Form1.Designer.cs** đại diện cho UI look like; giờ ta chỉ cần modify nó lại file và "View Designer" lại là được
+
+=====================================================================
+# Window Forms lifecycle
+
+## Concept
+* -> in Windows Forms, **every control** (e.g., a Form, Button, etc.) has an **`HWND - underlying Windows handle`**, 
+* -> which is a unique identifier for the control in the Windows operating system; this handle is required for Windows to interact with the control
+
+## Key Lifecycle Events
+* -> Constructor: Initializes the control. No handle yet.
+* -> OnHandleCreated: Handle is created. Control can now interact with Windows.
+* -> OnLoad: Form and its controls are ready to be displayed.
+* -> Shown: The form becomes visible.
