@@ -47,7 +47,10 @@ public partial class Form1 : Form
     private void button1_Click(object sender, EventArgs e)
     {   
         MessageBox.Show($"Hello { textBox1.Text } { textBox2.Text }");
-        
+
+        // Ví dụ: ta thêm logic để mở 1 Form2 nào đó
+        Form2 frm = new();
+        frm.Show();
     }
 }
 ```
@@ -63,6 +66,17 @@ public partial class Form1 : Form
 
 * -> vì cơ bản, **a window form** has split class behind it - gồm các **partial class** khác nhau cùng tên cho phép đặt code ở 2 nơi khác nhau nhưng form cùng 1 class
 * -> **Form1.Designer.cs** đại diện cho UI look like; giờ ta chỉ cần modify nó lại file và "View Designer" lại là được
+
+# Program.cs
+* -> lý do tại sao khi launch app thì Form1 lại hiện lên; và khi ta đóng Form1 thì nó cũng đóng toàn bộ Application (dù các form khác vẫn mở)
+```cs
+[STAThread]
+static void Main()
+{
+    ApplicationConfiguration.Initialize();
+    Application.Run(new Form1()); // Form1 consider the main form 
+}
+```
 
 =====================================================================
 # Window Forms lifecycle
