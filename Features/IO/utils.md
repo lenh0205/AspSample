@@ -215,3 +215,32 @@ using (MemoryStream memoryStream = new MemoryStream(data))
     Console.WriteLine($"Pushed back bytes: {string.Join(", ", pushedBackBuffer)}");
 }
 ```
+
+===================================================================
+# Byte
+
+## Find mime type of a byte array if it's a 'System.Drawing.Image'
+
+```cs
+public static string GetMimeTypeFromImageByteArray(byte[] byteArray)
+{
+   using (MemoryStream stream = new MemoryStream(byteArray))
+   using (Image image = Image.FromStream(stream))
+   {
+       return ImageCodecInfo.GetImageEncoders().First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
+   }
+}
+```
+
+===================================================================
+> https://blog.aspose.com/ocr/convert-image-to-searchable-pdf-with-ocr-using-csharp/
+> https://metrics.aspose.com/products/net/ocr/
+
+# Convert a scanned document or an image to a searchable PDF document 
+* -> in the case **images** or **scanned documents** can contain **`textual information`**, we can use the **`OCR (optical character recognition)`** to create a "searchable PDF"
+
+## searchable PDF
+* -> is a type of PDF file that contains both the **original visual content** (_e.g., a `scanned image` of a document_) and an **underlying, invisible layer of text**
+* -> that **`allows the document to be searched, copied, and indexed`** - this underlying text is typically generated using **`OCR (Optical Character Recognition)`** technology
+
+* _nói chung 1 PDF bình thường thì nó chỉ có lớp `original image content`, còn "searchable PDF" thì có thêm 1 lớp `hidden text`_

@@ -164,9 +164,44 @@ Sec-WebSocket-Accept: hsBlbuDTkk24srzEOTBUlZAlC2g=
 
 ## "WebSocket.send()" method
 * -> can send either **`text or binary data`**
-* -> allows **`body`** in string or a binary format, including (_Blob, ArrayBuffer, ..._); (_no settings are required: just send it out in any format_)
+* -> allows **`body`** in **string** or a binary format (_including **Blob**, **ArrayBuffer**, **TypedArray**_); (_no settings are required: just send it out in any format_)
 * -> when we **`receive the data`**, text always comes as string. And for binary data, we can choose between Blob and ArrayBuffer formats
 * (_that’s set by **socket.binaryType** property, it’s **`blob by default`**, so binary data comes as Blob objects_)
+
+```js
+// -----> Application A:
+const socket = new WebSocket('ws://application-b');
+const file = new File(["Hello, World!"], "example.txt", { type: "text/plain" });
+
+// Send metadata
+socket.onopen = () => {
+    const metadata = {
+        type: 'file-metadata',
+        fileName: file.name,
+    };
+    socket.send(JSON.stringify(metadata));
+
+    // Read and send the file as a binary blob
+    const reader = new FileReader();
+    reader.onload = () => socket.send(reader.result);
+    reader.readAsArrayBuffer(file);
+};
+
+// -----> Application B:
+const socket = new WebSocket('ws://application-b');
+let fileBuffer = [];
+
+socket.onmessage = (event) => {
+    const data = event.data;
+    if (typeof data === 'string') {
+        const metadata = JSON.parse(data);
+        console.log('Metadata received:', metadata);
+    } else {
+        fileBuffer.push(data);
+    }
+};
+
+```
 
 * _s **`Blob is a high-level binary object`**, it directly integrates with <a>, <img> and other tags, so that’s a sane default_
 * _But for **`binary processing`**, to access individual data bytes, we can change it to **arraybuffer**_
