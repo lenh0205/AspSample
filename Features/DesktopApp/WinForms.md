@@ -9,6 +9,10 @@
 * -> sau đó nó sẽ chạy **VSIX Installer** -> click **Modify** để kích hoạt
 * -> giờ restart lại Visual Studio 
 
+# chạy 'Setup project'
+* -> right-click để `rebuild` nó 
+* -> cần đảm bảo clear tất cả error lẫn warning (nhất là warning về version) để product build ra chạy oke
+
 =====================================================================
 ## Use case
 * -> nó cho phép trả xây dựng app rất nhanh nhưng sẽ kèm với 1 số bất lợi lâu dài; vậy nên sẽ phù hợp đối khi cần triền khai thử 1 ý tưởng 

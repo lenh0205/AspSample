@@ -272,6 +272,25 @@ There are other codes like:
 * **3** – **`CLOSED`**: the connection is closed
 
 =====================================================
+# Case: the connection failed to be established 
+* -> khi **onerror** được trigger thì chắc chắn theo sau đó sẽ là **onclose**
+
+```js
+const webSocket = new undici.WebSocket("wss://invalid-domain.example.com/");
+webSocket.onopen = () => { console.log("open"); };
+webSocket.onclose = () => { console.log("close"); };
+webSocket.onerror = () => { console.log("error"); };
+
+// the standard-compliant WebSocket implementation would output:
+// error
+// close
+```
+
+=====================================================
+# Case: possible to create 2 distinc websocket connections to the same server from the same client
+https://stackoverflow.com/questions/9247971/multiple-websocket-connections
+
+=====================================================
 # Chat App Example
 * _using browser **`WebSocket API`** and Node.js **`WebSocket module`**_
 

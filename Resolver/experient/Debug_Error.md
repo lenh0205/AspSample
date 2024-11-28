@@ -40,6 +40,17 @@
 * Trình duyệt sẽ báo: _`Your Connection is not private`: Attackers might be trying to steal your information from `localhost`_
 * ta sẽ sửa lại cấu hình Chrome -> truy cập đường link **`chrome://flags/`** -> check vào **Allow invalid certificates for resources loaded from localhost**
 
+# Setting - Visual Studio lúc run project báo lỗi "Couldn't process file .... due to its being in the Internet or Restricted zone or having the mark of the web on the file"
+* -> if we **`downloaded the file from the internet`**, either separately or inside a .zip file or similar, it may have been **`locked`** because it is flagged as coming from the **internet zone**
+
+* -> cách 1: mở file đó trong File Explorer -> right-click rồi chọn "properties" -> check vào **`Unblock`** option -> rồi bấm Ok
+
+* -> cách 2: if we got the file from an archive, trước khi unzip ta sẽ **`Unblock`** the archive first (_if the file is flagged as coming from the internet zone, and you unzip it, that flag might propagate to many of the files you just unarchived_)
+* -> cách 3: sử dụng code
+```bash
+> Get-ChildItem -Path '<YOUR-SOLUTION-PATH>' -Recurse | Unblock-File
+```
+
 ==============================================================
 # C# - Optional parameters must appear after all required parameters
 ```cs
