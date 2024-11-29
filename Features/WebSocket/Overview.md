@@ -164,9 +164,44 @@ Sec-WebSocket-Accept: hsBlbuDTkk24srzEOTBUlZAlC2g=
 
 ## "WebSocket.send()" method
 * -> can send either **`text or binary data`**
-* -> allows **`body`** in string or a binary format, including (_Blob, ArrayBuffer, ..._); (_no settings are required: just send it out in any format_)
+* -> allows **`body`** in **string** or a binary format (_including **Blob**, **ArrayBuffer**, **TypedArray**_); (_no settings are required: just send it out in any format_)
 * -> when we **`receive the data`**, text always comes as string. And for binary data, we can choose between Blob and ArrayBuffer formats
 * (_that’s set by **socket.binaryType** property, it’s **`blob by default`**, so binary data comes as Blob objects_)
+
+```js
+// -----> Application A:
+const socket = new WebSocket('ws://application-b');
+const file = new File(["Hello, World!"], "example.txt", { type: "text/plain" });
+
+// Send metadata
+socket.onopen = () => {
+    const metadata = {
+        type: 'file-metadata',
+        fileName: file.name,
+    };
+    socket.send(JSON.stringify(metadata));
+
+    // Read and send the file as a binary blob
+    const reader = new FileReader();
+    reader.onload = () => socket.send(reader.result);
+    reader.readAsArrayBuffer(file);
+};
+
+// -----> Application B:
+const socket = new WebSocket('ws://application-b');
+let fileBuffer = [];
+
+socket.onmessage = (event) => {
+    const data = event.data;
+    if (typeof data === 'string') {
+        const metadata = JSON.parse(data);
+        console.log('Metadata received:', metadata);
+    } else {
+        fileBuffer.push(data);
+    }
+};
+
+```
 
 * _s **`Blob is a high-level binary object`**, it directly integrates with <a>, <img> and other tags, so that’s a sane default_
 * _But for **`binary processing`**, to access individual data bytes, we can change it to **arraybuffer**_
@@ -235,6 +270,25 @@ There are other codes like:
 * **1** – **`OPEN`**: communicating,
 * **2** – **`CLOSING`**: the connection is closing,
 * **3** – **`CLOSED`**: the connection is closed
+
+=====================================================
+# Case: the connection failed to be established 
+* -> khi **onerror** được trigger thì chắc chắn theo sau đó sẽ là **onclose**
+
+```js
+const webSocket = new undici.WebSocket("wss://invalid-domain.example.com/");
+webSocket.onopen = () => { console.log("open"); };
+webSocket.onclose = () => { console.log("close"); };
+webSocket.onerror = () => { console.log("error"); };
+
+// the standard-compliant WebSocket implementation would output:
+// error
+// close
+```
+
+=====================================================
+# Case: possible to create 2 distinc websocket connections to the same server from the same client
+https://stackoverflow.com/questions/9247971/multiple-websocket-connections
 
 =====================================================
 # Chat App Example

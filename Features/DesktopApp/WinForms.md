@@ -3,7 +3,15 @@
 
 =====================================================================
 # publish WinForms project as '.msi' file
-* -> VSIX Installer -> click **Modify** để chạy 
+
+* đầu tiên cần install the **`Visual Studio Installer Projects Extension`**
+* -> Visual Studio -> **Extension** menu -> Manage Extensions -> Visual Studio Installer Projects
+* -> sau đó nó sẽ chạy **VSIX Installer** -> click **Modify** để kích hoạt
+* -> giờ restart lại Visual Studio 
+
+# chạy 'Setup project'
+* -> right-click để `rebuild` nó 
+* -> cần đảm bảo clear tất cả error lẫn warning (nhất là warning về version) để product build ra chạy oke
 
 =====================================================================
 ## Use case
