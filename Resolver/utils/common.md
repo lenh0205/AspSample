@@ -230,3 +230,9 @@ public static int GetAge(this DateTime dateOfBirth)
 ```
 
 ===================================================================
+# get MIME type of an image
+
+```cs
+var imgStrm = System.Drawing.Image.FromStream(stream);
+var mimeType = ImageCodecInfo.GetImageEncoders().First(codec => codec.FormatID == imgStrm.RawFormat.Guid).MimeType;
+```

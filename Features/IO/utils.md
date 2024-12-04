@@ -71,7 +71,7 @@ finally
 # 'StreamReader - StreamWriter' and 'BinaryWriter - BinaryReader'
 
 ## Problem
-* -> are `not streams` (_ not derived from System.IO.Stream_)
+* -> are `not streams` (_not derived from System.IO.Stream_)
 * -> with **Stream**, the functions for reading and writing are all **`byte orientated`** (_e.g. WriteByte()_)
 * -> there are **`no direct functions for work with higher data types like integers, strings, ....`**
 * => this makes the stream very general-purpose, but **`less simple to work with`** (_if, say, we just want to **transfer text**_)
@@ -129,6 +129,16 @@ myBinaryWriter.Write(123);
 # Convert between Stream
 * -> we generally read data from one stream and write it to another - **`.CopyTo()`**
 
+```cs
+MemoryStream _ms;
+    
+public MyClass(Stream sourceStream)
+{
+    _ms = new MemoryStream();
+    sourceStream.CopyTo(_ms);
+}
+```
+
 ```cs - Reading from the "FileStream" and writing to a "MemoryStream"
 string filePath = "example.txt";
 
@@ -145,7 +155,7 @@ using (FileStream fileStream = new FileStream("/filePath", FileMode.Open, FileAc
 {
     using (MemoryStream memoryStream = new MemoryStream())
     {
-        fileStream.CopyTo(memoryStream);
+        fileStream.CopyTo(memoryStream); // copy to Memory Stream
 
         // read from the MemoryStream
         memoryStream.Position = 0; // Reset position to the beginning
@@ -156,6 +166,29 @@ using (FileStream fileStream = new FileStream("/filePath", FileMode.Open, FileAc
         }
     }
 }
+```
+
+## Convert stream to physical file
+
+```cs
+using var fileStream = File.Create(path);
+stream.Position = 0;
+stream.CopyTo(fileStream);
+
+// or
+using var fileStream = File.Create(path);
+fileStream.Write(stream.ToArray());
+
+// or
+using var fileStream = File.Create(path);
+stream.Position = 0;
+while (stream.Position < stream.Length)
+{
+    fileStream.WriteByte((byte)stream.ReadByte());
+}
+
+// or
+File.WriteAllBytes(path, stream.ToArray());
 ```
 
 ## Typical operations on a stream
@@ -237,7 +270,47 @@ public static string GetMimeTypeFromImageByteArray(byte[] byteArray)
 > https://metrics.aspose.com/products/net/ocr/
 
 # Convert a scanned document or an image to a searchable PDF document 
-* -> in the case **images** or **scanned documents** can contain **`textual information`**, we can use the **`OCR (optical character recognition)`** to create a "searchable PDF"
+* -> in the case **images** or **scanned documents** can contain **`textual information`**, we can use the **`OCR (optical character recognition)`** to create a **`searchable PDF`**
+
+* -> the **` Aspose.OCR`** could easily read such texts, check the spelling, and replace any distorted characters from the misspelled text on the image
+* -> possible to scan and recognize text from a complete image or only a select part of the image for this process
+
+```cs - Recognize and extract text from PDF
+// -> this code example demonstrates how to OCR "PDF documents" 
+// -> and convert the extracted text from PDF to multiple format ("DOCX" - Word format in this case)
+
+// Initialize the PCR engine
+AsposeOcr recognitionEngine = new AsposeOcr();
+
+// Initialize recognition settings
+DocumentRecognitionSettings recognitionSettings = new DocumentRecognitionSettings();
+
+// Specify language for OCR. Multi-language by default
+recognitionSettings.Language = Language.Eng;
+
+// Recognize text from PDF
+List results = recognitionEngine.RecognizePdf("C:\\MyFiles\\test.pdf", recognitionSettings);
+
+// Save the recognized text as Word (DOCX) file
+AsposeOcr.SaveMultipageDocument("C:\\Files\\OCR_result.docx", SaveFormat.Docx, results);
+```
+
+```cs - Effortlessly Convert Images to Searchable PDFs 
+// -> extract searchable text from scanned images and photos of different commonly-used image formats such as GIF, PNG, JPG, BMP, and TIFF
+// -> converting JPG to PDF
+
+// Set path for input image to recognize
+string image = "OCR_test.jpg";
+
+// Initialize AsposeOcr class instance
+AsposeOcr api = new AsposeOcr();
+
+// Recognize input image with RecognizeImage method
+RecognitionResult result = api.RecognizeImage(image, new RecognitionSettings());
+
+// Save output to searchable PDF file
+result.Save("OCR_output.pdf", SaveFormat.Pdf);
+```
 
 ## searchable PDF
 * -> is a type of PDF file that contains both the **original visual content** (_e.g., a `scanned image` of a document_) and an **underlying, invisible layer of text**

@@ -12,6 +12,8 @@
 # chạy 'Setup project'
 * -> right-click để `rebuild` nó 
 * -> cần đảm bảo clear tất cả error lẫn warning (nhất là warning về version) để product build ra chạy oke
+* -> lưu ý chỉ để những Reference và kiểm tra version của project ta chỉ định làm Primary Output
+* -> kiểm tra prerequisite (_https://www.gonnalearn.com/target-version-net-framework-launch-condition-version/_) xem Primary Output và project có đang trỏ đến cùng 1 **version .NET Framework** không
 
 =====================================================================
 ## Use case
@@ -98,3 +100,8 @@ static void Main()
 * -> OnHandleCreated: Handle is created. Control can now interact with Windows.
 * -> OnLoad: Form and its controls are ready to be displayed.
 * -> Shown: The form becomes visible.
+
+## 'OnHandleCreated'
+* -> **a protected virtual method** of **`Control`** class that get called when **`the control's underlying window handle is created`**
+* -> by **override this method** we can **`perform custom actions at the point where the control's handle becomes available`**
+* -> this is often necessary for **`interacting with unmanaged resources or APIs`** that **depend on the control's handle**
