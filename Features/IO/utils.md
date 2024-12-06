@@ -3,6 +3,38 @@ https://stackoverflow.com/questions/43935608/difference-between-buffer-stream-in
 https://learn.microsoft.com/en-us/dotnet/api/system.io.bufferedstream?view=net-8.0
 https://www.infoworld.com/article/2337595/how-to-use-bufferedstream-and-memorystream-in-c-sharp.html
 https://stackoverflow.com/questions/63637874/does-converting-between-byte-and-memorystream-cause-overhead
+
+===================================================================
+# File
+
+## Download a static file from URL (virtual path of server)
+```cs
+string url = "https://example.com/path/to/your/file.ext"; // Replace with your URL
+string outputPath = @"C:\path\to\save\file.ext"; // Replace with your desired save path
+
+using (var client = new HttpClient())
+{
+    try
+    {
+        using (var response = await client.GetAsync(url))
+        {
+            response.EnsureSuccessStatusCode();  // Ensure successful response with 200 Status
+
+            // Read the response content as a byte array
+            byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+            // Write the byte array to a file
+            File.WriteAllBytes(outputPath, fileBytes);
+            Console.WriteLine($"File downloaded successfully to: {outputPath}");
+        }
+    }
+    catch (HttpRequestException e)
+    {
+        Console.WriteLine($"Error downloading file: {e.Message}");
+    }
+}
+```
+
 ===================================================================
 # "input stream" and "output stream"
 * -> streams for **`writing only`** are typically called **output streams**
@@ -15,7 +47,7 @@ https://stackoverflow.com/questions/63637874/does-converting-between-byte-and-me
 
 ```cs
 // for read file at a specific path:
-var fs = New FileStream("File Path", FileMode.Open);
+var fs = new FileStream("File Path", FileMode.Open);
 
 // for write file at a specific path:
 FileStream fs = new FileStream(strFilePath, FileMode.Create);
@@ -130,12 +162,14 @@ myBinaryWriter.Write(123);
 * -> we generally read data from one stream and write it to another - **`.CopyTo()`**
 
 ```cs
-MemoryStream _ms;
     
 public MyClass(Stream sourceStream)
 {
-    _ms = new MemoryStream();
-    sourceStream.CopyTo(_ms);
+    using(var _ms = new MemoryStream())
+    {
+        sourceStream.CopyTo(_ms);
+        return _ms.ToArray();
+    }
 }
 ```
 
@@ -168,7 +202,7 @@ using (FileStream fileStream = new FileStream("/filePath", FileMode.Open, FileAc
 }
 ```
 
-## Convert stream to physical file
+# Convert stream to physical file
 
 ```cs
 using var fileStream = File.Create(path);
@@ -191,7 +225,7 @@ while (stream.Position < stream.Length)
 File.WriteAllBytes(path, stream.ToArray());
 ```
 
-## Typical operations on a stream
+# Typical operations on a stream
 
 ```cs
 byte[] data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };

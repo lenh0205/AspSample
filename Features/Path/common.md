@@ -10,9 +10,20 @@ string subPath = HttpContext.Current.Server.MapPath("~/Uploads/KySo/");
 
 # Get Virtual Path:
 ```cs
-var authority = HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority);
-var resolvedUrl = VirtualPathUtility.ToAbsolute("~/DesktopModules/ViF/QLVB/QLVB/pages/ClientUpload.aspx");
-var urlUpload1 = authority + resolvedUrl;
+// .NET Framework
+var urlUpload = HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority)
+    + VirtualPathUtility.ToAbsolute("~/DesktopModules/ViF/QLVB/QLVB/pages/ClientUpload.aspx");
+
+// .NET Core
+public MyConstructor(IWebHostEnvironment environment)
+{
+    _environment = environment;
+}
+public IActionResult MyAction()
+{
+    var path = Path.Combine(_environment.WebRootPath, "DesktopModules", "VIF", "QLVB", "UPLOADS");
+    var url = Url.Content("~/DesktopModules/VIF/QLVB/UPLOADS");
+}
 ```
 
 # Get "file name" without extension (.NET Framework)

@@ -1,4 +1,8 @@
-# WebSocket
+> ta cần hiểu là khi các **browser-base web client** sử dụng javascript (new WebSocket) thì là nó đang **`tạo connection`** tới Websocket server
+> Browser-base web không thể tạo ra 1 websocket server; mà cần 1 server thực sự (sử dụng Nodejs, python, ....)
+> **`1 Websocket server`** có thể được kết nối với nhiều client connection khác nhau
+
+# WebSocket Connection from "browser web client"
 * -> the **`WebSocket protocol`** (_described in the specification RFC 6455_), provides a way to **`exchange data between browser and server`** via **a persistent connection** 
 * -> the data can be passed in **`both directions`** as **packets**, without breaking the connection and the need of additional HTTP-requests
 
