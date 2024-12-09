@@ -35,7 +35,7 @@
 * -> **close** – connection closed
 
 ```js - create web socket connection
-let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
+const socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
 
 socket.onopen = function(e) {
   alert("[open] Connection established");
@@ -216,6 +216,14 @@ socket.onmessage = (event) => {
 };
 ```
 
+## Transfer a file
+* -> với trường hợp truyền file, thì thường ta sẽ gửi liên tục **`2 .send() request`**: 1 lần là **`metadata`** của file (fileName, fileSize, fileType, ...) và 1 lần là **`File Content`**
+* -> **File Content** thường sẽ có format là **`Blob`** hoặc **`File`**; hoặc **`Base64`** (trong trường hợp WebSocket implementation chỉ support base text)
+
+* -> nếu file quá lớn, ta có thể tách thành nhiều chunk **`{"type": "file-chunk", "fileName": "example.txt", "chunkIndex": 1, "chunkData": "<binary data>"}`**
+* -> send a final message indicating the end of the transfer **`{ "type": "file-transfer-complete", "fileName": "example.txt" }`**
+* -> since WebSocket is built on **TCP**, it **`ensures delivery order`** (_however, it doesn’t handle application-level errors (e.g., missed chunks)_)
+
 =======================================================
 # Rate limiting
 * imagine, our app is generating a lot of data to send. But the user has a slow network connection (_maybe on a mobile internet, outside of a city_)
@@ -365,4 +373,146 @@ function onSocketConnect(ws) {
     clients.delete(ws);
   });
 }
+```
+
+=====================================================
+# ASP.NET Core
+* -> **message** sẽ được **Send** cũng như **Receive** dưới dạng **`byte[]`** 
+
+```cs - Console App
+using System.Net.WebSockets;
+using System.Text;
+
+var ws = new ClientWebSocket();
+Console.WriteLine("Connecting to server");
+await ws.ConnectAsync(new Uri("ws://localhost:6969/ws"),
+  CancellationToken.None);
+Console.WriteLine("Connected!");
+
+var receiveTask = Task.Run(async () =>
+{
+    var buffer = new byte[1024];
+    while (true)
+    {
+        var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer),
+            CancellationToken.None);
+
+        // check if the connection is not closed before processing the result
+        if (result.MessageType == WebSocketMessageType.Close)
+        {
+            break;
+        }
+
+        // display as a string
+        var message = Encoding.UTF8.GetString(buffer, 0, result.Count); 
+        Console.WriteLine("Recieved: "+message);
+
+    }
+});
+
+await receiveTask;
+```
+
+```cs - winforms
+public partial class MainForm : Form
+{
+    private ClientWebSocket _webSocket;
+
+    public MainForm()
+    {
+        InitializeComponent();
+    }
+
+    private async void btnConnect_Click(object sender, EventArgs e)
+    {
+        InitializeWebSocket();
+    }
+
+    private async void btnSend_Click(object sender, EventArgs e)
+    {
+        string message = txtMessage.Text; // get text from "textbox"
+        await SendMessage(message);
+    }
+
+    private async void InitializeWebSocket()
+    {
+        try
+        {
+            _webSocket = new ClientWebSocket();
+            _webSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
+
+            // Connect to the WebSocket server
+            await _webSocket.ConnectAsync(new Uri("wss://127.0.0.1:8987/SignCopy"), CancellationToken.None);
+
+            OnOpen();
+            await ReceiveMessagesAsync();
+        }
+        catch (Exception ex)
+        {
+            OnError(ex);
+        }
+    }
+
+    private async Task ReceiveMessagesAsync()
+    {
+        var buffer = new byte[1024 * 4];
+
+        try
+        {
+            // "ClientWebSocket" class doesn't have built-in websocket events
+            // continuous loop runs as long as the WebSocket connection is open
+            while (_webSocket.State == WebSocketState.Open)
+            {
+                // a blocking call that waits for a message from the WebSocket server
+                var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    OnClose();
+                    await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                }
+                else if (result.MessageType == WebSocketMessageType.Text)
+                {
+                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    OnMessage(message);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OnError(ex);
+        }
+    }
+
+    private async void SendMessage(string message)
+    {
+        if (_webSocket?.State == WebSocketState.Open)
+        {
+            var buffer = Encoding.UTF8.GetBytes(message);
+            await _webSocket.SendAsync(
+              new ArraySegment<byte>(buffer), 
+              WebSocketMessageType.Text, 
+              true, 
+              CancellationToken.None
+            );
+        }
+    }
+
+    // in case "message" is a complex object 
+    private async Task SendMessage<T>(T messageObject)
+    {
+        if (_webSocket?.State == WebSocketState.Open)
+        {
+            string jsonString = JsonSerializer.Serialize(messageObject);
+            byte[] buffer = Encoding.UTF8.GetBytes(jsonString);
+            await _webSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+    }
+
+    private void OnOpen() => MessageBox.Show("Connected to WebSocket server.");
+    private void OnMessage(string message) => MessageBox.Show($"Received: {message}");
+    private void OnClose() => MessageBox.Show("Connection closed.");
+    private void OnError(Exception ex) => MessageBox.Show($"Error: {ex.Message}");
+}
+
 ```

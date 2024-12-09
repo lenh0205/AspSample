@@ -34,6 +34,12 @@ using (var client = new HttpClient())
     }
 }
 ```
+```cs - hoặc
+string url = "https://downloadfreeimages.jpg";
+string savePath = @"D:\Demo\FreeImages.jpg";
+WebClient client = new WebClient();
+client.DownloadFile(url, savePath);
+```
 
 ===================================================================
 # "input stream" and "output stream"
