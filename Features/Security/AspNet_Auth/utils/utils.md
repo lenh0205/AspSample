@@ -203,3 +203,87 @@ code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
 var result = await _userManager.ConfirmEmailAsync(user, code);
 StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
 ```
+
+============================================================
+# Authorize against "scope" claim contain a list value
+
+```cs
+//  access the API controller with a JWT Token which contains this single scope 
+services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        "HasReadScope",
+        builder.RequireClaim("scope", "read"));
+    options.AddPolicy(
+        "HasReadOrWriteScope",
+        builder.RequireClaim("scope", "read", "write")); // "scope" claim have a single value with "read" or "write"
+});
+// apply both "HasReadScope" and "HasReadOrWriteScope" policy
+[Authorize(Policy = "HasReadScope")]
+[Authorize(Policy = "HasReadOrWriteScope")]
+public IActionResult Get()
+{
+    return Ok();
+}
+
+
+// for access token contains a scope claim with a multi value like "read write delete"
+services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        "HasReadWriteScope",
+        builder.RequireScope("read", "write"));
+});
+public static class ScopeAuthorizationRequirementExtensions
+{
+    public static AuthorizationPolicyBuilder RequireScope(
+        this AuthorizationPolicyBuilder authorizationPolicyBuilder,
+        params string[] requiredScopes)
+    {
+        authorizationPolicyBuilder.RequireScope((IEnumerable<string>) requiredScopes);
+        return authorizationPolicyBuilder;
+    }
+ 
+    public static AuthorizationPolicyBuilder RequireScope(
+        this AuthorizationPolicyBuilder authorizationPolicyBuilder,
+        IEnumerable<string> requiredScopes)
+    {
+        authorizationPolicyBuilder.AddRequirements(new ScopeAuthorizationRequirement(requiredScopes));
+        return authorizationPolicyBuilder;
+    }
+}
+public class ScopeAuthorizationRequirement : AuthorizationHandler<ScopeAuthorizationRequirement>, IAuthorizationRequirement
+{
+    public IEnumerable<string> RequiredScopes { get; }
+ 
+    public ScopeAuthorizationRequirement(IEnumerable<string> requiredScopes)
+    {
+        if (requiredScopes == null || !requiredScopes.Any())
+        {
+            throw new ArgumentException($"{nameof(requiredScopes)} must contain at least one value.", nameof(requiredScopes));
+        }
+ 
+        RequiredScopes = requiredScopes;
+    }
+ 
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ScopeAuthorizationRequirement requirement)
+    {
+        if (context.User != null)
+        {
+            var scopeClaim = context.User.Claims.FirstOrDefault(
+                c => string.Equals(c.Type, "scope", StringComparison.OrdinalIgnoreCase));
+ 
+            if (scopeClaim != null)
+            {
+                var scopes = scopeClaim.Value.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                if (requirement.RequiredScopes.All(requiredScope => scopes.Contains(requiredScope)))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+ 
+        return Task.CompletedTask;
+    }
+}
+```

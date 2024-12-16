@@ -46,3 +46,12 @@ Path.GetDirectoryName(pathToFile); // Output: Template/Word
 
 // cần check xem nó có phải là file trước, vì thằng "Path.GetDirectoryName" nó chỉ đơn giản là bỏ đi phần cuối thôi không quan tâm là nó là Directory hay File
 ```
+
+# Get supported physical directory path for saving temporary file:
+* -> the GetTempPath function checks for the existence of environment variables in the following order and uses the first path found: The path specified by the TMP environment variable, the path specified by the TEMP environment variable, the path specified by the USERPROFILE environment variable.
+The Windows directory.
+* -> **IMPORTANT NOTE**: it doesn't check whether or not the path actually exists or can be written to, so you may end up trying to write your log files to a path that doesn't exist, or one that you cannot access.
+
+```cs
+Path.GetTempPath() // typically return 
+```
