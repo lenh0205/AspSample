@@ -3,6 +3,23 @@
 * -> it **`allows third-party applications`** to **verify the identity of the end-user** and to **obtain basic user profile information**
 * -> OIDC **`uses JSON web tokens (JWTs)`** - obtain when using flows conforming to the OAuth 2.0 specifications. See our OIDC Handbook for more details.
 
+```cs - the OpenID Connect specification only defines a single set of "standard scopes":
++==========+================================================================================+
+|  Scope   |                                Claims                                          |
++==========+================================================================================+
+|  openid  |   sub, auth_time, acr                                                          |
++==========+================================================================================+
+|  profie  |   name, family_name, given_name, middle_name, nickname, preferred_username,    |
+|          |   profile, picture, website, gender, birthdate, zoneinfo, locale, updated_at   |
++==========+================================================================================+
+|  email   |   email, email_verified                                                        |
++==========+================================================================================+
+|  address |   address                                                                      |
++==========+================================================================================+
+|  phone   |   phone_number, phone_number_verified                                          |
++==========+================================================================================+
+```
+
 # OpenID vs. OAuth2
 * -> while **OAuth 2.0** is about **`resource access and sharing`**, **OIDC** is about **`user authentication`** 
 * -> its purpose is to **give us one login for multiple sites**

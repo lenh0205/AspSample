@@ -112,10 +112,12 @@ try
     }
 
     // Connect to the first available scanner
-    var device = firstScannerAvailable.Connect();
+    Device device = firstScannerAvailable.Connect();
 
-    // Select the scanner
-    var scannerItem = device.Items[1];
+    // Select the scanner 
+    // 'Device' is a physical device; and "Item" is a specific functional unit of device
+    // each 'Item' is indexed, starting from 1
+    Item scannerItem = device.Items[1];
 
     // Set the scanner settings
     int resolution = 150;

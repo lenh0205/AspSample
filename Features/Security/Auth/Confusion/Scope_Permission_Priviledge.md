@@ -1,14 +1,6 @@
-> What is the difference between **permissions**, **privileges**, and **scopes** in the **`authorization context`**?
-> behaft of user ?
-
 ========================================================
 # Actors of Access Control
 * **access control** is the **`selective restriction`** of **`access to a resource`**; determines who can do what on a resource
-
-* -> the **user** - the **`entity`** that wants to **`perform an action`** on an object
-* -> the **resource** - the **`object`** that a **`user wants to use`**
-* -> the **application** - the software that **`mediates`** the interaction **`between the user and the resource`**
-* => the `relationship between` the three actors described above contributes to the _complexity of access control_
 
 # Permissions
 * -> is a **declaration of an `action` that can be executed on a `resource`**
@@ -31,8 +23,11 @@
 * -> however, an application can request **`scopes corresponding to privileges that the user doesn't have`** and the **`user can grant them`**
 * -> this covers situations where the **`user doesn't have a given privilege`** in the moment they **grant the scopes to the application** but **`the user will have that privilege when the application exercises that scope to resources`**
 * -> the vice versa can happen too, **`a user has a given privilege`** and **grants a delegated access for the corresponding scope**, but **`the user loses the privilege when the application tries to exercise its scope`**
-
 * => this means that, **`on the resource side users' privileges must be checked even in the presence of granted scopes`** (_scopes should not be considered application's privileges_)
+
+* -> lưu ý là không phải cứ ứng với 1 permission thì sẽ tồn tại 1 scope, we could **`reserve some permissions for the user`** and decide that they are not delegable (**`third-party application can't request that permission as scope`**)
+* -> also there **scopes** that don't have a match among the **`resource's permissions or the user's privileges`** 
+* (_for instance, scopes defined by **OpenID Connect**: openid (request ID token from authorization server), profile (for ID token to contain user profile info as claims), email, address, phone)
 
 ```r - Example: "scope" shown in the following authorization request
 https://YOUR_DOMAIN/authorize?
