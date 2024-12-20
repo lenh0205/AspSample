@@ -231,6 +231,39 @@ while (stream.Position < stream.Length)
 File.WriteAllBytes(path, stream.ToArray());
 ```
 
+# Find MIME type / Extension of file stream
+```cs
+using (MemoryStream stream = new MemoryStream(byteArray))
+using (Image image = Image.FromStream(stream))
+{
+    return ImageCodecInfo.GetImageEncoders().First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
+}
+```
+
+# Convert FileStream to Image
+
+```cs - convert to "System.Drawing.Image"
+using (FileStream fileStream = new FileStream("path_to_your_image_file.jpg", FileMode.Open, FileAccess.Read))
+{
+    Image image = System.Drawing.Image.FromStream(fileStream);
+    pictureBox1.Image = image;
+}
+```
+
+```cs - convert to physical image file ".jpg"
+Stream inputStream;
+string filePath = @"C:\Path\To\Save\image.jpg";
+
+if (inputStream.CanSeek)
+{
+    inputStream.Position = 0;
+}
+using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+{
+    inputStream.CopyTo(fileStream);
+}
+```
+
 # Typical operations on a stream
 
 ```cs
@@ -289,27 +322,13 @@ using (MemoryStream memoryStream = new MemoryStream(data))
 }
 ```
 
-===================================================================
-# Byte
-
-## Find mime type of a byte array if it's a 'System.Drawing.Image'
-
-```cs
-public static string GetMimeTypeFromImageByteArray(byte[] byteArray)
-{
-   using (MemoryStream stream = new MemoryStream(byteArray))
-   using (Image image = Image.FromStream(stream))
-   {
-       return ImageCodecInfo.GetImageEncoders().First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
-   }
-}
-```
+=================================================================
 
 ===================================================================
 > https://blog.aspose.com/ocr/convert-image-to-searchable-pdf-with-ocr-using-csharp/
 > https://metrics.aspose.com/products/net/ocr/
 
-# Convert a scanned document or an image to a searchable PDF document 
+# OCR - convert a scanned document or an image to a 'searchable' PDF document 
 * -> in the case **images** or **scanned documents** can contain **`textual information`**, we can use the **`OCR (optical character recognition)`** to create a **`searchable PDF`**
 
 * -> the **` Aspose.OCR`** could easily read such texts, check the spelling, and replace any distorted characters from the misspelled text on the image

@@ -24,9 +24,10 @@
 * -> khi lần đầu ta mở lên ta sẽ có ngay **Form1.cs [Design]** - a design surface cho ta làm việc, có nút phóng to, thu nhỏ, đóng
 * -> giờ ta có thể chạy project để visualize nó 
 
-* -> khi ta right-click vào "Form1.cs" sẽ có **`View Designer`** để xem designer của ta và **`View Code`** để xem code
-
 ## Develop
+* -> khi ta right-click vào "Form1.cs" sẽ có **`View Designer`** để xem designer của ta và **`View Code`** để xem code
+* -> về cơ bản thì 1 **Form** (Ex: Form1) sẽ cấu thành cơ bản từ **`Designer`** (Form1.cs [Designer]), **`Event`** (Form1.cs), **`Code associate between Designer and Event`** (Form1.Designer.cs) và Form1.resx (không biết làm gì)
+
 * -> ta mở bảng **`Toolbox`** lên (View -> Toolbox) nó sẽ chứa các control để ta thêm vào form của ta
 * -> ta sẽ thêm nhưng control thường dùng như: button, textbox, label, checkbox, progress bar,....
 * -> khi ta kéo thêm 1 control vào form của ta thì đồng nghĩa với việc ta thêm 1 variable vào form class của ta 
