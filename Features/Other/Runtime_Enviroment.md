@@ -153,3 +153,84 @@ lib/
 ## Example
 * -> nếu ta có 1 **WinForms project targeting .NET 6** và ta publish it as **`a Self-Contained Deployment`**
 * -> thì ta có hoàn toàn có thể chạy cái published application trên 1 Windows computer không install .NET 6
+
+=================================================================
+> refer to CPU architectures, not operating systems
+> are supported across multiple operating systems, including Windows, macOS, and Linux
+
+# Target Platform
+* -> determines what is the type of processor architecture that the application is built for to run on
+
+## Best Pratice
+* -> use **`Any CPU`** whenever possible - most flexible option and should be the default choice for most .NET applications
+* -> if app uses 32-bit-only native libraries thì ta nên dùng **`x86`** as Target Platform
+* -> if app requires > 4GB memory (memory is available to 32-bit processes is ~4GB) thì ta nên dùng **`x86`** as Target Platform
+
+```bash
+// An x64-only application won’t run on a 32-bit system
+// An ARM64 application won’t run on x86 systems
+```
+
+## Troubleshoot Architecture Issues
+* -> if we encounter issues related to the platform target, use **`CorFlags.exe`** - a tool that shows the CPU architecture of our application's executable
+* -> also check dependencies, ensure all referenced libraries and components match the platform target
+
+* -> maybe analyze our Application’s Runtime Behavior Use tools like Dependency Walker or ILSpy to analyze the runtime dependencies of the package
+* -> Use tools like Process Explorer to verify the architecture of your application and its loaded modules.
+
+
+## Type 
+* -> 32-bit (x86) architecture.
+* -> 64-bit (x64) or AMD64 architecture (an extension of x86)
+* -> ARM (ARM32 or ARM64) architecture
+* -> Any CPU: this option allows the app to run on any processor architecture
+
+### Any CPU:
+* -> the application can run on either 32-bit or 64-bit systems
+* -> runs as a 64-bit process by default and runs as a 32-bit process because 64-bit processes are not supported
+* -> if running on a 32-bit OS, it runs as a 32-bit process (if the referenced a NuGet package is x64 only, the app will fail with a BadImageFormatException)
+* -> if running on a 64-bit OS, it runs as a 64-bit process (if the referenced a NuGet package is x86 only, the app will fail with a BadImageFormatException)
+
+### x86:
+* -> Forces the application to run as a 32-bit process, even on a 64-bit OS.
+* -> Required if your application depends on 32-bit components or libraries (e.g., COM objects, ActiveX controls, DLLs) that do not have 64-bit equivalents
+
+### x64:
+* -> forces the application to run as a 64-bit process
+* -> used when your application needs to utilize more memory than a 32-bit process can access (32-bit processes are limited to ~4GB of memory)
+
+### ARM32 / ARM64:
+* -> targets ARM processors, typically used for devices like phones, tablets, IoT devices, and some modern Windows-on-ARM laptops
+
+## Compatibility of OS
+* -> Windows: Supports both x86 and x64.
+* -> macOS: Historically supported x86 and x64 until Apple transitioned to ARM64 processors (Apple Silicon) starting with the M1 chip in 2020.
+* -> Linux: Supports x86, x64, ARM, and other architectures
+
+* -> most modern PCs (with **`WOW64`** that has **32-bit Compatibility Mode**) support **`both 32-bit and 64-bit apps`**
+* -> nhưng chỉ có thể dùng 1 trong 2 để chạy 1 app; vậy nên 1 NuGet Package không thể cùng lúc bao gồm both x86 and x64 libraries
+* -> by default it will use the 64-bit process
+* -> but if the Windows OS is 64-bit but the process is forced to run in 32-bit mode (e.g., due to legacy dependencies), an x86 library can load successfully, but x64 libraries will fail
+* => nếu ta muốn xử lý 1 application chạy cho 2 CPU architect khác nhau thì ta sẽ cần tạo 2 bản build với 1 target to x86, 1 target to x64
+
+## Compatibility of NuGet package
+* -> **managed code** - written entirely in .NET languages (C#, VB.NET, F#), which are platform-agnostic; these packages typically support **`Any CPU`** and are safe for cross-platform use
+* -> **native Code** - if the package includes native libraries (e.g., C++ DLLs), it **`may only support specific architectures`** (e.g., x86 or x64)
+
+* => a NuGet package that uses native C++ libraries, such as **`image processing`** or **`hardware integration`** tools, may have architecture-specific binaries
+
+## Multi-Architecture Libraries
+* -> Some libraries include both x86 and x64 versions in their NuGet package (e.g., in runtimes/x86 and runtimes/x64 folders)
+* -> **`the correct version is automatically selected at runtime`**
+
+### Target Framework
+* -> if a package targets **`.NET Standard`** or a modern **`.NET`** runtime (e.g., .NET 6), it is more likely to support **Any CPU**
+* -> packages targeting older frameworks (e.g., **`.NET Framework`**) might depend on **architecture-specific dependencies** or runtime environments
+
+### TroubleShoot
+* -> if in the **`Dependencies`** section of **NuGet Package Manager**, the package lists platform-specific dependencies, it may not support "Any CPU"
+* -> a NuGet package is essentially a .zip file, we can extract it to **`look for folders named runtimes, x86, x64, ARM`**, etc
+if we see architecture-specific binaries (e.g., x86/native.dll), the package does not fully support "Any CPU"
+* -> we can also visit the package’s page on the **`NuGet Gallery`** to check architecture-specific
+
+### Using "Any CPU" application with a Platform-Specific Package
