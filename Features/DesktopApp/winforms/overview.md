@@ -3,17 +3,31 @@
 
 =====================================================================
 # publish WinForms project as '.msi' file
-
 * đầu tiên cần install the **`Visual Studio Installer Projects Extension`**
 * -> Visual Studio -> **Extension** menu -> Manage Extensions -> Visual Studio Installer Projects
 * -> sau đó nó sẽ chạy **VSIX Installer** -> click **Modify** để kích hoạt
 * -> giờ restart lại Visual Studio 
 
+* -> nếu có sẵn **setup_project** trong solution thì ta chỉ cần **Add existing project** và chọn file project **`.vdproj`** là được
+
+* -> còn nếu cần tạo mới thì: File -> Add -> New Project -> search for **`Setup Project`** or **`Setup Wizard`** template
+* -> right-click vào setup_project -> Add -> Project Output -> chọn project ta muốn build ra .msi
+
 # chạy 'Setup project'
-* -> right-click để `rebuild` nó 
-* -> cần đảm bảo clear tất cả error lẫn warning (nhất là warning về version) để product build ra chạy oke
+* -> trước tiên kiểm tra xem **`Primary Out`** có đúng là project ta muốn public ra file .msi chưa; 
+* -> right-click vào project để check xem đang **Active** Debug hay Release để biết nó build msi vào thư mục nào
+* -> cũng như kiểm tra trong **`Prerequisite`** xem nó có đang trỏ đến cùng **.NET target Framework** mà "primary output" project đang trỏ đến không
+* -> right-click để **`Rebuild`** nó 
+* -> nếu không thể build ra file .msi mới cần đảm bảo clear tất cả error lẫn warning (nhất là warning về version, thiếu file)
 * -> lưu ý chỉ để những Reference và kiểm tra version của project ta chỉ định làm Primary Output
-* -> kiểm tra prerequisite (_https://www.gonnalearn.com/target-version-net-framework-launch-condition-version/_) xem Primary Output và project có đang trỏ đến cùng 1 **version .NET Framework** không
+* -> xem các **detected Reference** của Setup_project có thừa thiếu gì với "primary out" project không
+* -> nếu build success nhưng vẫn bị warning trong quá trình build thì ta cũng nên kiểm tra lại
+
+# Debug Desktop App installed by .msi
+* -> khi Rebuild cần đảm bảo **setup_project** đang active **`Debug`** mode
+* -> chạy file **.msi** để install application và chạy application
+* -> Visual Studio -> Debug -> Attach to Process -> tìm process **`application_name.exe`**
+* -> đặt breakpoint vào project xem có được không
 
 =====================================================================
 ## Use case
