@@ -34,18 +34,17 @@
 * -> for .NET MAUI, it uses platform abstractions (platform-independent libraries and APIs) to work on Windows, macOS, iOS, and Android
 
 ## Web Developement
-ASP.NET Core:
+* **ASP.NET Core:**
+* -> Fully cross-platform.
+* -> Can run on Windows, macOS, and Linux.
+* -> Suitable for building web APIs, MVC applications, Razor Pages, and Blazor Server apps.
 
-Fully cross-platform.
-Can run on Windows, macOS, and Linux.
-Suitable for building web APIs, MVC applications, Razor Pages, and Blazor Server apps.
+* **ASP.NET (Classic):**
+* -> Windows-only because it depends on IIS (Internet Information Services), which is a Windows-specific web server.
+* -> The reasons for this are similar to desktop apps:
 
-ASP.NET (Classic):
-Windows-only because it depends on IIS (Internet Information Services), which is a Windows-specific web server.
-The reasons for this are similar to desktop apps:
-
-Cross-platform frameworks like ASP.NET Core are designed to use platform-independent abstractions.
-Windows-only frameworks like ASP.NET (Classic) rely on Windows-specific components like IIS
+* -> Cross-platform frameworks like ASP.NET Core are designed to use platform-independent abstractions.
+* -> Windows-only frameworks like ASP.NET (Classic) rely on Windows-specific components like IIS
 
 ## .NET Runtime vs .NET SDK
 * -> ta cần hiểu rằng nếu chỉ cái **.NET Runtime** thì nó sẽ không có những libraries như **`Microsoft.AspNetCore.`** hoặc **`Microsoft.Extensions.`** để dev 1 ASP.NET Core Web API app
@@ -124,6 +123,11 @@ lib/
 * -> **`WinForms and WPF`** chỉ được add vào .NET Core version 3.0
 * -> .NET Core lacked full support **`Windows Communication Foundation (WCF)`**, thường thì phải migrate to gRPC or ASP.NET Core for similar functionality
 * -> **`ASP.NET Web Forms`** was not ported to .NET Core because it was tightly tied to older technologies and design patterns  
+
+## Best Practice
+* -> không thể refer trực tiếp giữa 1 project target **.NET** và 1 project target **.NET Framework**, tốt nhất là ta nên extract **`shared code`** thành 1 **`.NET Standard library`** để các project khác tham chiếu tới
+* -> vì **.NET** là evolution của **.NET Core**, nên ta hoàn toàn có thể tham chiếu nếu API are compatible
+* -> có thể reference giữa các project có target **.NET** version khác nhau nếu API compatible, nhưng thường thì **.NET** có phiên bản cao sẽ khó refer đến **.NET** thấp hơn, trường hợp này ta nên dùng **`Multiple Targeting`**
 
 =================================================================
 # Publish/Deployment: 

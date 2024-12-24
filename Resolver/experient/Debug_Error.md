@@ -52,7 +52,7 @@
 ```
 
 ==============================================================
-# C# - Optional parameters must appear after all required parameters
+# BE - C# - Optional parameters must appear after all required parameters
 ```cs
 public void GetIAccountInfo(string VanThuDonVi = "1", int? donviId, int? phongbanId);
 // sửa thành:
@@ -60,21 +60,24 @@ public void GetIAccountInfo(int? donviId, int? phongbanId, string VanThuDonVi = 
 ```
 * Lỗi này là do để sai thứ tự param; vì "VanThuDonVi" là 1 **`Optional parameters`**, nó cần được để sau "donviId" và "phongbanId"
 
-# C# - Object reference not set to an instance of an object
+# BE - C# - Object reference not set to an instance of an object
 * -> trong trường hợp là bind data vào tham số của 1 Method không được, thì kiểm tra lại trong function nó có truy cập giá trị của các biến bằng **`.Value`**, có thì bỏ nó đi
 * -> có thể thử viết lại Method đó tối giản hơn, Ví dụ: gọi nó trực tiếp thay vì thông qua 1 Service hay 1 instance nào đó, đổi parameter sang dạng đơn giản hơn 
 
-==============================================================
 # BE - Run Debug - Gọi API với 1 Action Method nhưng khi đặt break point trong action method thì nó không chạy vô được
 * Kiểm tra lại Endpoint xem ta đặt break point đúng controller/action method chưa
 * Khả năng cao lỗi này là do **`không map được data ta truyền trong Request với Parameter của action method`**
 * -> VD: DaDoc=1 nhưng ta lại truyền DaDoc="1" ; hoặc truyền 1 field null cho unullable value
 
-# BE - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
+# BE - Dependencies - không thể load được các 'Analyzers' của project
+* -> rất có thể là do 1 trong các projects của ta đang target đến 1 phiên bản cao của .NET, ta sẽ cần kiểm tra xem máy tính của ta có cài phiên bản .NET này chưa
+* -> nếu cài rồi thì rất có thể Visual Studio của ta chưa hỗ trợ phiên bản .NET này, ta sẽ cần vào **Visual Studio Installer** để update Visual Studio lên phiên bản mới nhất
+
+# BE - calling API - System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported. Path: $.DataResult.MoveNextAction. ---> System.NotSupportedException: Serialization and deserialization of 'System.Action' instances are not supported.
 * Access API Swagger vẫn ra dữ liệu nhưng, frontend gọi bị lỗi
 * Lỗi này là do không dùng **`async`**` cho Method Action và Service
 
-# BE - Có dữ liệu trong Database nhưng không Get được
+# BE - DB - Có dữ liệu trong Database nhưng không Get được
 * Do các Item có field **`IsDeleted=True`**
 
 # BE - Turn Off Warning: the variable may be null
