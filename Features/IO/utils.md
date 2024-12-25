@@ -167,8 +167,7 @@ myBinaryWriter.Write(123);
 # Convert between Stream
 * -> we generally read data from one stream and write it to another - **`.CopyTo()`**
 
-```cs
-    
+```cs - from "Stream" to "byte[]"
 public MyClass(Stream sourceStream)
 {
     using(var _ms = new MemoryStream())

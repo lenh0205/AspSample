@@ -9,6 +9,8 @@
 * -> an abstract factory for initialize class instances with startup data
 * -> a factory for instantiating different implementation classes based upon passing parameters
 
+## Simple Factory
+
 ```cs
 // Ví dụ: ta có trang UI có 1 button để lấy thời gian hiện tại hiển thị ra màn hình
 // ta có 1 class "Sample1" chứa property thể hiện thời gian hiện tại; nếu ta inject class này vào 1 view
@@ -52,7 +54,13 @@ public class Sample1 : ISample1
 
 ## Abstract Factory
 * -> làm việc inject factory 1 cách rõ ràng hơn
+* -> lý do mà ta không inject trực tiếp **`IServiceCollection`** và dùng nó luôn, mà viết trong 1 factory để ta có thể làm rõ factory này có những dependencies nào cụ thể
+
 ```cs
+// Register
+builder.Services.AddAbstractFactory<ISample1, Sample1>();
+
+// Define
 public static class AbstractFactoryExtension
 {
     public static void AddAbstractFactory<TInterface, TImplementation>(this IServiceCollection services)
@@ -83,6 +91,177 @@ public class AbstractFactory<T> : IAbstractFactory<T>
 public interface IAbstractFactory<T>
 {
     T Create();
+}
+
+// Usage
+@inject IAbstractFactory<ISample1> factory
+<h2>@currentTime?.CurrentDateTime</h2>
+<button class="btn btn-primary" @onclick="GetNewTime">Get New Time</button>
+
+@code {
+    ISample1? currentTime;
+    private void GetNewTime()
+    {
+        currentTime = factory.Create();
+    }
+}
+```
+
+## Populate data when initiate instance
+* -> when using DI, constructor was passed in the dependencies only
+* -> to pass data to constructor at startup, we will create a factory that is custom built and **`only used for one particular type`**
+
+
+```cs
+// Register
+builder.Services.AddGenericClassWithDataFactory();
+
+// Define 
+public static class GenerateClassWithDataFactoryExtension
+{
+    public static void AddGenericClassWithDataFactory(this IServiceCollection services)
+    {
+        services.AddTransient<IUserData, UserData>();
+        services.AddSingleton<Func<IUserData>>(x => () => x.GetService<IUserData>()!);
+        services.AddSingleton<IUserDataFactory, UserDataFactory>();
+    }
+}
+
+public interface IUserDataFactory
+{
+    IUserData Create(string name);
+}
+
+public class UserDataFactory : IUserDataFactory
+{
+    private readonly Func<IUserData> _factory;
+
+    public UserDataFactory(Func<IUserData> factory)
+    {
+        _factory = factory;
+    }
+
+    public IUserData Create(string name)
+    {
+        var output = _factory();
+        output.Name = name;
+        return output;
+    }
+}
+
+// Usage
+<h1>Hello @user?</h1>
+
+@code {
+    IUserData? user;
+    protected override void OnInitialized()
+    {
+        user = userDataFactory.Create("Sue Storm");
+    }
+}
+
+// model
+public interface IUserData
+{
+    string? Name { get; set; }
+}
+
+public class UserData : IUserData
+{
+    public string? Name { get; set; }
+}
+```
+
+## Interface with multiple Implementation
+
+```cs
+// Usage
+builder.Services.AddVehicleFactory();
+
+// Define
+public static class DifferentImplementationsFactoryExtension
+{
+    public static void AddVehicleFactory(this IServiceCollection services)
+    {
+        services.AddTransient<IVehicle, Car>();
+        services.AddTransient<IVehicle, Truck>();
+        services.AddTransient<IVehicle, Van>();
+
+        services.AddSingleton<Func<IEnumerable<IVehicle>>>(x => () => x.GetService<IEnumerable<IVehicle>>()!);
+        services.AddSingleton<IVehicleFactory, VehicleFactory>();
+    }
+}
+
+public interface IVehicleFactory
+{
+    IVehicle Create(string name);
+}
+
+public class VehicleFactory : IVehicleFactory
+{
+    private readonly Func<IEnumerable<IVehicle>> _factory;
+
+    public VehicleFactory(Func<IEnumerable<IVehicle>> factory)
+    {
+        _factory = factory;
+    }
+
+    public IVehicle Create(string name)
+    {
+        var set = _factory();
+        // Lưu ý cách này có thể là vấn đề về performance nếu có hàng ngàn implementation của IVehicle
+        IVehicle output = set.Where(x => x.VehicleType == name).First();
+        return output;
+    }
+}
+
+// Usage
+@inject IVehicleFactory vehicleFactory
+
+<h1>Hello @user?.Name (who drives a @vehicle?.VehicleType)</h1>
+
+@code {
+    IVehicle? vehicle;
+
+    protected override void OnInitialized()
+    {
+        vehicle = vehicleFactory.Create("Truck");
+    }
+}
+
+// model
+public interface IVehicle
+{
+    string VehicleType { get; set; }
+
+    string Start();
+}
+
+public class Car : IVehicle
+{
+    public string VehicleType { get; set; } = "Car";
+    public string Start()
+    {
+        return "The car has been started.";
+    }
+}
+
+public class Truck : IVehicle
+{
+    public string VehicleType { get; set; } = "Truck";
+    public string Start()
+    {
+        return "The truck has been started.";
+    }
+}
+
+public class Van : IVehicle
+{
+    public string VehicleType { get; set; } = "Van";
+    public string Start()
+    {
+        return "The van has been started.";
+    }
 }
 ```
 

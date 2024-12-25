@@ -129,6 +129,10 @@ public class StudentController : Controller
 ```
 
 =================================================================
+# Data Annotation Model Binder
+https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions-1/models-data/validation-with-the-data-annotation-validators-cs
+
+=================================================================
 ## ValidationMessageFor
 * **`a strongly typed extension method`** 
 * -> **`first parameter`** - a lambda expression to **specify a property** for which we want to show an error message
