@@ -2,8 +2,94 @@
 ===============================================================
 # Arise
 * -> in **`Dependency Injection`**, we typically **put our dependencies in the constructor**; when class is created, the dependencies get created and injected
-* -> however, there're times we want to **create our dependencies more often or in a different way**
-* -> one solution is **Factory pattern**
+* => however, there're times we want to **create our dependencies more often or in a different way**
+* => one solution is **`Factory pattern`** - create instances properly from dependency injection
+
+* => we can create **factories** for various needs in project
+* -> an abstract factory for initialize class instances with startup data
+* -> a factory for instantiating different implementation classes based upon passing parameters
+
+```cs
+// Ví dụ: ta có trang UI có 1 button để lấy thời gian hiện tại hiển thị ra màn hình
+// ta có 1 class "Sample1" chứa property thể hiện thời gian hiện tại; nếu ta inject class này vào 1 view
+// thì mỗi lần bấm button nó sẽ không cập nhật thời gian mới mà chỉ lấy đúng thời gian đã được inject lúc load trang lần đâu
+// giờ chỉ còn cách là trong callback của button event, ta khởi tạo class thủ công và lấy nó ra khỏi Dependecies injection
+// điều này là vấn đề nhất là khi "Sample1" cũng chứa Dependencies mà lại không thể lấy từ DI nữa
+// => vậy nên ta sẽ cần 1 factory
+
+// program.cs
+builder.Services.AddTransient<ISample1, Sample1>();
+
+// a simple factory
+builder.Services.AddSingleton<Func<ISample1>>(x => () => x.GetService<ISample1>()!);
+
+// Index.razor
+@page "/"
+@inject Func<ISample1> factory
+
+<h2>@currentTime?.CurrentDateTime</h2>
+<button class="btn btn-primary" @onclick="GetNewTime">Get New Time</button>
+
+@code {
+    ISample1? currentTime;
+    private void GetNewTime()
+    {
+        // giờ mỗi lần bấm nút nó sẽ hiển thị cho ta thời gian mới nhất ra màn hình
+        currentTime = factory();
+    }
+}
+
+// model
+public interface ISample1
+{
+    string CurrentDateTime { get; set; }
+}
+public class Sample1 : ISample1
+{
+    public string CurrentDateTime { get; set; } = DateTime.Now.ToString();
+}
+```
+
+## Abstract Factory
+* -> làm việc inject factory 1 cách rõ ràng hơn
+```cs
+public static class AbstractFactoryExtension
+{
+    public static void AddAbstractFactory<TInterface, TImplementation>(this IServiceCollection services)
+    where TInterface : class
+    where TImplementation : class, TInterface
+    {
+        services.AddTransient<TInterface, TImplementation>();
+        services.AddSingleton<Func<TInterface>>(x => () => x.GetService<TInterface>()!);
+        services.AddSingleton<IAbstractFactory<TInterface>, AbstractFactory<TInterface>>();
+    }
+}
+
+public class AbstractFactory<T> : IAbstractFactory<T>
+{
+    private readonly Func<T> _factory;
+
+    public AbstractFactory(Func<T> factory)
+    {
+        _factory = factory;
+    }
+
+    public T Create()
+    {
+        return _factory();
+    }
+}
+
+public interface IAbstractFactory<T>
+{
+    T Create();
+}
+```
+
+## Other
+* -> không phải lúc nào ta cũng s/d factory; sẽ có những trường hợp cần thiết để ta xài
+* -> việc ta calling API trong C# app, thực chất là sử dụng **HttpClientFactory** - nó tạo các HttpClient, handle life span, reuse, closing them
+
 
 ===============================================================
 # Factory Design Pattern
