@@ -2,18 +2,29 @@
 > sau này có thêm WPF, UWP, MAUI
 
 =====================================================================
-# publish WinForms project as '.msi' file
+# Setup Project
+* -> create an Installer For a WinForm Application, publish WinForms into a '.msi' file
+
+# Tạo 'Setup Project'
 * đầu tiên cần install the **`Visual Studio Installer Projects Extension`**
-* -> Visual Studio -> **Extension** menu -> Manage Extensions -> Visual Studio Installer Projects
+* -> Visual Studio -> **Extension** menu -> Manage Extensions -> tìm **Visual Studio Installer Projects**
 * -> sau đó nó sẽ chạy **VSIX Installer** -> click **Modify** để kích hoạt
 * -> giờ restart lại Visual Studio 
 
 * -> nếu có sẵn **setup_project** trong solution thì ta chỉ cần **Add existing project** và chọn file project **`.vdproj`** là được
 
-* -> còn nếu cần tạo mới thì: File -> Add -> New Project -> search for **`Setup Project`** or **`Setup Wizard`** template
-* -> right-click vào setup_project -> Add -> Project Output -> chọn project ta muốn build ra .msi
+* -> còn nếu cần tạo mới thì: File -> Add -> New Project -> search for **`Setup Project`** (or **`Setup Wizard`** template)
+* -> trong cửa sổ **File System** của setup project -> right-click on **`Application Folder`** -> chọn "Add" -> chọn "Project Output..." -> chọn project ta muốn và chọn **`Primary Output`** -> OK
+* -> nó sẽ add 1 primary output of our setup với tên **Primary output from ....**
+* -> ta sẽ right-click lên nó -> chọn **Create Shortcut to ...** -> đổi tên shortcut thành "My App" chẳng hạn (đây là tên App của ta sau khi publish ra thành production)
+* -> ta có thể thay đổi icon cho product app bằng cách: right-click vào shortcut -> chọn **Properties Window** -> thay đổi **Icon** property
+* -> giờ ta sẽ kéo shortcut này vào **`User's Desktop`** (để sau khi user cài xong app, nó sẽ hiện thị app trong desktop của user)
+* -> (ta cũng có thể tạo thêm 1 shorcut tương tự và kéo vào **`User's Programs Menu`** nếu muốn)
+* -> giờ ta right-click vào Setup project chọn **Build**
+* -> sau khi build thì **installers (Setup.exe and ProjectName.msi)** are ready in the **Debug** folder of the Setup Project
+* -> ta có thể chạy 1 trong 2 on target machine
 
-# chạy 'Setup project'
+# Đảm bảo 'Setup project' chạy success
 * -> trước tiên kiểm tra xem **`Primary Out`** có đúng là project ta muốn public ra file .msi chưa; 
 * -> right-click vào project để check xem đang **Active** Debug hay Release để biết nó build msi vào thư mục nào
 * -> cũng như kiểm tra trong **`Prerequisite`** xem nó có đang trỏ đến cùng **.NET target Framework** mà "primary output" project đang trỏ đến không
@@ -28,6 +39,10 @@
 * -> chạy file **.msi** để install application và chạy application
 * -> Visual Studio -> Debug -> Attach to Process -> tìm process **`application_name.exe`**
 * -> đặt breakpoint vào project xem có được không
+
+# 'Setup Project' vs 'Setup Wizard' template
+* -> **`Setup Project`** template sẽ tạo trực tiếp setup project
+* -> còn **`Setup Wizard`** sẽ cho ta 1 wizard gồm 5 steps để tạo 1 trong các project này: **Setup Project**, **Web Setup Project**, **Merge Module Project**, **CAB Project** 
 
 =====================================================================
 ## Use case

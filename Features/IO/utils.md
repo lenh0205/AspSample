@@ -5,6 +5,29 @@ https://www.infoworld.com/article/2337595/how-to-use-bufferedstream-and-memoryst
 https://stackoverflow.com/questions/63637874/does-converting-between-byte-and-memorystream-cause-overhead
 
 ===================================================================
+# Note
+* -> **`Stream.Read()`** - may not always read all the data we ask it to read
+* _Ex:  if we’re reading data from a file stream, the Read() method may only read a section of the file and return it, even if we expect more data_
+* => vậy nên để đảm bảo accurately read and convert all the data in the stream, ta cần tạo 1 method that reads and copies the data repeatedly until there is no more data left to be read
+```cs
+public byte[] UseStreamDotReadMethod(Stream stream)
+{
+    byte[] bytes;
+    List<byte> totalStream = new();
+    byte[] buffer = new byte[32];
+    int read;
+    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+    {
+        totalStream.AddRange(buffer.Take(read));
+    }
+    bytes = totalStream.ToArray();
+    return bytes;
+}
+```
+
+https://code-maze.com/create-byte-array-from-stream-in-csharp/  
+
+===================================================================
 # File
 
 ## Download a static file from URL (virtual path of server)
@@ -167,6 +190,7 @@ myBinaryWriter.Write(123);
 # Convert between Stream
 * -> we generally read data from one stream and write it to another - **`.CopyTo()`**
 
+## Convert 'Stream' to 'byte[]'
 ```cs - from "Stream" to "byte[]"
 public MyClass(Stream sourceStream)
 {
@@ -178,6 +202,7 @@ public MyClass(Stream sourceStream)
 }
 ```
 
+## Convert 'FileStream' to 'MemoryStream'
 ```cs - Reading from the "FileStream" and writing to a "MemoryStream"
 string filePath = "example.txt";
 
@@ -249,7 +274,7 @@ using (FileStream fileStream = new FileStream("path_to_your_image_file.jpg", Fil
 }
 ```
 
-```cs - convert to physical image file ".jpg"
+```cs - convert "Stream" to physical image file ".jpg"
 Stream inputStream;
 string filePath = @"C:\Path\To\Save\image.jpg";
 
@@ -320,8 +345,6 @@ using (MemoryStream memoryStream = new MemoryStream(data))
     Console.WriteLine($"Pushed back bytes: {string.Join(", ", pushedBackBuffer)}");
 }
 ```
-
-=================================================================
 
 ===================================================================
 > https://blog.aspose.com/ocr/convert-image-to-searchable-pdf-with-ocr-using-csharp/
