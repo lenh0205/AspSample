@@ -23,7 +23,8 @@
 * -> **RPC** like **`gRPC`** provides faster response, but blast radius, or the impact to other microservices would be larger when the service was to go down
 * -> **`Event Streaming`** - provides better isolation between services but they take longer to process
 
-## Message Bus
+* _về cơ bản thì Khi message cần được được xử lí ở nhiều service khác nhau không yêu cầu phản hồi kết quả ngay lập tức, hoặc message xử lí tốn rất nhiều thời gian thì người ta thường sử dụng message broker_
+* _còn nếu các service giao tiếp với nhau cần phản hồi kết quả ngay thì thông thường người ta sẽ gọi trực tiếp qua REST API, GraphQL, gRPC_
 
 ==================================================================
 # Database
