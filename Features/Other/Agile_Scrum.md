@@ -1,12 +1,26 @@
 https://www.youtube.com/watch?v=n2XLNlThjms
 https://www.youtube.com/watch?v=vuBFzAdaHDY
 
+> liệu khách hàng có thêm yêu cầu thì có thêm tiền không ?
 
 # Waterfall
 * -> các step có thể bao gồm: Plan -> Build -> Test -> Review -> Deploy
 * -> việc sai ở mỗi bước có thể sẽ khiển ta phải bắt đầu làm lại từ bước trước đó, có khi sẽ phải làm lại từ đầu
 * -> lengthy planning process that required to completed before any work begins
 * => rất có thể sản phẩm ra mắt cuối cùng lại sai so với market demand or technology vì chúng đã thay đổi so với original plan
+
+# Agile
+* -> phương thức phát triển phần mềm
+* -> cá nhân và sự tương hỗ quan trọng hơn tool
+* -> sản phẩm dùng được quan trọng hơn là document
+* -> cộng tác với khách hàng quan trọng hơn hợp đồng
+* -> phản hồi với sự thay đổi quạn trong hơn kế hoạch
+
+* => nhanh và flexible; cho phép khách hàng thấy sản phầm liên tục và liên tục đưa qua yêu cầu
+
+## Scum có thể fail
+* -> Scum master không thể estimate, phần công việc hiệu quả
+* -> trong product backlog, trong epic sẽ có nhiều user stories sẽ có nhiều task
 
 # Scrum - implementation of Agile
 * -> process is broken up into smaller pieces
@@ -30,6 +44,7 @@ https://www.youtube.com/watch?v=vuBFzAdaHDY
 * _**Business Analyst** (nếu có) complement the PO in translating business needs into actionable technical requirements, ensures that requirements are well-understood and actionable_
 
 * -> **`Scum Master`** - a servant leader to the team; reponsible for protecting the team and the process, running the meetings and keeping things going
+* _có thể là nhiều vị trí khác nhau trong team_
 
 * -> **`Team`** - có thể bao gồm B.A, U.X, software engineer, QA, Tester, writers, ... để help in building product
 * -> mỗi thành viên sẽ self-managing/không có manager và sẽ làm việc cùng nhau
@@ -77,3 +92,4 @@ https://www.youtube.com/watch?v=vuBFzAdaHDY
 * -> **`Sprint Review`** and **`Sprint Retrospective`** 
 
 ## Software to Manage the work flow
+
