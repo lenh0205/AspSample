@@ -18,8 +18,8 @@ https://www.docker.com/blog/6-development-tool-features-backend-developers-need/
 > https://aws.amazon.com/compare/the-difference-between-docker-vm/
 > https://www.reddit.com/r/docker/comments/q6ykxa/when_should_you_choose_vms_over_docker/?rdt=63673
 > https://tel4vn.edu.vn/blog/so-sanh-su-khac-nhau-giua-may-ao-va-docker-container/
-> https://tel4vn.edu.vn/blog/so-sanh-su-khac-nhau-giua-may-ao-va-docker-container/
 > https://www.freecodecamp.org/news/docker-vs-vm-key-differences-you-should-know/
+> https://www.geeksforgeeks.org/difference-between-docker-and-virtualization/
 
 # Docker vs Virtual Machine
 * -> technologies used in **`application deployment`**
