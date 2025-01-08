@@ -6,6 +6,14 @@ https://www.svix.com/resources/faq/event-bus-vs-message-queue/
 https://www.linkedin.com/pulse/event-bus-vs-message-queue-broker-sanjeev-rai-m2tjc
 https://pandaquests.medium.com/difference-between-event-bus-message-queue-and-message-broker-a8630a8823f7
 
+======================================================================
+# Microservices Communication
+* -> for external **`REST API`** is the most popular and **`gRPC`** is used for most of the service to service communication
+
+* -> **Message based commutication** (**`Queue`** or **`Pub/Sub`**) - works well when we want to offload work to some background microserives and response is not time sensitive
+* _it also really help in decouple things completely_
+
+======================================================================
 # RabbitMQ Message Bus
 * -> Event Driven Design
 * -> an microservice will publish an event onto Message Bus, and there will be another microservice subscribe to the Message Bus and receive those published events

@@ -82,5 +82,24 @@ CMD ["ls", "-ltr", "/data"]
 > https://www.freecodecamp.org/news/docker-vs-vm-key-differences-you-should-know/
 > https://www.geeksforgeeks.org/difference-between-docker-and-virtualization/
 
+# Term
+* ESXi system
+
 # Docker vs Virtual Machine
 * -> technologies used in **`application deployment`**
+* -> if we need to run an OS like Windows, OSX, MacOS then we run a VM (Docker is Linux-based); if we only need to run an app, then we run a container
+* -> VM sẽ isolated hơn - đảm bảo về security
+* -> VM cho phép chạy các GUI app (vẫn có cách work around để thực hiện điều này trong container)
+* -> sẽ có những dependencies kiểu như COM components that closely attached to the OS thì VM là cần thiết
+
+* -> **Containers** are usually extremely lightweight (may be mbs), **VMs** can go up to GB of size
+* -> về vấn đề RAM, Docker chỉ xài đúng với processes cần còn VM đòi hỏi ta cần phân bổ trước lượng RAM ta cần (nên thường thì ta sẽ có nó nhiều hơn số lượng ta cần) 
+* -> using a single filesystem for all containers (and using --volume to map directories in the container to host directories) to be simpler than each VM having a 50GB-100GB disk file
+* -> containers are really fast to start (_cost effective way to do is to scale things out when needed_) 
+
+* -> Docker images is easy to replicate
+
+* -> ta hoàn toàn có thể dựng 1 VM và chạy Docker trên đó, việc này khá phổ biến
+
+# Docker Compose 
+* -> Docker Compose files to define multiple related (or unrelated) Docker containers and define their networking between them in an easy way, and create all containers in a single command

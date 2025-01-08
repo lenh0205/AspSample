@@ -1,9 +1,17 @@
 > https://www.youtube.com/watch?v=lTAcCNbJ7KE&t=22s
 
 ==================================================================
-# microservices
-* -> microservices are loosely coupled
-* -> each service handles a dedicated function inside a large-scale application, these functional areas are sometimes called **`domains`**
+## Microservice
+* -> every microservices deals with **`one business function end-to-end`** independently from other microservices, these functional areas are sometimes called **`domains`**
+* -> **usually** they own their data and the data store
+
+* -> microservices presents simple, easy to understand **`APIs`**
+* -> communicate with each other through lightweight common protocols such as **HTTP** or **message queues**
+
+### Purpose
+* -> meet market demand at a faster pace - most important thing to agility is how easy it's to test and deploy our application
+* -> addresses the limitations and drawbacks of legacy applications
+* -> cho phép các team làm việc tách biệt, không ảnh thưởng đến các team cũng như business functions khác
 
 ==================================================================
 # Communication
@@ -39,7 +47,7 @@
 * -> the burden of maintaining data integrity is now moved into application layer
 
 ==================================================================
-# Citical Components
+# Critical Components
 * -> some other useful components: **Monitoring and Alerting**, **DevOps Toolings** for deployment, Troubleshooting
 
 # Tools
@@ -55,9 +63,14 @@
 # Evolution of Application Design
 
 ## Monolithic
-* -> design it as a single piece of code encapsulating data storage and access, business logic and user interfaces
+* -> every part of a product is part of same service or web application
+* -> a single piece of code encapsulating data storage and access, business logic and user interfaces
 
-* => limits when building complex intricate systems since everthing is tangled together, it becomes quickly difficult to maintain evolve and scale such application
+* => difficult to maintain evolve and scale complex intricate application
+* -> source code management in source control
+* -> management nightmare because requiring big team to mantain big application
+* -> code and database deployments and rollback 
+
 * => solution: the **`multi-tier architecture`**
 
 ## Multi-tier 
@@ -71,11 +84,3 @@
 * => this still can not address quite well the chanllenges associated with complex application and systems
 * => by breaking apart the logic and data layers into smaller pieces called **`microservices`**
 
-## Microservice
-* -> every microservices deals with **one business function end-to-end** independently from other microservices 
-* -> microservices presents simple, easy to understand **`APIs`**
-* -> communicate with each other through lightweight common protocols such as **HTTP** or **message queues**
-
-### Purpose
-* -> addresses the limitations and drawbacks of legacy applications
-* -> cho phép các team làm việc tách biệt, không ảnh thưởng đến các team cũng như business functions khác
