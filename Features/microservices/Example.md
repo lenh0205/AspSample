@@ -46,25 +46,36 @@ public async Task<ActionResult<PlatformReadDto>> CreatePlatform(PlatformCreateDt
 ```Dockerfile
 # search "Dockerize an ASP.NET Core application
 
-# First, specify the 'images' we want to pull down from "Docker Hub" that we'll use to start our build
-# pull down .NET SDK image to build the main part of our application 
+### Stage 1: Build Environment
+
+# First, specify the base 'images' we want to pull down from "Docker Hub" that we'll use to start our build
+# pull down .NET 5 SDK image, which contains the necessary tools for building .NET applications 
+# the "AS build-env" part names this stage as "build-env", allowing it to be referenced later
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 
-# create a working directory
+# create a working directory inside the container
 WORKDIR /app
 
-# copy ".csproj" file, so that we know what dependencies we actually need to work with
+# copies all .csproj files from the host machine to the "/app" directory in the container
+# this step ensures that project dependencies can be restored without copying all source files, which speeds up builds when dependencies have not changed
 COPY *.csproj ./
-# pull down packages contained in ".csproj"
+# restores the NuGet packages required for the project by using the .csproj file
 RUN dotnet restore
 
-# copy everything else and build it 
+# copies all the source files from the host machine to the /app directory in the container 
 COPY . ./
 
-# publish
+# builds and publishes the application in Release configuration.
+# outputs the compiled application to the "out" directory
 RUN dotnet publish -c Release -o out
 
-# build a runtime image
+### End Stage 1
+
+
+### Stage 2: Runtime Environment
+
+# specifies the base image for the runtime environment
+# this image contain only the ASP.NET runtime, optimized for running applications
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 # create working directory
@@ -75,4 +86,6 @@ COPY --from=build-env /app/out .
 
 # set the entry point for out 'image', so when we run our image that's what gets kicked off 
 ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
+
+### End Stage 2
 ```
