@@ -98,8 +98,9 @@ CMD ["ls", "-ltr", "/data"]
 * -> containers are really fast to start (_cost effective way to do is to scale things out when needed_) 
 
 * -> Docker images is easy to replicate
-
 * -> ta hoàn toàn có thể dựng 1 VM và chạy Docker trên đó, việc này khá phổ biến
+
+* đọc thêm: https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine
 
 # Docker Compose 
 * -> Docker Compose files to define multiple related (or unrelated) Docker containers and define their networking between them in an easy way, and create all containers in a single command

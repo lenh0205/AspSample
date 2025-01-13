@@ -78,14 +78,23 @@ RUN dotnet publish -c Release -o out
 # this image contain only the ASP.NET runtime, optimized for running applications
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
-# create working directory
+# sets the working directory inside the container to /app
 WORKDIR /app
 
-# copy the content of what we built over 
+# copies the output files from the out directory of the "build-env" stage to the "/app" directory in this stage 
 COPY --from=build-env /app/out .
 
 # set the entry point for out 'image', so when we run our image that's what gets kicked off 
+# specifies the command to run when the container starts
+# run .NET application by executing the PlatformService.dll
 ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
 
 ### End Stage 2
+```
+
+# Build image
+
+* -> trước tiên ta cần kiểm tra ta đã có docker running trên máy chưa
+```bash
+docker --version
 ```
