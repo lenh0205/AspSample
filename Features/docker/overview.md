@@ -1,3 +1,13 @@
+https://www.youtube.com/watch?v=Ud7Npgi6x8E
+https://www.youtube.com/watch?v=bg0QVTS4Q0c
+https://www.youtube.com/watch?v=bg0QVTS4Q0c&t=21s
+
+https://learn.microsoft.com/en-us/dotnet/architecture/microservices/net-core-net-framework-containers/
+https://stakhov.pro/containerize-dotnet-framework/
+https://stackoverflow.com/questions/65972093/docker-net-framework-application
+https://stackoverflow.com/questions/72177307/is-there-is-a-way-to-dockerize-a-net-framework-application-on-linux
+https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containerize-the-.NET-Framework-web-apps-with-Windows-Containers-and-Docker
+
 ============================================================================
 # Docker
 * -> packages software into containers that run reliably in any enviroment
