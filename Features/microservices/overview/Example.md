@@ -13,9 +13,11 @@
 * -> 1 **`gRPC Client`** (synchronous - out) để make requests to **gRPC Service** của microservice khác 
 
 ```cs - PlatformsController.cs
+// ....
+
+
 // as REST best practice, whenever we create a resource we should return a HTTP 201 along with the resource we created and also a URI to the resource location
 // ta không nên trả thẳng model ta đã truyền vô để tạo resource
-
 [HttpPost]
 public async Task<ActionResult<PlatformReadDto>> CreatePlatform(PlatformCreateDto platformCreateDto)
 {
@@ -93,8 +95,47 @@ ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
 ```
 
 # Build image
+* -> ta nên dùng **Docker** của VSCode để theo dõi những image trên máy ta và những image đang run
 
-* -> trước tiên ta cần kiểm tra ta đã có docker running trên máy chưa
 ```bash
+# check if Docker running trên máy
 docker --version
+
+# build image - basically it will run through our "Dockerfile" and start executing all the scripts
+# -> if the images that it need not already exist on our machine or out of date, it will pull down from DockerHub
+docker build -t <our_dockerhub_id>/<name_of_our_service> .
 ```
+
+# Run the image as a container
+```bash
+# "-p" flag - the "port mapping" is required to access the server running inside the container
+# "-d" flag - detached mode to avoid the container output displays in this CLI và ta sẽ không thể gõ trên terminal này được nữa
+docker run -p 8080:80 -d <our_dockerhub_id>/<name_of_our_service>
+
+# show running containers bao gồm thông tin: container_id, image, command_names, ....
+docker ps
+
+# stop container
+docker stop <container_id>
+
+# mỗi lần ta dùng "docker run" nó sẽ run 1 container hoàn toàn mới, vậy nên để chạy lại container ta đã stop ta cần:
+docker start <container_id_to_restart>
+```
+
+# using port mapping to get to running container
+* giờ thì thay vì truy cập trực tiếp http://localhost:5000/api/platforms/ bằng cách dotnet run trực tiếp project trên mấy của ta
+* ta có thể truy cập vào dockerized image thông qua http://localhost:8080/api/platforms/
+
+# Push image to DockerHub
+```bash
+docker push <our_dockerhub_id>/<name_of_our_service>
+```
+
+============================================================================
+> **`Docker compose`** is a very nice option in **development enviroment**, but **`Kubernetes`** is the option in **production**
+> sẽ có rất nhiều layer liên quan khi làm việc với kubernetes
+> việc ta tương tác với Docker như trên thì oke khi development, nhưng với microservices architecture khi ta cần những việc như make sure containers to run and restart when crashing, scale them out, ... thì cần K8S
+> **`Declarative Model`** - define a desired **end state**, let Kubernetes figure out how to get there
+
+# Kubernetes
+* -> often referred to as **`K8S`**; is a **`Container Orchestrator`**
