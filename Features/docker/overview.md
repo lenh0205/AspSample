@@ -1,106 +1,88 @@
-# what should learn about docker as an backend developer
-https://www.youtube.com/watch?v=91Sp7dSlpzs
-https://www.quora.com/As-a-web-developer-is-it-really-necessary-to-learn-Docker
-https://dev.to/suzuki0430/docker-for-beginners-crafting-your-backend-development-environment-38oo
-https://stackoverflow.com/beta/discussions/77475709/should-a-full-stack-developer-know-docker-as-mandatory
-https://www.docker.com/blog/6-development-tool-features-backend-developers-need/
-
-# Deployment
-
-```bash - deploy an NodeJS app
-// first, we must have a VM runing any Linux based OS
-// install NodeJS
-// put our file on the server and ask Nodejs to run our programs
-// then NodeJS in conjunction with system files will create an enviroment and translate our program into machine code, hand it over to the Kernel
-// Kernel can ask the bare mental to do its job
-```
-
-# Reason using Docker
-* -> giải quyết vấn đề "it works on my machine"
-* -> thuận tiện hơn cho việc deploy 1 full-fledged fullstack application (BE, FE, DB); ta chỉ cần package application along with the runtime into a single package
-* -> Docker uses Linux kernel features to provide its functionality (khi ta cài Docker trên Window/MacOS thì thực chất nó sẽ cài 1 VM running Linux)
-
-* -> by package all the system files required, our application and dependencies into a binary - that's **Docker image**, a distributable artifact which can be stored anywhere
-* -> when we run this image on top of Docker it becomes a container
-
-# 2 way of Docker installation
-* -> install **`Docker CE`** (or **Docker CLI**) - chỉ run trên Linux
-* -> cho **Window** and **MacOS**, ta sẽ cần install **`Docker Desktop`** (**VM** + **Docker CE** + **GUI**)
-
-* => khi install Docker trên máy ta sẽ có:
-* -> "Docker" is a **`Client server based application`** that reponsible for taking our command (_e.g, docker run, docker build, docker pull_)
-* -> the client will ship those command to **`Docker Daemon`** - reponsible for managing resources on the machine it's installed (_downloading new images, spawn new containers, ..._)
-* -> the images is download from **`Registry`** - **Docker Hub**, **Azure container registry**
-
+============================================================================
 # Docker
-* -> **`Dockerfile`** is the blueprint for image
-* _every image is starts with a base image, so base image is like the starting point for our image; we have to start from the **`Operation System`** or some intermediate image_
+* -> packages software into containers that run reliably in any enviroment
+* -> 3 fundamental elements: Dockerfile, Image, Container
 
-```bash - run "busybox" image (chứa các câu lệnh linux) on our machine
-# -> vào Docker Hub -> tìm "busybox"
+## Problem
+* -> how do we replicate the enviroment our software needs on any machine
 
-# open terminal, pull image to our local system by this command:
-docker pull busybox
+* -> one way is to package an app is with a **`Virtual Machine`** 
+* -> where the **`hardware is simulated`** (_using a host's hypervisor layer_) then installed with the **required OS** and **dependencies**
+* -> this allows us to run multiple apps on the same infrastructure
+* -> however because each VM is running its own operating system, they tend to be bulky and slow
 
-# list các images đang locate trong system
-docker images
+* -> **`Docker container`** 
+* -> is conceptually very similar to a **Virtual Machine** with one key different - instead of virtualizing hardware, containers only **`virtualize the OS`**
+* -> emulate a minimal file system while piggybaking resources by sharing the host's kernel
+* => in others words, all apps or containers are run by a single kernel 
+* => makes almost everything faster and more efficent
 
-# run image
-docker run busybox
+## Kernel
+* -> is the core of any Operating System - the brigde between **what the softeware asks for** and **what the hardware actually does**
+* -> responsible for all sorts of critical low-level tasks like CPU and memory management, device I.O, file systems and process management 
 
-# run image into an interactive mode (-it), then run a program of that image
-docker run -it busybox /bin/sh
-# this will drop us down to the Shell inside container, giờ thì ta có thể thực thi 1 số lệnh Linux như: ls, whoami
+============================================================================
+# Dockerfile 
+* -> just command tells Docker how to build an image - a napshot of our software along with all of its dependencies down to the OS level
+* -> Docker will execute command in sequence and add each generated change to the final image as a new **file system layer** or a **metadata layer** 
 
-# -> ta có thể mở 1 terminal khác và list tất cả containers đang running
-docker ps
-``` 
+```bash - Example: Dockerfile
+# use "FROM" to start from an existing template 
+FROM ubuntu:20.04
 
-```bash - create image that contain application 
-# -> this app feature is to list down the content inside "data" directory that is mounted on that particular machine in the tabular format (-ltr)
+# use "RUN" to run a terminal command that installs dependencies into our image
+RUN apt-get install sl
 
-# First, create Dockerfile
-mkdir busybox-list
-cd busybox-list
-touch Dockerfile
+# do all kind of stuff, like set enviroment variables 
+ENV PORT=8080
 
-# Editing Dockerfile
-nvim Dockerfile
-
-###
-FROM busybox
-# able to use the "ls" command that take from "busybox":
-# the 'CMD' will execute the command when the image is run
-CMD ["ls", "-ltr", "/data"]
+# finally, set a default command that's executed when we start up a container
+CMD ["echo", "Docker is easy"]
 ```
 
-=============================================================================
-> https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine
-> https://aws.amazon.com/compare/the-difference-between-docker-vm/
-> https://www.reddit.com/r/docker/comments/q6ykxa/when_should_you_choose_vms_over_docker/?rdt=63673
-> https://tel4vn.edu.vn/blog/so-sanh-su-khac-nhau-giua-may-ao-va-docker-container/
-> https://www.freecodecamp.org/news/docker-vs-vm-key-differences-you-should-know/
-> https://www.geeksforgeeks.org/difference-between-docker-and-virtualization/
+```bash - create image file
+# running docker build command
+# -> go to each step of Dockerfile to build the image layer by layer
+# -> "-t" is the name tag and provide "path to Dockerfile"
+docker build -t myapp ./
 
-# Term
-* ESXi system
+# bring the image to life as a container
+docker run myapp 
+```
 
-# Docker vs Virtual Machine
-* -> technologies used in **`application deployment`**
-* -> if we need to run an OS like Windows, OSX, MacOS then we run a VM (Docker is Linux-based); if we only need to run an app, then we run a container
-* -> VM sẽ isolated hơn - đảm bảo về security
-* -> VM cho phép chạy các GUI app (vẫn có cách work around để thực hiện điều này trong container)
-* -> sẽ có những dependencies kiểu như COM components that closely attached to the OS thì VM là cần thiết
+## Container Image
+* -> is immutable and can be used to spin up multiple containers which is our actual software running in the real world
+* -> all containers run from **`a base FileSystem`** and **`some metadata`**, presented to us as **a container image**
+* -> the way container images work is formed with **overlapping layers**
 
-* -> **Containers** are usually extremely lightweight (may be mbs), **VMs** can go up to GB of size
-* -> về vấn đề RAM, Docker chỉ xài đúng với processes cần còn VM đòi hỏi ta cần phân bổ trước lượng RAM ta cần (nên thường thì ta sẽ có nó nhiều hơn số lượng ta cần) 
-* -> using a single filesystem for all containers (and using --volume to map directories in the container to host directories) to be simpler than each VM having a 50GB-100GB disk file
-* -> containers are really fast to start (_cost effective way to do is to scale things out when needed_) 
+* -> in the context of a FileSystem instead of changing data and its source, file changes are tracked by their differences to the previous layer and then composed together to achieve the final system state
+* _it is similar to how Source Control track changes in our code_
 
-* -> Docker images is easy to replicate
-* -> ta hoàn toàn có thể dựng 1 VM và chạy Docker trên đó, việc này khá phổ biến
+* => there's loads of pre-made and officially supported base images out there that we can match to our project's core requirements and then add our own packages, code, configuration to
 
-* đọc thêm: https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine
+## Container Runtime
+* -> we can run as many containers as we like from a single image 
+* -> this is because when a container is first created, the image's file system is **extended with a new file system layer** completely dedicated to that container
+* -> this means that we can make any runtime changes we like and it won't affect other containers using the same image
+* -> this new layer will persist until we delete the container, so we can stop and start them as we like **`without losing any data`**
 
-# Docker Compose 
-* -> Docker Compose files to define multiple related (or unrelated) Docker containers and define their networking between them in an easy way, and create all containers in a single command
+## Accessing running container
+* -> it's just like we do with a **VM**
+
+```cs - for example: a Linux container
+// we can start a shell prompt when executing it, give us access to the enviroment
+```
+
+## Communication between Containers
+* -> is really simple because most runtimes virtualize a Network layer for us
+
+## Publish to production
+* -> tag it with something unique, like a version then publish it to a **Container Registry**
+
+## Deployment
+* -> many **`Cloud Platform`** have **built-in support** for deploying containers as standalone unit
+* -> alternatively, we can **`install compatible container runtime (like Docker)`** on the machine we want to use and pull image from the Container Registry
+
+## Kubernetes
+* -> allow us to **`create our own container-based cloud`**
+* -> we describe the **desired state** of our deployment declaratively, and let Kubernetes handle the details of how to get there
