@@ -27,9 +27,24 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * => in others words, all apps or containers are run by a single kernel 
 * => makes almost everything faster and more efficent
 
+============================================================================
+# Relative concepts
+
 ## Kernel
 * -> is the core of any Operating System - the brigde between **what the softeware asks for** and **what the hardware actually does**
 * -> responsible for all sorts of critical low-level tasks like CPU and memory management, device I.O, file systems and process management 
+
+## Virtualization
+* -> we start off with a **host machine** (_could be a Local PC, a server up in Cloud, server in a data center_) - it's **`a piece of hardware`** 
+* -> in this piece of hardware, we have different **things that control how this hardware work** - CPU, memory, IO
+* -> what happen in virtualization is we **`take little pieces of these pieces of hardware`** and **`separate them out`** into a separate machine - a **`Virtual Machine`**
+
+* -> in the virtual machine, we actually run a full entire **Operating System**
+* -> the **`Hypervisor`** - a special program run and manage the life cycle of these machines (_start, stops, creates, deletes them, provisions resources for them_)
+* -> the common Hypervisor we usually use is **VMware**, **Virtual Box**
+
+## Containerization
+* -> 
 
 ============================================================================
 # Dockerfile 
