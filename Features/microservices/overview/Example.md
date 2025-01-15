@@ -58,9 +58,11 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 # create a working directory inside the container
 WORKDIR /app
 
-# copies all .csproj files from the host machine to the "/app" directory in the container
-# this step ensures that project dependencies can be restored without copying all source files, which speeds up builds when dependencies have not changed
+# copy file from our local system into the image
+# -> copies all .csproj files from the host machine to the "/app" directory in the container
+# -> this step ensures that project dependencies can be restored without copying all source files, which speeds up builds when dependencies have not changed
 COPY *.csproj ./
+
 # restores the NuGet packages required for the project by using the .csproj file
 RUN dotnet restore
 
@@ -87,8 +89,8 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 
 # set the entry point for out 'image', so when we run our image that's what gets kicked off 
-# specifies the command to run when the container starts
-# run .NET application by executing the PlatformService.dll
+# -> specifies the default command to run when the container starts (can be overwritten by CLI)
+# -> run .NET application by executing the PlatformService.dll
 ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
 
 ### End Stage 2
@@ -101,7 +103,8 @@ ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
 # check if Docker running trên máy
 docker --version
 
-# build image - basically it will run through our "Dockerfile" and start executing all the scripts
+# build image 
+# -> basically it will run through our "Dockerfile" and start executing all the scripts
 # -> if the images that it need not already exist on our machine or out of date, it will pull down from DockerHub
 docker build -t <our_dockerhub_id>/<name_of_our_service> .
 ```

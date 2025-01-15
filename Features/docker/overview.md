@@ -44,7 +44,8 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * -> the common Hypervisor we usually use is **VMware**, **Virtual Box**
 
 ## Containerization
-* -> 
+* -> is ability to create a lightweight enviroment where processes can run on a host OS, they share all the same things in that OS but can't touch anything outside their bound
+* -> Docker is a program that **manages the life cycles of containers**
 
 ============================================================================
 # Dockerfile 
@@ -55,7 +56,8 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 # use "FROM" to start from an existing template 
 FROM ubuntu:20.04
 
-# use "RUN" to run a terminal command that installs dependencies into our image
+# use "RUN" to tells Docker that we want to run something on the image we just add above
+# -> this run a terminal command that installs dependencies into our image
 RUN apt-get install sl
 
 # do all kind of stuff, like set enviroment variables 
@@ -68,22 +70,33 @@ CMD ["echo", "Docker is easy"]
 ```bash - create image file
 # running docker build command
 # -> go to each step of Dockerfile to build the image layer by layer
-# -> "-t" is the name tag and provide "path to Dockerfile"
+# -> "-t" is the name tag: image name + ":" + tên tag tuỳ ý (by default is "latest")
+# -> "./" is for providing "path to Dockerfile" (để trống cũng được)
 docker build -t myapp ./
 
-# bring the image to life as a container
+# check what images we have currently built on our system 
+docker images
+
+# bring the image to life as a container, các step nó sẽ làm bao gồm:
+# -> find image "myapp:latest" ("myapp" image with "latest" tag) locally
+# -> không tìm thấy thì Docker client sẽ contact với Docker daemon
+# -> Docker daemon pulled the "myapp" image from the Docker Hub
+# -> Docker daemon created a new container from that image 
 docker run myapp 
 ```
 
 ## Container Image
-* -> is immutable and can be used to spin up multiple containers which is our actual software running in the real world
+* -> is immutable (muốn update thì cần update lại Dockerfile sau đó build lại image)
+* -> can be used to spin up multiple containers which is our actual software running in the real world
 * -> all containers run from **`a base FileSystem`** and **`some metadata`**, presented to us as **a container image**
 * -> the way container images work is formed with **overlapping layers**
 
 * -> in the context of a FileSystem instead of changing data and its source, file changes are tracked by their differences to the previous layer and then composed together to achieve the final system state
 * _it is similar to how Source Control track changes in our code_
 
-* => there's loads of pre-made and officially supported base images out there that we can match to our project's core requirements and then add our own packages, code, configuration to
+* _there's loads of pre-made and officially supported base images out there that we can match to our project's core requirements and then add our own packages, code, configuration to_
+* _build image lần đầu có thể lâu, nhưng lần sau sẽ rất nhanh vì những package ta đã kéo về lần sau sẽ không cần kéo về nữa (và các images này vẫn tồn tại song song trên máy của ta)_
+* _các images build từ cùng 1 Dockerfile này phân biệt nhau bởi **`-t`** flag - a snapshot of our Dockerfile that was built into an image_
 
 ## Container Runtime
 * -> we can run as many containers as we like from a single image 
