@@ -99,7 +99,7 @@ CMD ["ls", "-ltr", "/data"]
 
 
 * -> **Containers** 
-* -> khác với VM simulate an entire machine; containers is an application that been packaged with all the files, configuration, dependencies, ... necessary for it to run
+* -> khác với VM simulate an entire machine that contain an application; containers is an application that been packaged with all the files, configuration, dependencies, ... necessary for it to run
 * -> are usually extremely lightweight (may be mbs), **VMs** can go up to GB of size
 * -> all the containers share the services of a single operating system kernel, they use fewer resources than virtual machine
 * -> về vấn đề RAM, Docker chỉ xài đúng với processes cần còn VM đòi hỏi ta cần phân bổ trước lượng RAM ta cần (nên thường thì ta sẽ có nó nhiều hơn số lượng ta cần) 

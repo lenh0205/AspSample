@@ -1,6 +1,5 @@
 https://www.youtube.com/watch?v=bg0QVTS4Q0c
 
-https://learn.microsoft.com/en-us/dotnet/architecture/microservices/net-core-net-framework-containers/
 https://stakhov.pro/containerize-dotnet-framework/
 https://stackoverflow.com/questions/65972093/docker-net-framework-application
 https://stackoverflow.com/questions/72177307/is-there-is-a-way-to-dockerize-a-net-framework-application-on-linux
@@ -14,16 +13,42 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 ## Problem
 * -> how do we replicate the enviroment our software needs on any machine
 
-* -> one way is to package an app is with a **`Virtual Machine`** 
-* -> where the **`hardware is simulated`** (_using a host's hypervisor layer_) then installed with the **required OS** and **dependencies**
+## Solution
+* -> one way is to package an app is with a **Virtual Machine**
+* -> another is **Container**
+
+* -> both **VM files** and **Container files** are **`portable`** - we can move them easily to different machines
+* -> but **container are a lot smaller so it's much more portable**
+
+### Virtual Machine
+* -> where the **`hardware is simulated`**
+* -> then we just need to install with the **required OS** and **dependencies**
 * -> this allows us to run multiple apps on the same infrastructure
 * -> however because each VM is running its own operating system, they tend to be bulky and slow
 
+* -> về kiến trúc, ta sẽ start off with **`hardware`** (such as server)
+* -> then on top of the **hardware** there is software called **`Hypervisor`** - this is what allows one machine to run multiple virtual machines **by allocating and controling the sharing of a machine's hardware** 
+* -> and on top of the **Hypervisor** are the **`Virtual Machines with each own Operating System`** 
+* -> and on top of the **Operating System** is the running application 
+
+### Container
 * -> **`Docker container`** 
 * -> is conceptually very similar to a **Virtual Machine** with one key different - instead of virtualizing hardware, containers only **`virtualize the OS`**
 * -> emulate a minimal file system while piggybaking resources by sharing the host's kernel
 * => in others words, all apps or containers are run by a single kernel 
 * => makes almost everything faster and more efficent
+
+* -> về kiến trúc, ta sẽ start off with **`hardware`** (such as server)
+* -> and then on top of the **hardware** is the **`Operation System`**
+* -> then on top of the **Operating System** is the **`Container Engine`** - what unpacks the containers files and hands them off to the operating system kernel
+* -> all the **`Containers`** is control by **Container Engine** and share the **underlying Operating System** on the Server
+
+## IMPORTANT NOTE
+* -> **`Containers (or image) must be packaged to work with the same Operating System of server that it's is running on`**
+* _tức là nếu OS của Server mà ta sẽ chạy là Linux, vậy thì container file must be Linux-based_
+* _nó khác với Virtual Machine, vì mỗi VM có thể chạy bất cứ OS nào nó muốn_
+
+* -> since all the containers share the underlying OS between them that means **if the OS on Server crashes then all the containers will go down** 
 
 ============================================================================
 # Relative concepts
