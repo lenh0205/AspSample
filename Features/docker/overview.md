@@ -1,6 +1,4 @@
-https://www.youtube.com/watch?v=Ud7Npgi6x8E
 https://www.youtube.com/watch?v=bg0QVTS4Q0c
-https://www.youtube.com/watch?v=bg0QVTS4Q0c&t=21s
 
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/net-core-net-framework-containers/
 https://stakhov.pro/containerize-dotnet-framework/
@@ -48,6 +46,8 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * -> Docker is a program that **manages the life cycles of containers**
 
 ============================================================================
+# Container
+
 # Dockerfile 
 * -> just command tells Docker how to build an image - a napshot of our software along with all of its dependencies down to the OS level
 * -> Docker will execute command in sequence and add each generated change to the final image as a new **file system layer** or a **metadata layer** 

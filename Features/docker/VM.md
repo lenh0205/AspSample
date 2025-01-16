@@ -88,11 +88,19 @@ CMD ["ls", "-ltr", "/data"]
 # Docker vs Virtual Machine
 * -> technologies used in **`application deployment`**
 * -> if we need to run an OS like Windows, OSX, MacOS then we run a VM (Docker is Linux-based); if we only need to run an app, then we run a container
-* -> VM sẽ isolated hơn - đảm bảo về security
+
+* -> về cơ bản VM đảm bảo các **applications** (database, web app, ...) có thể chạy riêng biệt **`inside a single sever`** (_tiết kiệm tiền_) mà vẫn đảm bảo về **`security`** 
 * -> VM cho phép chạy các GUI app (vẫn có cách work around để thực hiện điều này trong container)
 * -> sẽ có những dependencies kiểu như COM components that closely attached to the OS thì VM là cần thiết
+* -> việc từng VM sẽ có OS riêng sẽ hao tốn rất nhiều **disk space**; 
+* -> đồng thời cũng tiêu tốn rất nhiều **RAM** và **CPU** đáng ra có thể xài cho các processes khác 
+* -> VM is slow to start up because require boot up the OS
+* -> và từng OS cũng cần license cost nữa 
 
-* -> **Containers** are usually extremely lightweight (may be mbs), **VMs** can go up to GB of size
+
+* -> **Containers** 
+* -> khác với VM simulate an entire machine; containers is an application that been packaged with all the files, configuration, dependencies, ... necessary for it to run
+* -> are usually extremely lightweight (may be mbs), **VMs** can go up to GB of size
 * -> all the containers share the services of a single operating system kernel, they use fewer resources than virtual machine
 * -> về vấn đề RAM, Docker chỉ xài đúng với processes cần còn VM đòi hỏi ta cần phân bổ trước lượng RAM ta cần (nên thường thì ta sẽ có nó nhiều hơn số lượng ta cần) 
 * -> using a single filesystem for all containers (and using --volume to map directories in the container to host directories) to be simpler than each VM having a 50GB-100GB disk file
