@@ -77,15 +77,28 @@ docker run -it --rm -p 8080:80 myproject
 ```
 
 # Sharing your image with others
-* -> Currently, your image sits in your local docker registry on your computer. If we want to share it with others we need to upload it to a container registry. The most common one used is Dockerhub. Head over to https://hub.docker.com and sign up for an account if you don’t already have one. After, come back to the command prompt and execute the following:
 
+## Container Registry
+* -> currently, our image **sits in our local docker registry** on our computer
+* -> if we want to share it with others we need to upload it to a container registry - the most common one used is **`Dockerhub`**
+* -> head over to **https://hub.docker.com** and sign up for an account if we don't already have one
+* -> after, come back to the command prompt and execute the following:
+```bash
 docker login -u <USERNAME>
-Notice we didn’t specify the server. If no server is specified it just defaults to docker hub. Speaking of defaults, it’s worth discussing how docker image naming works. When we minted our image we gave it a name such as myproject. In the docker world, image names carry the URL of the container registry they belong to. So when we used an image like mcr.microsoft.com/dotnet/framework/sdk, it is not just the name of the image, it’s a full URL of where to find it. A server that hosts docker images is called a container registry (ex. mcr.microsoft.com), while the image that contains URL where to find it is synonymous with the word repository in the context of docker. There’s a special case though for Dockerhub. Any image that has a naming convention like <owner>/<image> is assumed to be living on Dockerhub, where the owner is the username. ANY other image registry will include a prefix (like mcr.microsoft.com). There’s one other thing you need to know about image naming: tags. All images have a “tag”, and if one is not specified it implicitly defaults to a tag called latest. Tags are specified via a colon after image name, so in fact, the image we created earlier is actually called myproject:latest. We can assign different tags to images, and they are most often used to differentiate between different versions or configurations of the same image.
+# -> notice we didn't specify the server
+# -> if no server is specified it just defaults to docker hub
+```
 
-Now that we got that out of the way, let’s get our image over to Dockerhub. First, we need to retag it to match our Dockerhub name. Execute the following:
+* -> speaking of defaults, it's worth discussing how docker image naming works
+. When we minted our image we gave it a name such as myproject
+. In the docker world, image names carry the URL of the container registry they belong to.
+So when we used an image like mcr.microsoft.com/dotnet/framework/sdk, it is not just the name of the image, it's a full URL of where to find it
+. A server that hosts docker images is called a container registry (ex. mcr.microsoft.com), while the image that contains URL where to find it is synonymous with the word repository in the context of docker. There's a special case though for Dockerhub. Any image that has a naming convention like <owner>/<image> is assumed to be living on Dockerhub, where the owner is the username. ANY other image registry will include a prefix (like mcr.microsoft.com). There's one other thing you need to know about image naming: tags. All images have a “tag”, and if one is not specified it implicitly defaults to a tag called latest. Tags are specified via a colon after image name, so in fact, the image we created earlier is actually called myproject:latest. We can assign different tags to images, and they are most often used to differentiate between different versions or configurations of the same image.
+
+Now that we got that out of the way, let's get our image over to Dockerhub. First, we need to retag it to match our Dockerhub name. Execute the following:
 
 docker tag myproject <MY-DOCKERHUB-USERNAME>/myproject
-You’ve just created a new image. You now have two images in your local container registry:
+You've just created a new image. You now have two images in your local container registry:
 
 myproject
 <MY-DOCKERHUB-USERNAME>/myproject
