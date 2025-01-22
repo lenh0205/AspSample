@@ -32,7 +32,6 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * -> and on top of the **Operating System** is the running application 
 
 ### Container
-* -> **`Docker container`** 
 * -> is conceptually very similar to a **Virtual Machine** with one key different - instead of virtualizing hardware, containers only **`virtualize the OS`**
 * -> emulate a minimal file system while piggybaking resources by sharing the host's kernel
 * => in others words, all apps or containers are run by a single kernel 
@@ -67,7 +66,7 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * -> the common Hypervisor we usually use is **VMware**, **Virtual Box**
 
 ## Containerization
-* -> is ability to create a lightweight enviroment where processes can run on a host OS, they share all the same things in that OS but can't touch anything outside their bound
+* -> is ability to **create a lightweight enviroment where processes can run on a host OS**, they **`share all the same things in that OS but can't touch anything outside their bound`**
 * -> Docker is a program that **manages the life cycles of containers**
 
 ============================================================================
@@ -77,7 +76,7 @@ https://github.com/dotnet-architecture/eShopModernizing/wiki/02.-How-to-containe
 * -> just command tells Docker how to build an image - a napshot of our software along with all of its dependencies down to the OS level
 * -> Docker will execute command in sequence and add each generated change to the final image as a new **file system layer** or a **metadata layer** 
 
-```bash - Example: Dockerfile
+```Dockerfile - Example: Dockerfile
 # use "FROM" to start from an existing template 
 FROM ubuntu:20.04
 
@@ -108,6 +107,24 @@ docker images
 # -> Docker daemon pulled the "myapp" image from the Docker Hub
 # -> Docker daemon created a new container from that image 
 docker run myapp 
+```
+
+```Dockerfile - for building NodeJS application image
+FROM node:latest
+
+RUN mkdir /app
+
+WORKDIR /app
+
+COPY package.json
+
+RUN npm install
+
+COPY . ./
+
+EXPOSE 3000
+
+CMD ['npm', 'start']
 ```
 
 ## Container Image
