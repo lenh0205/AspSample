@@ -1,5 +1,5 @@
 =========================================================================
-# ,Aggregate()
+# .Aggregate()
 * -> nó cho phép ta tích luỹ qua từng lần lặp (_giống reduce trong javascript_)
 
 ```cs
