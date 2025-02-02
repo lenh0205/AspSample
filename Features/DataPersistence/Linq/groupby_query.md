@@ -48,8 +48,11 @@ output = [
     "cars": ["jkm"]
   }
 ]
+```
 
 ## with Aggregate function
+
+```cs
 foreach
 (
     var line in data
@@ -79,8 +82,6 @@ var consolidatedChildren = children
                                 FavoriteColor = gcs.Key.FavoriteColor,
                                 Children = gcs.ToList(),
                             });
-
-// ----->
 
 // -----> case phức tạp:  
 // -> nhóm những record có trường "TenFile" giống nhau trong list "lstTepDinhKem", 

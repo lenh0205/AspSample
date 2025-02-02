@@ -17,7 +17,7 @@
 * -> with its user-friendly interface and powerful features, the **Sumo Logic OTel Collector** is an ideal choice for organizations looking to understand their systems with better visibility and improve their overall performance and reliability
 
 =========================================================
-# Example: config 'Serilog' and 'SumoLogic' in .NET 6 Web API
+# Example 1: config 'Serilog' and 'SumoLogic' in .NET 6 Web API
 
 ## Knowledge
 * -> **example purpose**: able to push application logs to SumoLogic as a structed data
@@ -30,9 +30,10 @@
 * **`SumoLogic`** provides best-in-class cloud monitoring, log management
 
 ## 'SumoLogic' preparation
-* -> ta cần truy cập vào website SumoLogic với tài khoản của ta
-* -> first, we need to create a **`HTTP collector endpoint`** in SumoLogic
-* -> Menu -> Manage Data -> Collection
+* -> ta cần truy cập vào website SumoLogic với tài khoản của ta hoặc create "Free trial account" in SumoLogic
+* -> first, we need to create a **`HTTP collector endpoint`** in SumoLogic: Menu -> Manage Data -> Collection
+* _**collection endpoint** về cơ bản sẽ expose cho ta some endpoint mà ta có thể inject our **logs**; ví dụ ta có thể sử dụng những endpoint này trong Web API của ta để push logs_
+
 * -> có 2 cách để tạo "HTTP Source collector endpoint" là:
 
 * cách 1 là **Setup Wizard** -> chọn "Integrate with Sumo Logic" -> chọn "Your Custom App" -> chọn "HTTPS Source" 
@@ -214,12 +215,174 @@ var logger = new LoggerConfiguration()
 builder.Logging.AddSerilog(logger);
 ```
 
-* -> giờ ta sẽ vào **Search** section của trang **SumoLogic** và nhập:
+* -> **`Query`** in Sumologic - giờ ta bấm **New +** tab trang **SumoLogic** -> chọn **Log Search** để mở một cửa sổ mới và nhập câu search rồi click "icon hình kính lúp":
 ```bash
-_sourceCategory="demo"
+_sourceCategory="demo" # đây là "Source Category" (không phải "Name") của HTTP Source URL mà ta đã tạo
 ```
 ```bash
 _sourceCategory="demo"
     | json field=_raw "message"
     | json field=_raw "message.Data[0].VerbType"
+```
+
+=========================================================
+# Dashboard / Panel / Widget
+* -> using query, logs, inbuilt function to create Dashboard
+
+```bash - Example:
+// Dashboard của ta có 3 widget (nói chung là nó sẽ hiện 3 cái biểu đồ cột)
+
+// widget 1: Number of request for City by date
+// -> ta sẽ có 1 endpoint trả về particular city
+// -> các city sẽ được group by date
+
+// widget 2: City with Avarage response time
+// -> nó sẽ cho biết average response time to a particular endpoint that response particular result
+// -> group các city by date
+
+// widget 3: Errors by exception-type
+// -> it shows how many occurences from the particular error in our API system
+// -> like "An handled exception", "System Exception" - nó bắt đầu xuất hiện ngày bao nhiêu, xuất hiện bao nhiêu lần
+```
+
+## .NET application preparation
+* -> cài Nuget package **`SumoLogic.Logging.AspNetCore`**
+
+```cs - Program.cs
+public void Configure(IApplicationBuilder app, IWebHostEnviroment env, ILoggerFactory loggerFactory)
+{
+    loggerFactory.AddSumoLogic(
+        // all the logs will be pushed to SumoLogic collection endpoint
+        new LoggerOptions
+        {
+            Uri = "url_to_httpsourcecollector_ofSumoLogic",
+            IsBuffered = false
+        });
+}
+```
+
+```cs
+// ta có 3 endpoint ứng với dữ liệu cung cấp cho 3 panel trong SumoLogic của ta
+
+[HttpGet]
+[Route("city")]
+public IActionResult City()
+{
+    var cities = new[] { "Melbourne", "Sydney", "Canberra", "Brisbane" };
+    var randomNumber = new Random().Next(0, 4);
+    var randomCity = cities[randomNumber];
+
+    _logger.LogInformation($"City endpoint returns {randomCity}.");
+    return Ok(randomCity);
+}
+
+[HttpPost]
+[Route("cityWithDelay")]
+public IActionResult CityWithDelay()
+{
+    Stopwatch watch = new Stopwatch();
+    watch.Start();
+    Thread.Sleep(new Random().Next(1000, 10000));
+
+    var cities = new[] { "Melbourne", "Sydney", "Canberra", "Brisbane" };
+    var randomNumber = new Random().Next(0, 4);
+    var randomCity = cities[randomNumber];
+
+    watch.Stop();
+    _logger.LogInformation($"Delay City endpoint returns {randomCity} took: {watch.ElapsedMilliseconds}");
+    return Ok(randomCity);
+}
+
+[HttpGet]
+[Route("random-error")]
+public IActionResult RandomError()
+{
+    var randomNumber = new Random().Next(1, 10);
+    try 
+    {
+        switch (randomNumber)
+        {
+            case 1:
+                throw new Exception($"my custom error message: {Guid.NewGuid()}");
+            case 2:
+                var ob = new Person();
+                var street = ob.Address.Street; // throw Null Exception
+                break;
+            case 3:
+                var listPerson = new List<Person> { new Person() {}, new Person() {} };
+                var person = listPerson.SingleOrDefault(); // throw Exception
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                throw new  Exception("NOT IMPLEMENTED ERROR");
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error occured. Exception: {ex}");
+    }
+    return Ok();
+}
+
+public class Person
+{
+    public Address Address { get; set; }
+}
+public class Address
+{
+    public string Street { get; set; }
+}
+```
+
+* -> giờ ta sẽ execute những enpoint này
+
+## Query
+
+* -> giờ ta sẽ viết query cho panel đầu tiên "Number of request for City by date"
+```bash
+_sourceCategory="dev/test-app"
+AND "City endpoint returns"
+| timeslice 1d # group the data
+| formatdate(_messagetime, "yyyy-MM-dd") as date # "Time" column (_messagetime) is currently date time value
+| parse regex field=_raw "City endpoint returns(?<city> \w*)" nodrop # lấy tên city từ log cột Message (_raw)
+| count city, date # create "Aggregates" tab for occurences of particular city - cho ta nút "Add to Dashboard"
+| transpose row date column city # group by date
+
+# -> khi query bằng câu lệnh này nó sẽ hiện cho ta tab "Message" gồm 4 cột Time, city, date, Message
+# -> và tab "Aggregates", nó sẽ có cho ta nút "Add to Dashboard" cũng như hiển thị số liệu dưới nhiều dạng bảng, biểu đồ,...
+#  -> click "Add to Dashboard" -> Create New Dashboard -> Personal -> đặt tên cho Dashboard + "Panel Title" sẽ là "Number of request for City by date"
+# -> sau khi Panel được tạo ta có thể click vào "icon 3 chấm" của panel -> click Edit -> để điều chỉnh thêm theo ý ta muốn
+```
+
+* -> query cho panel thứ 2 "City with Avarage response time"
+```bash
+_sourceCategory="dev/test-app"
+AND "Delay City endpoint returns"
+| formatdate(_messagetime, "yyyy-MM-dd") as date
+| parse regex field=_raw "Delay City endpoint returns(?<city> \w*) took:(?<TimeTakenMS> \w*)" nodrop
+| TimeTakenMS / 1000 as TimeTaken
+| avg(TimeTaken) as avgValue group by city,date
+| transpose row date column city
+
+# -> khi chạy câu query này nó sẽ cho ta tab "Message" gồm cột: Time, city, date, TimeTaken, Message
+# -> và tab "Aggregates", nó sẽ có cho ta nút "Add to Dashboard" cũng như hiển thị số liệu dưới nhiều dạng bảng, biểu đồ,...
+# -> click "Add to Dashboard" -> nhập tên cho Dashboard + "Panel Title" là "City with Avarage response time"
+```
+
+* -> query cho panel thứ 3 "random-error"
+```bash
+_sourceCategory="dev/test-app"
+AND "Error occured"
+| formatDate(_receiptTime, "yyyy-MM-dd") as date
+| parse regex field=_raw "Error occured. Exception: (?<message> \w.*)" nodrop
+| replace(message, /my custom error message: ([0-9A-Fa-f\-]{36})/, "my custom error message") as replaceMessage
+| parse regex field=_raw "\[Error](?<otherMessage> \w.*)" nodrop
+| if (replaceMessage = "", otherMessage, replaceMessage) as consolidatedMessage
+| if (lenght(consolidatedMessage) > 100, substring(consolidatedMessage, 0, 100), consolidatedMessage) as finalMessage
+| count date, replaceMessage
+| transpose row date column replaceMessage
 ```
