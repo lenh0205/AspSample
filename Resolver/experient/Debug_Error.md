@@ -1,7 +1,13 @@
 ==============================================================
-# Git lỗi toàn cục
+# Git - lỗi toàn cục
 * -> không thể show các changes, xoá đi tải lại vẫn không được
 * -> vào **`C:/Users/<user>/`** xoá file **`.gitconfig`**
+
+# Git - không thể tương tác với Git remote do SSL "fatal: unable to access 'https://git.....': SSL certificate problem: unable to get local issuer certificate"
+* -> https://stackoverflow.com/questions/23885449/unable-to-resolve-unable-to-get-local-issuer-certificate-using-git-on-windows
+```bash
+git config --global http.sslbackend schannel
+```
 
 ==============================================================
 # Http - Đối với việc gửi data bằng request-response sẽ có giới hạn. VD gửi 23000 records lên Client thì response sẽ không chịu nổi 

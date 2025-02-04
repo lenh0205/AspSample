@@ -112,3 +112,7 @@ var maxes = from x in list
 // hoặc
 var maxes = list.GroupBy(x => x.id2).Select(xs => xs.Select(x => x.value).Max())
 ```
+
+====================================================================
+# Note
+* -> lưu ý nếu ta chỉ groupby bằng 1 trường thì không thể "SELECT *" - vì nó đỏi hỏi ta cần groupby tất cả các trường để có thể select tất cả trường 
