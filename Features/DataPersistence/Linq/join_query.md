@@ -30,6 +30,7 @@
 
 ## Inner Join 
 * -> produces a "flat sequence"; only those objects that have a match in the other data set are returned
+* -> ta cần nhớ nếu đối với quan hệ "one-to-many" hoặc "many-to-many" relation thì việc join bảng có thể sẽ tạo ra 1 bảng với số lượng record nhiều hơn ban đầu
 
 ### Single key join
 

@@ -22,7 +22,7 @@ git config --global http.sslbackend schannel
 * thử xoá **`thư mục .vs và thư mục obj`** đi
 * right-click vào csproj -> Properties -> Build -> uncheck **Optimize Code**
 * vào **`Configuration Manager`**, đổi hết thành Debug
-* Vào Debug -> Options -> Debugging -> check **`Suppress JIT optim....`** và uncheck **`Enable Just My Code`**
+* vào Debug -> Options -> Debugging -> check **`Suppress JIT optim....`** và uncheck **`Enable Just My Code`**
 
 # Setting - Connected Service: add Service Reference (add WCF lỗi) lỗi "the system can not find the path specified error"
 * Trong trường hợp ta `add Service Reference`, rồi pass URL của WCF rồi bấm "Go" để tìm kiếm và tìm thấy service; nhưng khi bấm "OK" thì báo lỗi

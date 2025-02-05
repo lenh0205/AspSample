@@ -62,6 +62,8 @@ SELECT (chooses columns)
 ORDER BY (sorts results)
 LIMIT/TOP (reduces output)
 
+* => khi viết câu SQL ta cần viết **JOIN** trước khi **GROUP BY** hoặc **ORDER BY**, ta không cần phải groupby orderby, limit các kiểu rồi mới join SQL sẽ tự biết tối ưu phần join
+
 =================================================================
 # Example
 
@@ -164,4 +166,94 @@ var query = (
     orderby g.Count() descending 
     select g.Key.Name
 ).FirstOrDefault();
+```
+
+## Join để tìm 2 giá trị lớn nhất theo Time
+* -> WHERE kết hợp với AND để tạo 2 điều kiện
+
+```sql - create table
+CREATE TABLE film (
+    film_id              INT IDENTITY(1,1) PRIMARY KEY,
+    title                NVARCHAR(255) NOT NULL,
+    description          NVARCHAR(MAX),
+    release_year         INT CHECK (release_year > 1800),
+    language_id          SMALLINT NOT NULL,
+    original_language_id SMALLINT,
+    rental_duration      SMALLINT NOT NULL DEFAULT 3,
+    rental_rate          DECIMAL(5,2) NOT NULL,
+    length               SMALLINT,
+    replacement_cost     DECIMAL(5,2) NOT NULL,
+    rating               NVARCHAR(50)
+);
+
+CREATE TABLE inventory (
+    inventory_id INT IDENTITY(1,1) PRIMARY KEY,
+    film_id      INT NOT NULL,
+    store_id     SMALLINT NOT NULL,
+    CONSTRAINT FK_Film FOREIGN KEY (film_id) REFERENCES film(film_id) ON DELETE CASCADE
+);
+
+CREATE TABLE rental (
+    rental_id    INT IDENTITY(1,1) PRIMARY KEY,
+    rental_ts    DATETIMEOFFSET NOT NULL,
+    inventory_id INT NOT NULL,
+    customer_id  SMALLINT NOT NULL,
+    return_ts    DATETIMEOFFSET,
+    staff_id     SMALLINT NOT NULL,
+    CONSTRAINT FK_Inventory FOREIGN KEY (inventory_id) REFERENCES inventory(inventory_id) ON DELETE CASCADE
+);
+```
+
+```sql - join
+SELECT f.film_id, f.title
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_ts >= '2020-06-01 00:00:00' 
+  AND r.rental_ts < '2020-07-01 00:00:00'
+GROUP BY f.film_id, f.title
+ORDER BY COUNT(r.rental_id) DESC
+LIMIT 2;
+```
+
+```cs - linq
+(
+	from f in Films
+	join i in Inventories on f.Film_id equals i.Film_id
+	join r in Rentals on i.Inventory_id equals r.Inventory_id
+	where r.Rental_ts >= new DateTime(2020, 6, 1) && r.Rental_ts < new DateTime(2020, 7, 1)
+	group r.Rental_id by new { f.Film_id, f.Title } into g
+	orderby g.Count() descending
+	select new { g.Key.Film_id, g.Key.Title }
+).Take(2)
+
+// or
+Films
+  .Join(Inventories, f => f.Film_id, i => i.Film_id, (f, i) => new { f, i })
+  .Join(Rentals, fi => fi.i.Inventory_id, r => r.Inventory_id, (fi, r) => new { fi.f, r })
+  .Where(x => x.r.Rental_ts >= new DateTime(2020, 6, 1) &&
+              x.r.Rental_ts < new DateTime(2020, 7, 1))
+  .GroupBy(x => new { x.f.Film_id, x.f.Title })
+  .OrderByDescending(g => g.Count())
+  .Select(g => new { g.Key.Film_id, g.Key.Title })
+  .Take(2)
+```
+
+## Union with WHERE + LIKE
+
+```sql
+SELECT a.first_name, a.last_name FROM actor a
+WHERE a.last_name LIKE 'A%'
+UNION
+SELECT c.first_name, c.last_name FROM customer c
+WHERE c.last_name LIKE 'A%';
+```
+```cs
+Actors
+    .Where(a => a.Last_name.StartsWith("A"))
+    .Select(a => new { a.First_name, a.Last_name })
+    .Union(Customers
+        .Where(c => c.Last_name.StartsWith("A"))
+        .Select(c => new { c.First_name, c.Last_name }))
+    .Distinct()
 ```

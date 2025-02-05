@@ -1,10 +1,9 @@
 
-# Example: "external APIs" inside "integration test"
+# Test "external APIs" 
 * -> this would be a problem if these external API is unavailable or have some lincenses that require us to pay for calls it
 * -> especially when we're running a pretty large test or running test in parallel
 * -> mocking an HTTP Handle might seem like a good idea, but we can't really simulate pragmatically all the real world scenarios for production like network, delays, timeouts, service unavailable, ....
 
-## WrireMock
 * => we **don't necessarily need to call those external API**, we can **call a mocked out instance of the API** that will behave in a similar fashion to the one that we need
 * => this is where **`WireMock`** comes in - basically by using this library we can setup **InMemory API** that will behave like the real instance
 * -> it can response to URL, paths, headers, cookie, ...
@@ -46,5 +45,73 @@ public class PaymentStatusResponse
 public class PaymentServiceEndpointDefinition : IEndpointsDefinition
 {
     public static void Configuration
+}
+```
+========================================================================
+# Step
+* -> Đầu tiên tạo project với templace **`Unit Test + XUnit`** và các packages bao gồm **`Fluent Assertion`**, **`Microsoft.AspNetCore.Mvc.Testing`**, **`Microsoft.NET.Test.Sdk`**
+* -> reference tới project chính
+
+```cs 
+// we will test only the "create habit" endpoint
+
+// the 'IClassFixture' is use to avoiding creating new instance of WebApplicationFactory<IApiMaker> for every test that we create
+// 'IAsyncLifetime' require implement 2 method
+public class CreateHabitEndpointTests 
+    : IClassFixture<WebApplicationFactory<IApiMaker>>
+    : IAsyncLifetime
+{
+    
+
+    // we'll use the 'WebApplicationFactory'
+    // -> because for integration testing, we need an instance of our "Habit tracker" API in memory
+    // -> and also offer us possibility to create 'HttpClient'
+    private readonly WebApplicationFactory<IApiMaker> _webApplicationFactory;
+
+    private List<int> _habitIds;
+
+    public CreateHabitEndpointTests(WebApplicationFactory<IApiMaker> webApplicationFactory)
+    {
+        _webApplicationFactory = webApplicationFactory;
+        _habitIds = new List<int>();
+    }
+
+    [Fact]
+    public async Task GivenValidHabit_CreateHabit()
+    {
+        // Arrange
+        var httpClient = _webApplicationFactory.CreateClient();
+        var habit = new Habit // a valid habit
+        {
+            Name = "First integration test"
+        };
+
+        // Act
+        var response = await httpClient.PostAsJsonAsync("api/v1/habits", habit);
+        var createdHabit = await response.Content.ReadFromJsonAsync<Habit>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        createdHabit.Should().NotBeNull();
+        createdHabit.Name.Should().Be(habit.Name);
+        response.Headers.Location.AbsolutePath.Should().Be($"/api/v1/habits/{createdHabit.Id}");
+        _habitIs.Add(createdHabit.Id);
+    }
+
+    // for set up things before specific test
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync()
+    {
+
+    }
+}
+```
+
+* -> tạo 1 interface trong project chính:
+```cs
+public interface IApiMaker
+{
+
 }
 ```
