@@ -126,8 +126,8 @@ var query = from a in Actors
      }
 ```
 
-## tìm max của 1 bảng rồi join với 1 bảng để lấy thông tin tương ứng cho kết quả cuối
-* -> nếu chỉ tìm giới hạn 1 kết quả nhất định theo thứ tự thì khả năng cao là ta sẽ cần dùng **`orderby, select top, và aggregate func`**
+## Tìm giá trị MAX của 1 bảng rồi join với 1 bảng để lấy thông tin tương ứng cho kết quả cuối
+* -> nếu chỉ tìm giới hạn 1 kết quả nhất định theo thứ tự thì khả năng cao là ta sẽ cần dùng **`groupby, aggregate func, orderby, top/limit`**
 
 ```sql
 SELECT c.name
@@ -168,7 +168,7 @@ var query = (
 ).FirstOrDefault();
 ```
 
-## Join để tìm 2 giá trị lớn nhất theo Time
+## Inner Join để tìm 2 giá trị lớn nhất trong 1 Time
 * -> WHERE kết hợp với AND để tạo 2 điều kiện
 
 ```sql - create table
@@ -238,6 +238,11 @@ Films
   .Select(g => new { g.Key.Film_id, g.Key.Title })
   .Take(2)
 ```
+
+## Left join than count the number of records that have value and not have value
+```sql
+
+``` 
 
 ## Union with WHERE + LIKE
 

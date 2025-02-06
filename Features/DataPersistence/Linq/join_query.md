@@ -5,6 +5,10 @@
 * -> the join methods provided in the LINQ framework are "Join" and "GroupJoin" 
 * -> these methods perform "equijoins", or joins that match two data sources based on equality of their keys
 
+## Note
+* -> ta cần nhớ đối với quan hệ **one-to-many** hoặc **many-to-many** relation thì việc join bảng (dù là inner join hay left join) cũng có thể sẽ **`tạo ra số lượng record nhiều hơn so với ban đầu`** 
+* (nếu là inner join của one-to-many thì số lượng record lớn nhất sẽ bằng với số lượng của bảng "many")
+
 ## Choosing "Join" type: the join methods provided in the LINQ framework are "Join" and "GroupJoin"
 * in relational database terms, "Join" implements an "inner join"
 * "GroupJoin" method has no direct equivalent in relational database terms
@@ -30,7 +34,6 @@
 
 ## Inner Join 
 * -> produces a "flat sequence"; only those objects that have a match in the other data set are returned
-* -> ta cần nhớ nếu đối với quan hệ "one-to-many" hoặc "many-to-many" relation thì việc join bảng có thể sẽ tạo ra 1 bảng với số lượng record nhiều hơn ban đầu
 
 ### Single key join
 

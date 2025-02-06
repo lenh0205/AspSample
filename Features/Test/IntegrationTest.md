@@ -98,6 +98,7 @@ public class CreateHabitEndpointTests
         _habitIs.Add(createdHabit.Id);
     }
 
+    // InitializeAsync
     // for set up things before specific test
     public Task InitializeAsync() => Task.CompletedTask;
 
