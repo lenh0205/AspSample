@@ -56,7 +56,7 @@ public class PaymentServiceEndpointDefinition : IEndpointsDefinition
 // we will test only the "create habit" endpoint
 
 // the 'IClassFixture' is use to avoiding creating new instance of WebApplicationFactory<IApiMaker> for every test that we create
-// 'IAsyncLifetime' require implement 2 method
+// 'IAsyncLifetime' require implement 2 method 'InitializeAsync' và 'DisposeAsync'
 public class CreateHabitEndpointTests 
     : IClassFixture<WebApplicationFactory<IApiMaker>>
     : IAsyncLifetime
@@ -95,16 +95,45 @@ public class CreateHabitEndpointTests
         createdHabit.Should().NotBeNull();
         createdHabit.Name.Should().Be(habit.Name);
         response.Headers.Location.AbsolutePath.Should().Be($"/api/v1/habits/{createdHabit.Id}");
-        _habitIs.Add(createdHabit.Id);
+        _habitIds.Add(createdHabit.Id);
     }
 
-    // InitializeAsync
-    // for set up things before specific test
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public Task DisposeAsync()
+    [Fact]
+    public async Task GivenInvalidHabit_ReturnsProblemDetails()
     {
+        // Arrange
+        var httpClient = _webApplicationFactory.CreateClient();
+        var habit = new Habit();
 
+        // Act
+        var response = await httpClient.PostAsJsonAsync("api/v1/habits", habit);
+        var problem = await response.Content.ReadFromJsonAsync<Habit>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        problem.Should().NotBeNull();
+        problem.Errors.Should().NotBeEmpty(); 
+        problem.Errors
+            .Any(x => x.Key == "Name" && x.Value.Any(y => y == "'Name' must not be empty."))
+            .Should()
+            .BeTrue();
+
+    }
+
+    // 'InitializeAsync' thường được dùng thay cho constructor khi có một số setup methods cần được call in async fashion
+    // for set up things before specific test
+    public Task InitializeAsync() => Task.CompletedTask; // trong trường hợp ta sẽ không làm gì cả
+
+    // vấn đề hiện tại là mỗi lần ta chạy test "GivenValidHabit_CreateHabit" thì nó sẽ thêm 1 record vào database
+    // ta sẽ dùng thằng này clean up the database after running the test 
+    // nó sẽ gửi 1 request để delete sau khi chạy 1 test  
+    public async Task DisposeAsync()
+    {
+        var httpClient = _webApplicationFactory.CreateClient();
+        foreach (var habitId in _habitIds)
+        {
+            await httpClient.DeleteAsync($"api/v1/habits/{habitId}");
+        }
     }
 }
 ```

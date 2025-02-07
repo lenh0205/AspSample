@@ -240,8 +240,24 @@ Films
 ```
 
 ## Left join than count the number of records that have value and not have value
-```sql
+* -> ta sẽ sử dụng **`CASE WHEN`** để tạo ra 2 loại giá trị khác nhau theo 2 điều kiện khác nhau trong 1 bảng
+* -> sau đó **GROUP BY** bảng này 1 lần nữa để lấy ra kết quả cuối cùng
 
+```sql
+WITH film_inventory AS (
+    SELECT 
+        f.film_id, 
+        CASE 
+            WHEN COUNT(i.inventory_id) > 0 THEN 'in stock'
+            ELSE 'not in stock'
+        END AS in_stock
+    FROM film f
+    LEFT JOIN inventory i ON f.film_id = i.film_id
+    GROUP BY f.film_id
+)
+SELECT in_stock, COUNT(*) 
+FROM film_inventory
+GROUP BY in_stock;
 ``` 
 
 ## Union with WHERE + LIKE
