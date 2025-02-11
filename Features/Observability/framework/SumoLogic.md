@@ -341,15 +341,17 @@ public class Address
 * -> giờ ta sẽ execute những enpoint này
 
 ## Query
+* -> **`|`** - đây là thể hiện cho pipe
+* -> **`nodrop`** đảm bảo những giá trị không thoã mãn sẽ vẫn được giữ lại mà không bị drop đi
 
 * -> giờ ta sẽ viết query cho panel đầu tiên "Number of request for City by date"
 ```bash
 _sourceCategory="dev/test-app"
 AND "City endpoint returns"
 | timeslice 1d # group the data
-| formatdate(_messagetime, "yyyy-MM-dd") as date # "Time" column (_messagetime) is currently date time value
+| formatdate(_messagetime, "yyyy-MM-dd") as date # "Time" column (_messagetime) is currently date time value, ta sẽ tạo thêm 1 cột "date" với giá trị date only
 | parse regex field=_raw "City endpoint returns(?<city> \w*)" nodrop # lấy tên city từ log cột Message (_raw)
-| count city, date # create "Aggregates" tab for occurences of particular city - cho ta nút "Add to Dashboard"
+| count city, date # group record - create new column "" create "Aggregates" tab for occurences of particular city có 1 cột là "_count" - cho ta nút "Add to Dashboard"
 | transpose row date column city # group by date
 
 # -> khi query bằng câu lệnh này nó sẽ hiện cho ta tab "Message" gồm 4 cột Time, city, date, Message
@@ -380,6 +382,7 @@ AND "Error occured"
 | formatDate(_receiptTime, "yyyy-MM-dd") as date
 | parse regex field=_raw "Error occured. Exception: (?<message> \w.*)" nodrop
 | replace(message, /my custom error message: ([0-9A-Fa-f\-]{36})/, "my custom error message") as replaceMessage
+# in the message, find the sentence that satify the pattern and replace it 
 | parse regex field=_raw "\[Error](?<otherMessage> \w.*)" nodrop
 | if (replaceMessage = "", otherMessage, replaceMessage) as consolidatedMessage
 | if (lenght(consolidatedMessage) > 100, substring(consolidatedMessage, 0, 100), consolidatedMessage) as finalMessage
