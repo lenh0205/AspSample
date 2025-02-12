@@ -34,10 +34,13 @@ public class MyDbContext : IdentityDbContext<ApplicationUser> // chỉ định l
 * -> install **Microsoft.AspNetCore.Authentication.JwtBearer**
 
 ```cs - program.cs
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>() // add "Identity" service
     .AddEntityFrameworkStores<MyDbContext>() // chứa 1 số bảng của "Identity"
-    .AddDefaultTokenProvider();
+    .AddDefaultTokenProviders();
 
 builder.Services.AddDbContext<MyDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectString("myDb"))});
