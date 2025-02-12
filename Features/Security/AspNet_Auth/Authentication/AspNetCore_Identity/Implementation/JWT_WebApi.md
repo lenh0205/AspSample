@@ -101,6 +101,12 @@ public static class AppRole
 ## Repositories
 
 ```cs - ~/Repositories/IAccountRepository.cs
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
 public interface IAccountRepository
 {
     public Task<IdentityResult> SignUpAsync(SignUpModel model);
@@ -110,14 +116,14 @@ public interface IAccountRepository
 public class AccountRepository : IAccountRepository
 {
     private readonly UserManager<ApplicationUser> userManager;
-    private readonly SignInManager<ApplciationUser> signInManager;
+    private readonly SignInManager<ApplicationUser> signInManager;
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly IConfiguration configuration;
 
     // "UserManager", "SignInManager" là service cung cấp bởi Identity
     public AccountRepository(
         UserManager<ApplicationUser> userManager, 
-        SignInManager<ApplciationUser> signInManager,
+        SignInManager<ApplicationUser> signInManager,
         RoleManager<IdentityRole> roleManager,
         IConfiguration configuration
     )
@@ -128,7 +134,7 @@ public class AccountRepository : IAccountRepository
         this.configuration = configuration;
     }
 
-    public Task<string> SignInAsync(SignInModel model)
+    public async Task<string> SignInAsync(SignInModel model)
     {
         // kiểm tra tính hợp lệ của user credential
         var user = await userManager.FindByEmailAsync(model.Email);
@@ -181,14 +187,14 @@ public class AccountRepository : IAccountRepository
             // add role default cho user là "Customer"
             // chỉ thêm duy nhất trong lần đầu có 1 request chạy vô đây
             // kiểm tra role "Customer" đã có (trong DB của Identity) chưa
-            if (!await roleManager.RoleExistAsync(AppRole.Customer))
+            if (!await roleManager.RoleExistsAsync(AppRole.Customer))
             {
                 // chưa có thì tạo rồi lưu vào bảng 'AspNetRoles' của 'Identity'
                 await roleManager.CreateAsync(new IdentityRole(AppRole.Customer));
             }
 
             // thêm dữ liệu vào bảng 'AspNetUserRoles'
-            await userManager.AddToRoleAsync(user, AppRole.Customer)
+            await userManager.AddToRoleAsync(user, AppRole.Customer);
         }
 
         return result;
