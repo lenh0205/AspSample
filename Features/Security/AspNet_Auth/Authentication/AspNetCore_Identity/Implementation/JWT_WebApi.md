@@ -205,7 +205,9 @@ public class AccountRepository : IAccountRepository
 ```cs
 // program.cs
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+```
 
+```cs
 // Controllers
 [Route("api/[controller]")]
 [ApiController]
@@ -239,6 +241,8 @@ public class AccountsController : ControllerBase
 ## Usage
 
 ```cs
+using Microsoft.AspNetCore.Authorization;
+
 [HttpGet]
 [Authorize] // require "authen" only
 public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
