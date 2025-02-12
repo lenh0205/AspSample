@@ -50,11 +50,11 @@ var secretKey = Configuration["JWT:Secret"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services
-    .AddAuthentication(option => { // sử dụng lại Authen nào ? (cookie-base, jwt bearer, ...)
+    .AddAuthentication(options => { // sử dụng lại Authen nào ? (cookie-base, jwt bearer, ...)
         // import "JwtBearerDefaults" from "Microsoft.AspNetCore.Authentication.JwtBearer"
-        options.DefaultAuthenticateSheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthentcationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     // hoặc ".AddAuthentication(JwtBearerDefaults.AuthenticationScheme)" cho ngắn gọn
     .AddJwtBearer(options => 
