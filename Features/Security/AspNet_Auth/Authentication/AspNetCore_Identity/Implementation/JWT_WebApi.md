@@ -32,10 +32,25 @@ public class MyDbContext : IdentityDbContext<ApplicationUser> // chỉ định l
 
 ## Cấu hình service sử dụng Identity
 * -> install **Microsoft.AspNetCore.Authentication.JwtBearer**
+* -> install **System.IdentityModel.Tokens.Jwt**
+
+```json - appsettings.json
+{
+    "JWT": {
+      "ValidIssuer": "http://localhost:5149",
+      "ValidAudience": "client",
+      "Secret": "this is the secret string with 32 characters"
+    }
+}
+```
 
 ```cs - program.cs
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;    
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>() // add "Identity" service
@@ -45,6 +60,29 @@ builder.Services
 builder.Services.AddDbContext<MyDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectString("myDb"))});
 
+// vì ASP.NET Core Identity sử dụng cookie làm mặc định, nên ta cần chỉ định JwtBearer
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])
+            )
+        };
+    });
+builder.Services.AddAuthorization();
+
+app.UseAuthentication();
+app.UseAuthorization();
 ```
 
 ## Migration
@@ -163,7 +201,7 @@ public class AccountRepository : IAccountRepository
             audience: configuration["JWT:ValidAudience"],
             expires: DateTime.Now.AddMinutes(20),
             claims: authClaims,
-            signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
+            signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha256Signature)
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -238,13 +276,13 @@ public class AccountsController : ControllerBase
 }
 ```
 
-## Usage
+## Apply to Endpoint
 
 ```cs
 using Microsoft.AspNetCore.Authorization;
 
 [HttpGet]
-[Authorize] // require "authen" only
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // require "authen" only
 public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
 {
 }
