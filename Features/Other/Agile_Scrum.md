@@ -10,13 +10,13 @@ https://www.youtube.com/watch?v=vuBFzAdaHDY
 * => rất có thể sản phẩm ra mắt cuối cùng lại sai so với market demand or technology vì chúng đã thay đổi so với original plan
 
 # Agile
-* -> phương thức phát triển phần mềm
-* -> cá nhân và sự tương hỗ quan trọng hơn tool
+* _là phương thức phát triển phần mềm_
+* -> self-organizing - cá nhân và sự tương hỗ quan trọng hơn tool
 * -> sản phẩm dùng được quan trọng hơn là document
 * -> cộng tác với khách hàng quan trọng hơn hợp đồng
-* -> phản hồi với sự thay đổi quạn trong hơn kế hoạch
+* -> phản hồi với sự thay đổi quan trong hơn kế hoạch
 
-* => nhanh và flexible; cho phép khách hàng thấy sản phầm liên tục và liên tục đưa qua yêu cầu
+* => delivery nhanh và flexible; cho phép khách hàng thấy sản phầm liên tục và liên tục đưa qua yêu cầu
 
 ## Scum có thể fail
 * -> Scum master không thể estimate, phần công việc hiệu quả
