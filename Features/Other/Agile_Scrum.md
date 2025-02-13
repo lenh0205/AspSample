@@ -10,13 +10,14 @@
 * => rất có thể sản phẩm ra mắt cuối cùng lại sai so với market demand or technology vì chúng đã thay đổi so với original plan
 
 # Agile
-* _là phương thức phát triển phần mềm_
-* -> self-organizing - cá nhân và sự tương hỗ quan trọng hơn tool
-* -> sản phẩm dùng được quan trọng hơn là document
+* _là phương thức phát triển phần mềm - chia nhỏ requirement thành `product backlog`, chia product backlog thành những `Sprint backlog` bao gồm những `User Stories` bên trong, và bỏ những "User Stories" vào `Sprint`_
+* -> cá nhân và sự tương hỗ quan trọng hơn tool
+* -> self-organizing - Ví dụ có thể không cần PM assign requirement, mà từng cá nhân có thể tự xử luôn
 * -> cộng tác với khách hàng quan trọng hơn hợp đồng
 * -> phản hồi với sự thay đổi quan trong hơn kế hoạch
+* -> sản phẩm dùng được quan trọng hơn là document
 
-* => delivery nhanh và flexible; cho phép khách hàng thấy sản phầm liên tục và liên tục đưa qua yêu cầu
+* => delivery nhanh nhất có thể và flexible; cho phép khách hàng thấy sản phầm liên tục và liên tục đưa qua yêu cầu
 
 ## Scum có thể fail
 * -> Scum master không thể estimate, phần công việc hiệu quả
@@ -25,7 +26,7 @@
 # Scrum - implementation of Agile
 * -> process is broken up into smaller pieces
 
-* _1 proccess nhỏ (**`a Sprint`**) kéo dài từ **`1-3 tuần`** sẽ bao gồm các bước:_
+* _1 proccess nhỏ (**`a Sprint`**) kéo dài từ **`2-4 tuần`** sẽ bao gồm các bước:_
 * -> đầu tiền lên plan vừa đủ để start 
 * -> xây dựng 1 tập chức năng tối thiểu đã được lên plan
 * -> test và review tập chức năng nhỏ đó
@@ -39,7 +40,7 @@
 
 * **`Production Owner`**
 * -> define what kind of software or product is to be built
-* -> defining features that are needed in the product (base on customer feedback) (create, prioritiez, accept stories)
+* -> defining features that are needed in the product (base on customer feedback) (create, prioritiez, accept stories; release planning)
 * _(có thể làm việc với khách hàng trực tiếp hoặc gián tiếp qua `Business Analyst` customer support, sales team)_
 * _**Business Analyst** (nếu có) complement the PO in translating business needs into actionable technical requirements, ensures that requirements are well-understood and actionable_
 
