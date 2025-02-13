@@ -1,6 +1,6 @@
-https://www.youtube.com/watch?v=n2XLNlThjms
-https://www.youtube.com/watch?v=vuBFzAdaHDY
-
+> https://www.youtube.com/watch?v=n2XLNlThjms
+> https://www.youtube.com/watch?v=vuBFzAdaHDY
+> PI - Program Increment
 > liệu khách hàng có thêm yêu cầu thì có thêm tiền không ?
 
 # Waterfall
@@ -39,11 +39,11 @@ https://www.youtube.com/watch?v=vuBFzAdaHDY
 
 * **`Production Owner`**
 * -> define what kind of software or product is to be built
-* -> defining features that are needed in the product (base on customer feedback)
+* -> defining features that are needed in the product (base on customer feedback) (create, prioritiez, accept stories)
 * _(có thể làm việc với khách hàng trực tiếp hoặc gián tiếp qua `Business Analyst` customer support, sales team)_
 * _**Business Analyst** (nếu có) complement the PO in translating business needs into actionable technical requirements, ensures that requirements are well-understood and actionable_
 
-* -> **`Scum Master`** - a servant leader to the team; reponsible for protecting the team and the process, running the meetings and keeping things going
+* -> **`Scum Master`** - a servant leader to the team; reponsible for protecting (from outside influence) the team and the process, running the meetings and keeping things going
 * _có thể là nhiều vị trí khác nhau trong team_
 
 * -> **`Team`** - có thể bao gồm B.A, U.X, software engineer, QA, Tester, writers, ... để help in building product
