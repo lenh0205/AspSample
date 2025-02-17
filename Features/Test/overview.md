@@ -21,7 +21,8 @@
 
 ## End To End Tests (E2E)
 * -> **`validate the system from the user's perspective`** (_what happen if user use the system from the UI to backend then to database_)
-* -> extremely time consuming; very fragile; hard to maintain, diagnose and debug; challenging to prepare test enviroment / data setup
+
+* Ex: for end-to-end/ UI testing, we need a browser that loads our app; we need to be able to control that browser via code so that we can program certain user interactions (_click, entering text, ..._) and simulate them
 
 ## Contract Tests
 * -> **`ensure the contracts between services are honored`** 
