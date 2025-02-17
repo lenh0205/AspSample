@@ -590,3 +590,6 @@ public class DataContext : DbContext
     }
 }
 ```
+
+===============================================================
+# Mocking Framework - NSubstitute
