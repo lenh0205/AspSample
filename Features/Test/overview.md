@@ -11,12 +11,13 @@
 * _Ex: class, method, ..., something very small and isolated_
 
 ## Integration Tests
-* -> **`verify the interactions between different units`** (_for example: databases or external web services_)
-* -> are typically used and triggered by a **Continuous Integration (CI) system** to ensure that the code being integrated does not conflict with other parts of the code
-* -> focus on integration with **out-of-process dependencies**, provide confidence that the **`API is ready for deployment`**
-* -> however, it's time consuming and hard to diagnose failure (_because when errors happen we don't know exactly what unit cause these errors_)
+* -> ensure that an app's components function correctly at a level that includes the **app's supporting infrastructure** (_such as the **`database`**, **`file system`**, and **`network`**_)
+* -> ASP.NET Core supports integration tests using a **`unit test framework`** with a **test web host** and an **in-memory test server**
 
-* _not just about combining multiple classes together but also to involve components like database, network call, external system call, file system call_
+* -> in contrast to **unit tests** - that use fabricated components (**`fakes or mock objects`**) in place of infrastructure components, **integration tests** use the **`actual components that the app uses in production`**
+
+* => the integration test require more code, data processing and take longer to run so limit the use of integration tests to the most important infrastructure scenarios, 
+* -> don't write integration tests for every permutation of data and file access with databases and file systems
 
 ## End To End Tests (E2E)
 * -> **`validate the system from the user's perspective`** (_what happen if user use the system from the UI to backend then to database_)
