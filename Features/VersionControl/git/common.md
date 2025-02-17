@@ -1,4 +1,40 @@
 ==========================================================================
+# Ignore the tracked file
+* -> **.gitignore** ignores **`just files that weren't tracked before`**
+* -> _tức là sau khi ta **git commit** hoặc **git add** file đó rồi thì dù ta thêm file đó vào **.gitignore** thì **`git vẫn sẽ track change của file đó`**_
+
+* -> run **`git reset name_of_file`** (nếu file đang ở **staged** status) to unstage the file and keep it
+* -> in case we want to also remove the given file from the repository (after pushing), use git **`rm --cached name_of_file`** (repository sẽ đánh dấu là ta đã xoá file đó, file đó trên máy ta vẫn còn nhưng máy khác pull về sẽ không có)
+
+# stage 1 file đang bị .gitignore
+```bash
+git add --force ./index.html
+```
+
+==========================================================================
+# Tag
+* -> Tags are just human readable shortcuts for hashes
+```bash
+$ git tag <tag-name>
+```
+
+==========================================================================
+# Get Information
+
+```bash
+$ git help
+$ git status # Shows list of modified files
+$ git diff # Shows changes we have made
+$ git log # Note the hash code for each commit
+$ git show # Can use full or shortened hash
+$ git reflog # see all changes that have occurred
+
+$ git diff HEAD^^ # Show what has changed in last two commits
+$ git diff HEAD~10..HEAD~2 # Show what changed between 10 commits ago and two commits ago
+$ 
+```
+
+==========================================================================
 # git cherry-pick
 * -> để lấy 1 commit từ 1 nhánh khác về nhánh hiện tại
 https://stackoverflow.com/questions/36975986/cherry-pick-shows-no-m-option-was-given-error
