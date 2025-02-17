@@ -1,4 +1,4 @@
-
+=============================================================================
 # Test "external APIs" 
 * -> this would be a problem if these external API is unavailable or have some lincenses that require us to pay for calls it
 * -> especially when we're running a pretty large test or running test in parallel
@@ -143,5 +143,93 @@ public class CreateHabitEndpointTests
 public interface IApiMaker
 {
 
+}
+```
+
+=============================================================================
+# NUnit for Integration Test -  Test a repository that queries data using Entity Framework Core
+
+```cs - origin project
+public class Product
+{
+    public int ProductId { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+
+public interface IProductRepository
+{
+    Product GetById(int productId);
+    void Add(Product product);
+    void SaveChanges();
+}
+public class ProductRepository : IProductRepository
+{
+    private ProductContext context;
+
+    public ProductRepository(ProductContext context)
+    {
+        this.context = context;
+    }
+
+    public Product GetById(int productId)
+    {
+        return context.Products.Find(productId);
+    }
+
+    public void Add(Product product)
+    {
+        context.Products.Add(product);
+    }
+
+    public void SaveChanges()
+    {
+        context.SaveChanges();
+    }
+}
+```
+
+```cs - test project
+using System.Data.Entity;
+using System.Linq;
+using Moq;
+using NUnit.Framework;
+
+public class ProductIntegrationTests
+{
+    [Test]
+    public void AddProductAndRetrieveFromDatabase()
+    {
+        // Arrange
+        var fixture = new Fixture();
+        var product = fixture.Create<Product>(); // use 'AutoFixture' library that allows us to create our test objects easily
+        
+        // simulate a database using Entity Framework Core
+        var dbContextOptions = new DbContextOptionsBuilder<ProductContext>()
+            .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+            .Options;
+
+        // added the product to the database
+        using (var context = new ProductContext(dbContextOptions))
+        {
+            var productRepository = new ProductRepository(context);
+            productRepository.Add(product);
+            productRepository.SaveChanges();
+        }
+
+        using (var context = new ProductContext(dbContextOptions))
+        {
+            var productRepository = new ProductRepository(context);
+
+            // Act
+            var retrievedProduct = productRepository.GetById(product.ProductId);
+
+            // Assert
+            Assert.IsNotNull(retrievedProduct);
+            Assert.AreEqual(product.ProductId, retrievedProduct.ProductId);
+            Assert.AreEqual(product.Name, retrievedProduct.Name);
+            Assert.AreEqual(product.Price, retrievedProduct.Price);
+        }
+    }
 }
 ```
