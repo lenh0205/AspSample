@@ -138,11 +138,38 @@ public class CreateHabitEndpointTests
 }
 ```
 
-* -> tạo 1 interface trong project chính:
+* -> tạo 1 interface tại root trong project chính:
 ```cs
-public interface IApiMaker
+// thằng IApiMaker này là để dùng cho 'WebApplicationFactory', ta có thể dùng program.cs cũng được
+public interface IApiMarker
 {
+}
+```
 
+* -> there is an infrastructure provision issue here, we have to make sure the database and all infrastructure was up and running and the data was in a specific state before we were able to run the tests
+* -> also if multiple build pipelines were running in parallel, we had interference between the tests and the tests were flanky 
+* => the Test Container library - allow us to bootstrap our integration tests against a real instance of a service running in a Docker container 
+
+# Infrastructure provision - Test Container
+* -> đầu tiên ta cần có custom **`WebApplicationFactory`**
+```cs
+public class ApiFactory : WebApplicationFactory<IApiMaker>
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        // we can override things that we have wired up in our program.cs
+        builder.ConfigureServices(services =>
+        {
+            var descriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+            if (descriptor != null)
+            {
+                service.Remove(descriptor);
+            }
+            var connectionString = string.Empty;
+            services.AddDbContext<ApplicationDbContext>(opts => opts.UseSqlServer(connectionString));
+        });
+    }
 }
 ```
 
