@@ -20,11 +20,70 @@
 > Common Git branching strategies
 
 # GitFlow
-* -> **`Master`** - main branch used for product release
-* -> **`Develop`** - tách ra từ master, used for ongoing development
-* -> **`Feature branches`** - tách từ develop, to develop new features
-* -> **`Release`** - tách từ develop, sau khi 1 quá trình development thì ta sẽ có 1 nhánh để assist in preparing a new production release and bug fixing, sau khi xong sẽ merge ngược về master và develop 
-* -> **`Hotfix`** - tách ra từ master, sau khi fix xong sẽ được merge ngược về master và develop specifically for critical bug resolution in the production release
+![gitflow](https://nvie.com/img/git-model@2x.png)
+
+* -> **`Master`** - main branch used for production, không bao giờ sửa trực tiếp chỉ hợp nhất từ nhánh `release` và `hotfix`
+* -> **`Develop`** - tách ra từ `master`, used for ongoing development
+* -> **`Feature branches`** - tách từ `develop`, to develop new features
+* -> **`Release`** - tách từ `develop`, sau khi 1 quá trình development thì ta sẽ có 1 nhánh để assist in preparing a new production release and bug fixing, sau khi xong sẽ merge ngược về master và develop 
+* -> **`Hotfix`** - tách ra từ `master`, sau khi fix xong sẽ được merge ngược về master và develop specifically for critical bug resolution in the production release
+
+## Command:
+```bash
+# -----> Tạo nhánh develop
+git branch develop
+git push -u origin develop
+
+# -----> Bắt đầu phát triển feature: tạo nhánh riêng để phát triển feature
+git checkout -b feature/1-feature-01 develop
+git status 
+git add some-file
+git commit
+
+# -----> Hoàn thành feature: merge feature vào dev, đẩy dev lên, rồi xóa feature đi
+git pull origin develop
+git checkout develop
+git merge --no-ff feature/1-feature-01
+git push origin develop
+git branch -d feature/1-feature-01 # xóa branch local
+git push origin --delete feature/1-feature-01 # xóa branch remote
+
+
+# -----> Bắt đầu phát hành bản release
+git checkout -b release-0.1.0 develop
+
+# -----> Hoàn thành bản release: merge release vô dev và master; xóa branch release; thêm tag cho master cho bản Release theo PATCH
+git checkout main
+git merge --no-ff release-0.1.0
+git push
+
+git checkout develop
+git merge --no-ff release-0.1.0
+git push
+
+git branch -d release-0.1.0 # xóa local
+git-follow-action git:(main) git push origin --delete release-0.1.0 # xóa remote
+
+git tag -a v0.1.0 master
+git push --tags
+
+# -----> Nếu có lỗi thì tạo nhánh hotfix
+git checkout -b hotfix-0.1.1 main
+
+# -----> Hoàn thành hotfix: merge hotfix vô dev và master; xóa hotfix; thêm tage cho master cho bản Release theo PATCH
+git checkout main
+git merge --no-ff hotfix-0.1.1
+git push
+
+git checkout develop
+git merge --no-ff hotfix-0.1.1
+git push
+
+git branch -d hotfix-0.1.1
+
+git tag -a v0.1.1 master
+git push --tags
+```
 
 ## Cons
 * -> complexity - khó quản lý khi có nhiều branch được add thêm
