@@ -6,6 +6,25 @@
 
 * => improve **code quality** and help **developers grow** professionally
 
+```bash - Example: from 'feature' branch to 'develop' branch in project using GitHub with GitFlow
+# quá trình develop:
+git checkout develop
+git pull origin develop  # Ensure you're up-to-date
+git checkout -b feature/my-feature
+git add .
+git commit -m "Implemented feature XYZ"
+git push origin feature/my-feature
+
+# create 'Pull Request' on Github
+# -> Go to your GitHub repository.
+# -> Click on Pull Requests > New pull request.
+# -> Select 'base' as "develop"
+# -> Select 'compare' as "feature/my-feature"
+# -> Write a clear title and description (what changes were made, why, any dependencies).
+# -> Assign reviewers (our teammates, rất có thể gồm 2 người là: bên khách hàng, bên team mình)
+# -> Click "Create pull request"
+```
+
 ===========================================================================
 # Best pratices
 
