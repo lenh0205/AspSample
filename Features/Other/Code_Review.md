@@ -8,12 +8,12 @@
 
 ```bash - Example: from 'feature' branch to 'develop' branch in project using GitHub with GitFlow
 # quá trình develop:
-git checkout develop
-git pull origin develop  # Ensure you're up-to-date
-git checkout -b feature/my-feature
-git add .
-git commit -m "Implemented feature XYZ"
-git push origin feature/my-feature
+$ git checkout develop
+$ git pull origin develop  # Ensure you're up-to-date
+$ git checkout -b feature/my-feature
+$ git add .
+$ git commit -m "Implemented feature XYZ"
+$ git push origin feature/my-feature
 
 # create 'Pull Request' on Github
 # -> Go to your GitHub repository.
@@ -23,6 +23,21 @@ git push origin feature/my-feature
 # -> Write a clear title and description (what changes were made, why, any dependencies).
 # -> Assign reviewers (our teammates, rất có thể gồm 2 người là: bên khách hàng, bên team mình)
 # -> Click "Create pull request"
+
+# Code Review Process
+# -> Reviewers will check your code for best practices, performance, security, and correctness.
+# -> ta sẽ cần theo dõi 'review status' on our Pull Request: pending approval (chờ đến khi tất cả approved), Approved, Changes requested (block việc merge bắt buộc phải update), Comments only (không block merge nhưng ta nên vô trả lời comment, mention reviewer by @reviewer-name)
+# -> They may leave comments or request changes.
+# -> Address feedback by making changes in your branch and pushing them (tức là ta sẽ update thêm commit và push vào current Pull Request để reviewer review lại lần nữa)
+# -> Once all required reviewers approve, the "Merge" button will become active
+
+# Merge the Pull Request
+# -> once approved, click "Merge pull request" in GitHub
+# -> delete the feature branch (both locally and remotely)
+
+# Update Local develop
+$ git checkout develop
+$ git pull origin develop
 ```
 
 ===========================================================================
