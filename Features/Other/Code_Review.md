@@ -29,10 +29,8 @@ $ git push origin feature/my-feature
 # -> ta sẽ cần theo dõi 'review status' on our Pull Request: 
 # - Pending Approval (chờ đến khi tất cả approved), 
 # - Approved, 
-# - Changes requested (block việc merge bắt buộc phải update), 
-# - Comments only (không block merge nhưng ta nên review/trả lời comment, mention reviewer by @reviewer-name)
-# -> They may leave comments or request changes.
-# -> Address feedback by making changes in your branch and pushing them (tức là ta sẽ update thêm commit và push vào current Pull Request để reviewer review lại lần nữa)
+# - Changes requested (block việc merge bắt buộc phải update: ta update code, commit và push lại vào current Pull Request để reviewer review lại lần nữa), 
+# - Comments only (reviewer đưa ra 1 vài suggestion, không block merge nhưng ta nên review/trả lời comment, mention reviewer by @reviewer-name)
 # -> Once all required reviewers approve, the "Merge" button will become active
 
 # Merge the Pull Request
