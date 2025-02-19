@@ -1,9 +1,9 @@
 ===========================================================================
 # Code Review
 * -> code reviews is a part of **`software development cycle`** (saved more money than resolving defects after they were found by customers)
-* -> also referred to as **`peer code review`** - a process where 1 or (should) 2 developers analyze a teammate's code, identifying bugs, logic errors, and overlooked edge cases
-* _always provide constructive feedback, making mistakes is not a crime and that's the reason we have peer review_
+* -> also referred to as **`peer code review`** - a process where 1 or (should) 2 developers analyze teammate's code to identify bugs, logic errors and overlooked edge cases
 
+* _always provide constructive feedback, making mistakes is not a crime and that's the reason we have peer review_
 * => improve **code quality** and help **developers grow** professionally
 
 ```bash - Example: from 'feature' branch to 'develop' branch in project using GitHub with GitFlow
