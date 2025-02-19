@@ -1,6 +1,6 @@
 =========================================================================
 # Branching strategy
-* a set of rules on how multiple developers simultaneously work and interact with a shared codebase with the help of a version control system like Git
+* a set of rules on how multiple developers can simultaneously work and interact with a shared codebase with the help of a version control system like Git
 
 * -> parallel development
 * -> enhanced productivity due to efficient collaboration
