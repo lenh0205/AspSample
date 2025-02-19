@@ -1,6 +1,6 @@
 =========================================================================
 # Branching strategy
-* -> a set of rules that aid the developers on how to go about writing, merging and deploying code and interact with a shared codebase with the help of a version control system like Git
+* a set of rules on how multiple developers simultaneously work and interact with a shared codebase with the help of a version control system like Git
 
 * -> parallel development
 * -> enhanced productivity due to efficient collaboration
@@ -8,13 +8,9 @@
 * -> clear path for software development process
 * -> bug-free environment without disrupting development workflow
 
-* => keeping project repositories organized, error free and avoid the dreaded merge conflicts when multiple developers simultaneously push and pull code from the same repository
-
 ## Branch
-* -> Branches are independent lines of work, stemming from the original codebase
-* -> developers create separate branches for independently working on features so that changes from other developers don't interfere with an individual's line of work. 
-* -> developers can easily pull changes from different branches and also merge their code with the main branch
-* => this allows easier collaboration for developers working on one codebase.
+* -> is like a separate workspace version where we can make changes to our code without affecting the main project version
+* -> once our changes are ready, we merge the branch back into the main branch
 
 =========================================================================
 > Common Git branching strategies
