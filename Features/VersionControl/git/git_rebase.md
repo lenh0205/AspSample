@@ -1,4 +1,4 @@
-
+======================================================================================
 # git rebase
 * -> về cơ bản, có thể hiểu **git rebase** tương tự như **git merge** - đều dùng để kết hợp những thay đổi từ nhánh này qua nhánh kia, nhưng khác nhau về cơ chế hoạt động
 
@@ -36,3 +36,8 @@ git rebase main
 
 ### Advance
 https://200lab.io/blog/git-rebase-vs-git-merge
+
+======================================================================================
+# Rebase with conflict
+https://stackoverflow.com/questions/161813/how-do-i-resolve-merge-conflicts-in-a-git-repository
+https://www.simplilearn.com/tutorials/git-tutorial/merge-conflicts-in-git
