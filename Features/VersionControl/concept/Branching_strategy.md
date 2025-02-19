@@ -50,7 +50,7 @@ git checkout -b release-0.1.0 develop
 
 # -----> Hoàn thành bản release: merge release vô dev và master; xóa branch release; thêm tag cho master cho bản Release theo PATCH
 git checkout main
-git merge --no-ff release-0.1.0
+git merge --no-ff release-0.1.0 # '--no-ff' (No Fast-Forward)
 git push
 
 git checkout develop
@@ -58,7 +58,7 @@ git merge --no-ff release-0.1.0
 git push
 
 git branch -d release-0.1.0 # xóa local
-git-follow-action git:(main) git push origin --delete release-0.1.0 # xóa remote
+git push origin --delete release-0.1.0 # xóa remote
 
 git tag -a v0.1.0 master
 git push --tags
