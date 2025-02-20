@@ -1,5 +1,6 @@
 > https://roadmap.sh/pdfs/best-practices/backend-performance.pdf
 
+============================================================================
 # Backend performance
 * -> Caching
 * -> Optimize API Response
@@ -28,8 +29,12 @@
 * -> **`Queue Length (Background Jobs)`** - if the backend uses background jobs (e.g., message queues like RabbitMQ), monitoring queue length is important
 
 ## Tools
-Monitoring Tools: Prometheus, Grafana, New Relic, Datadog.
-Load Testing Tools: JMeter, k6, Apache Bench.
-Logging & Tracing: OpenTelemetry, Serilog.
+* -> Monitoring Tools: Prometheus, Grafana, New Relic, Datadog.
+* -> Load Testing Tools: JMeter, k6, Apache Bench.
+* -> Logging & Tracing: OpenTelemetry, Serilog.
 
 ## Bottlenecks
+
+============================================================================
+# API Performance
+* -> 
