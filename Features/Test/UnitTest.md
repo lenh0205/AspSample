@@ -252,9 +252,9 @@ public class NetworkService
 ## Step
 * -> install **FakeItEasy**
 * -> ta cần sử dụng **`A.Fake<T>()`** để fake các dependencies, rồi khởi tạo thủ công class ta cần test bằng những Dependencies này
-* -> ta cần lưu ý là vì ta đã mock các dependency này, nên việc gọi vào các method này là không (Ex: dù method luôn trả về false nhưng khi test nó sẽ trả về mặc định là false vì thực tế nó không truy cập được)
-* => nên để truy cập method này thì trong test ta cần fake nó, s/d **`A.CallTo(() => Dependency.Method()).Returns(ExpectedReturn)`**
-* => vậy nên tất cả method ta muốn access từ Dependency được inject đều phải Fake nếu không lúc chạy test sẽ lỗi
+* -> ta cần lưu ý là vì ta đã mock các dependency này, nên việc gọi vào các method này là không thể 
+* (_Ex: method "SendDNS" bên dưới mặc định luôn trả về true nhưng khi test mà ta gọi trực tiếp nó thì nó sẽ trả về là false vì thực tế nó không truy cập được_)
+* => vậy nên tất cả method ta muốn access từ Dependency được inject trong đều phải Fake nếu không lúc chạy test sẽ lỗi; s/d **`A.CallTo(() => Dependency.Method()).Returns(ExpectedReturn)`**
 
 ```cs
 // test project
