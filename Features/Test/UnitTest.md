@@ -71,19 +71,20 @@ internal class DumpestFunction
 ===============================================================
 # XUnit and Fluent Assertions
 * -> **XUnit** cho phép ta truy cập vào **`Test Explorer`** (Visual Studio -> Test -> Test Explorer)
-* -> ta sẽ **`VS -> Test -> Run All Tests`** để chạy
-* -> khi ta chạy test, nó sẽ tự động tìm tất cả các Test và chạy cho ta
+* -> **XUnit** có hỗ trợ ta **`Assert.`** để viết assertions, nhưng NuGet package **`FluentAssertions`** sẽ giúp việc viết assertions dễ hơn rất nhiều
 
-* -> **XUnit** có hỗ trợ ta **`Assert.`** để viết assertions, nhưng **`FluentAssertions`** sẽ giúp việc viết assertions dễ hơn rất nhiều
-* -> nhớ install NuGet package cho FluentAssertions
-
-* -> để đánh dấu 1 Test (method) trong xUnit ta cần có **`[Fact]`** hoặc **`[Theory]`** (nếu muốn pass data) attribute 
-* -> **`InlineData`** (dùng với **[Theory]**) cho phép ta pass data vào param của Test method theo thứ tự
-
-## Step
+## Create Unit Test project
 * -> Trong solution, ta sẽ có project của ta rồi tạo thêm 1 project có template là **`xUnit Test Project`** với tên là tên của project cộng thêm **`.Test`** và reference đến project đó
 * -> ta nên để Folder Structure giống như project gốc và thêm chữ Tests đằng sau
 * -> giờ ta **Run All Tests** để xem project Test của ta đã hook vào được chưa
+
+## Chạy Test
+* -> ta sẽ **`VS -> Test -> Run All Tests`** để chạy
+* -> khi ta chạy test, nó sẽ tự động tìm tất cả các Test và chạy cho ta
+
+## Viết Test
+* -> để đánh dấu 1 Test (method) trong xUnit ta cần có **`[Fact]`** hoặc **`[Theory]`** (nếu muốn pass data) attribute 
+* -> **`InlineData`** (dùng với **[Theory]**) cho phép ta pass data vào param của Test method theo thứ tự
 
 ## Debug Test
 * -> để debug a test, ta sẽ đặt break point bên trong test sau đó right-click vào test chọn **`Debug Tests`**
