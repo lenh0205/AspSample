@@ -1,3 +1,5 @@
+> know how to passing data from controller to view, view to controller, controller to controller, view to view
+
 =========================================================================
 # Strongly Typed Model (Recommended Approach)
 
@@ -118,7 +120,7 @@ public ActionResult Index()
 =========================================================================
 # TempData
 * -> is used to **`transfer data`** from **view to controller**, **controller to view**, or **from one action method to another action method** of the same or a different controller
-* -> **`stores the data temporarily`** and **automatically removes key-value after retrieving a value**
+* -> **`stores the data temporarily`** and **automatically removes key-value after retrieving a value** (_tức là sau khi đọc data từ nó thì data đó sẽ mất_)
 * -> however, we can still **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
 
 ```cs - Transfer data from one "Action Method" to another "Action Method"
@@ -277,4 +279,22 @@ public class HomeController : Controller
         return View();
     }
 }
+```
+
+=========================================================================
+# Passing data from Controller to Controller
+* -> we store the data to be passed in the **`TempData`** dictionary in the **sender action method** and reads that data from the **`TempData`** dictionary in **receiving action method**
+
+```cs
+public ActionResult Index() {  
+    Customer data = new Customer() { CustomerID = 1, CustomerName = "Abcd", Country = "PAK" };
+    TempData["mydata"] = data;
+    return RedirectToAction("Index", "Home2");  
+}  
+
+// inside the Index() of Home2:
+public ActionResult Index() {  
+    Customer data = TempData["mydata"] as Customer;  
+    return View(data);  
+}  
 ```
