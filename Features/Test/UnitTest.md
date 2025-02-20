@@ -8,8 +8,8 @@
 ## Cách test
 * -> ta chỉ test những gì **`critical`** và **`liên tục thay đổi`**; không cần test model, static things
 
-* _ta sẽ cần nghĩ how would we actually test this ? what would we be testing for? why would we even have a test?_
-* _cái ta cần suy nghĩ là kết quả mong muốn tương ứng với tham số truyền vào_
+* _ta sẽ cần suy nghĩ how would we actually test this ? what would we be testing for? why would we even have a test?_
+* _tiếp theo suy nghĩ là kết quả mong muốn tương ứng với tham số truyền vào_
 * _ý tưởng của Unit Test là việc ta chỉ cần bấm một nút và nó sẽ chạy cả ngàn Unit Test, xem sau khi ta thay đổi có test nào bị fail không_
 
 ===============================================================
