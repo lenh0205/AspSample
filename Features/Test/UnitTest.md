@@ -1,12 +1,16 @@
 ===============================================================
 # Overview
-* -> ensure our code is not breaking
-* -> why ? because we working on a team, a large code base, we make changes
-* -> ta sẽ không cần test model, static things; ta chỉ test những gì critical và liên tục thay đổi
 
-* -> ta sẽ cần nghĩ how would we actually test this ? what would we be testing for ? why would we even have a test 
-* -> cái ta cần suy nghĩ là kết quả mong muốn tương ứng với tham số truyền vào
-* -> ý tưởng của Unit Test là việc ta chỉ cần bấm một nút và nó sẽ chạy cả ngàn Unit Test, xem sau khi ta thay đổi có test nào bị fail không
+## Reason
+* -> improve **`code quality`**: require our code cover various scenarios; the code also need to be modular and maintainable for easily testing
+* -> ensure making **`code changes`** did not break existing functionality
+
+## Cách test
+* -> ta chỉ test những gì **`critical`** và **`liên tục thay đổi`**; không cần test model, static things
+
+* _ta sẽ cần nghĩ how would we actually test this ? what would we be testing for? why would we even have a test?_
+* _cái ta cần suy nghĩ là kết quả mong muốn tương ứng với tham số truyền vào_
+* _ý tưởng của Unit Test là việc ta chỉ cần bấm một nút và nó sẽ chạy cả ngàn Unit Test, xem sau khi ta thay đổi có test nào bị fail không_
 
 ===============================================================
 # No Unit Test Framework
