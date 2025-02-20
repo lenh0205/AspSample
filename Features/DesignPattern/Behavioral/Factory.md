@@ -15,8 +15,8 @@
 // Ví dụ: ta có trang UI có 1 button để lấy thời gian hiện tại hiển thị ra màn hình
 // ta có 1 class "Sample1" chứa property thể hiện thời gian hiện tại; nếu ta inject class này vào 1 view
 // thì mỗi lần bấm button nó sẽ không cập nhật thời gian mới mà chỉ lấy đúng thời gian đã được inject lúc load trang lần đâu
-// giờ chỉ còn cách là trong callback của button event, ta khởi tạo class thủ công và lấy nó ra khỏi Dependecies injection
-// điều này là vấn đề nhất là khi "Sample1" cũng chứa Dependencies mà lại không thể lấy từ DI nữa
+// giờ chỉ còn cách là trong callback của button event, ta khởi tạo class "Sample1" thủ công và mỗi lần click button là mỗi lần access property để lấy thời gian mới nhất
+// điều này là 1 vấn đề nhất là khi class "Sample1" cũng đang có những Dependencies mà bình thường nó sẽ lấy từ DI
 // => vậy nên ta sẽ cần 1 factory
 
 // program.cs
