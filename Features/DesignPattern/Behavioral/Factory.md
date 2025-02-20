@@ -2,7 +2,7 @@
 ===============================================================
 # Arise
 * -> in **`Dependency Injection`**, we typically **put our dependencies in the constructor**; when class is created, the dependencies get created and injected
-* => however, there're times we want to **create our dependencies more often or in a different way**
+* -> however, there're times we want to **create our dependencies more often or in a different way**
 * => one solution is **`Factory pattern`** - create instances properly from dependency injection
 
 * => we can create **factories** for various needs in project
