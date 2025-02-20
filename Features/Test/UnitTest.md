@@ -4,6 +4,7 @@
 ## Reason
 * -> improve **`code quality`**: require our code cover various scenarios; the code also need to be modular and maintainable for easily testing
 * -> ensure making **`code changes`** did not break existing functionality
+* -> **`catches bugs early`** in development state - reduce the cost and effort of fixing them later in development
 
 ## Cách test
 * -> ta chỉ test những gì **`critical`** và **`liên tục thay đổi`**; không cần test model, static things
@@ -260,8 +261,9 @@ public class NetworkService
 // test project
 public class NetworkServiceTests
 {
-    private readonly NetworkService _pingService;
     private readonly IDNS _dNS;
+    private readonly NetworkService _pingService;
+
     public NetworkServiceTests()
     {
         // Dependencies
@@ -303,7 +305,7 @@ public class NetworkService
         var dnsSuccess = _dNS.SendDNS();
         if (dnsSuccess)
         {
-        return "Success: Ping Sent";
+            return "Success: Ping Sent";
         }
         else
         {
