@@ -10,7 +10,6 @@
 * -> key **`metrics`** include **page load time, error rates, responsiveness, and cross-browser compatibility, security vulnerabilities**
 
 * => IBM found that **the cost to fix an error found after product release was ... 100 times more than one identified in the maintenance phase**
-* => 
 
 ## Types of Web Testing:
 * _https://www.geeksforgeeks.org/software-testing-web-based-testing/_
