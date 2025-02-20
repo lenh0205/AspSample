@@ -14,15 +14,17 @@
 
 ===============================================================
 # No Unit Test Framework
-* -> khi đặt tên cho test (method không có kiểu trả về) cần tuân theo convention: **`ClassName_MethodName_ExpectedResult`**
 
+## AAA
 * _1 test sẽ bao gồm **triple A**:_
 * -> **`Arrange`** - preparing, go get your variables, your classes, functions, whatever you need for this test to run 
 * ->  **`Act`** - Execute this function
 * ->  **`Assert`** - whatever is returned is it what you want
 
-* => ta sẽ cần điều chỉnh số lượng **Assertion** cho hợp lý, nếu quá nhiều thì nhiều khi gây khó chịu
-* => ta có thể dựa vào **fluent assertions** khi viết test, ví dụ viết test case cho method trả về string thì **`https://fluentassertions.com/strings/`**
+## Note
+* -> khi đặt tên cho test (method không có kiểu trả về) cần tuân theo convention: **`ClassName_MethodName_ExpectedResult`**
+* -> ta sẽ cần điều chỉnh số lượng **Assertion** cho hợp lý, nếu quá nhiều thì nhiều khi gây khó chịu
+* -> ta có thể dựa vào **fluent assertions** khi viết test, ví dụ viết test case cho method trả về string thì **`https://fluentassertions.com/strings/`**
 
 ```cs
 // class with function we want to test
