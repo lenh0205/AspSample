@@ -1,5 +1,5 @@
 =========================================================================
-# Model 
+# Strongly Typed Model (Recommended Approach)
 
 ```cs
 // Models
