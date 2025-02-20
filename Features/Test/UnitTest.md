@@ -245,12 +245,9 @@ public class NetworkService
 ===============================================================
 # Mocking Framework - FakeItEasy
 * -> cho phép ta fake các DI để khởi tạo instance từ class
-* -> đảm bảo **consistence**: dữ liệu trên database là luôn thay đổi vậy nên lấy dữ liệu thực từ database để test là không thể (cùng input nhưng có thể khác output)
-
-* -> it's almost impossible to unit test những abstraction như Repository layer nếu không có **mocking framework**
-* -> ta sẽ không muốn mocking framework đụng tới database hay vào sâu trong abstraction (cái đó thuộc về integration testing hay end-to-end testing)
-* -> 
-* -> công việc của mocking framework là thay thế data ta cần từ abstraction và test method chính đang sử dụng data đó
+* -> thay thế data ta cần từ abstraction và test method chính đang sử dụng data đó
+* => đảm bảo **consistence** (same input same output) của Unit Test (_dữ liệu trên database là luôn thay đổi vậy nên lấy dữ liệu thực từ database để test là không thể - cùng input nhưng có thể khác output_)
+* => it's almost impossible to unit test những abstraction như Repository layer nếu không có **mocking framework** (_việc đụng tới database hay vào sâu trong abstraction thuộc về integration testing hay end-to-end testing_)
 
 ## Step
 * -> install **FakeItEasy**
