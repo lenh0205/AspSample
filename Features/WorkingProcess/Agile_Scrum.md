@@ -3,6 +3,7 @@
 > PI - Program Increment
 > liệu khách hàng có thêm yêu cầu thì có thêm tiền không ?
 
+====================================================================================
 # Waterfall
 * -> các step có thể bao gồm: Plan -> Build -> Test -> Review -> Deploy
 * -> việc sai ở mỗi bước có thể sẽ khiển ta phải bắt đầu làm lại từ bước trước đó, có khi sẽ phải làm lại từ đầu
@@ -23,6 +24,7 @@
 * -> Scum master không thể estimate, phần công việc hiệu quả
 * -> trong product backlog, trong epic sẽ có nhiều user stories sẽ có nhiều task
 
+====================================================================================
 # Scrum - implementation of Agile
 * -> process is broken up into smaller pieces
 
@@ -94,3 +96,6 @@
 
 ## Software to Manage the work flow
 
+====================================================================================
+# QA in web development with Agile
+https://moldstud.com/articles/p-essential-role-of-quality-assurance-in-web-development
