@@ -272,12 +272,14 @@ public class Van : IVehicle
 
 
 ===============================================================
+> https://stackoverflow.com/questions/13029261/design-patterns-factory-vs-factory-method-vs-abstract-factory
+
 # Factory Design Pattern
 * -> the pattern **`encapsulates object generation`** - separates clients from the creation process, allowing dynamic object instantiation based on runtime requirements
 * -> enables us to **generate objects without defining the specific type of object** that will be created 
 * => by using a **factory method** or **factory class**, it allows us to **`abstract away the instantiation process`** - resulting in a more modular and scalable solution
 
-## Factory Method Pattern
+# Factory Method Design Pattern
 * -> a _design pattern_ that **`provides an interface for creating objects`** while **`allowing subclasses to determine the type of objects to be made`**
 * -> **bypassing the instantiation process to subclasses** encourages **`loose coupling`**
 
