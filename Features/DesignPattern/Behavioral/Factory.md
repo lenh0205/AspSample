@@ -5,9 +5,10 @@
 * -> however, there're times we want to **create our dependencies more often or in a different way**
 * => one solution is **`Factory pattern`** - create instances properly from dependency injection
 
-* => we can create **factories** for various needs in project
-* -> an abstract factory for initialize class instances with startup data
-* -> a factory for instantiating different implementation classes based upon passing parameters
+```cs - we can create "factories" for various needs in project
+// an abstract factory for initialize class instances with startup data
+// a factory for instantiating different implementation classes based upon passing parameters
+```
 
 ## Simple Factory
 
