@@ -24,6 +24,7 @@
 * -> **`Automation testing`** - is when testers write an automation script, either by coding on an automation framework or leveraging automation testing tools, to perform the interactions for them
 
 ## STLC - Software Testing Life Cycle
+* _https://www.altexsoft.com/whitepapers/quality-assurance-quality-control-and-testing-the-basics-of-software-quality-management/_
 1. Requirement Analysis
 2. Test Planning
 3. Test Case Developement
