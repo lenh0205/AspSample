@@ -118,8 +118,7 @@ public ActionResult Index()
 
 =========================================================================
 # TempData
-* _**`available across multiple requests`** (survives redirects) - so we can transfer data from **view to controller**, **controller to view**, or **from one action method to another action method** of the same or a different controller_
-* -> **`data persists until read`** - automatically removes key-value after retrieving a value (_tức là sau khi đọc data từ nó thì data đó sẽ mất_)
+* -> **`data available across multiple requests (survives redirects) and persists until read`** (_tức là we can transfer data from **view to controller**, **controller to view**, or **from one action method to another action method** of the same or a different controller nhưng nó sẽ automatically removes key-value after retrieving a value_
 * -> but able to **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
 * -> is a **`Dictionary<string, object>`**, so require **`type casting`** when retrieve
 * _Note: stored in session state but not permanently like session variables_
