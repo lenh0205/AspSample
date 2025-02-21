@@ -72,7 +72,7 @@ namespace MVC_BasicTutorials.Controllers
 
 # Note 
 * -> internally, `ViewBag` is a wrapper around **ViewData**; it will **`throw a runtime exception`**, **if the ViewBag property name matches with the key of ViewData** (_in case using both_)
-* -> ViewData's life only lasts **during the current HTTP request**, ViewBag values will be **`null if redirection occurs`**
+* -> both `ViewData` and `ViewBag` are valid **`only for the duration of the current HTTP request`**; if a **redirection** occurs, their values will not persist
 * -> _ViewBag_ **doesn't require typecasting** while **`retrieving values from it`** - this can throw a run-time exception if the wrong method is used on the value
 * -> _ViewBag_ is a dynamic type and **`skips compile-time checking`**; so, **ViewBag property names must match between controller and view** while writing it manually
 
