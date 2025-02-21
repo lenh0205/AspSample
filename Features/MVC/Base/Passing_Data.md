@@ -121,8 +121,9 @@ public ActionResult Index()
 * -> **`stores the data temporarily`** and **automatically removes key-value after retrieving a value** (_tức là sau khi đọc data từ nó thì data đó sẽ mất_)
 * -> however, we can still **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
 
-```cs - Transfer data from one "Action Method" to another "Action Method"
-// user visit "Index" page first and then to the "About" page and assume that Index.chtml not retrieve TempData 
+```cs
+// Transfer data from one "Action Method" to another "Action Method"
+// -> user visit "Index" page first and then to the "About" page and assume that Index.chtml not retrieve TempData 
 // -> add data in the 'TempData' in the "Index()" action method and access it in the "About()" action method
 // -> sau khi About() retrive data từ TempData thì nó sẽ tự động bị remove, Contact() không thể retrieve nữa
 
@@ -159,7 +160,8 @@ public class HomeController : Controller
 }
 ```
 
-```cs - Transfers data from an "Action method" to a "View"
+```cs
+// Transfers data from an "Action method" to a "View"
 // -> added data in the TempData in the Index() action method, so we can access it in the Index.cshtml view
 // -> because we have accessed it in the index view first, we cannot access it anywhere else
 
@@ -244,7 +246,8 @@ public class HomeController : Controller
 }
 ```
 
-```cs - retain TempData value for the subsequent requests even after accessing it
+```cs
+// retain TempData value for the subsequent requests even after accessing it
 public class HomeController : Controller
 {
     public ActionResult Index()
