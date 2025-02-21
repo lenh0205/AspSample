@@ -43,11 +43,10 @@ public ActionResult Index()
 
 =========================================================================
 # common point of 'ViewBag' and 'ViewData'
+* -> **'ViewBag' is a wrapper around 'ViewData'**- internally, ViewBag uses ViewData (ViewDataDictionary) to store values dynamically; 
 * -> used to transfer temporary data (_which is not included in the model_) from the **`controller to the view, not visa-versa`** 
-* -> **`ViewBag` is a wrapper around `ViewData`**- internally, ViewBag uses ViewData (ViewDataDictionary) to store values dynamically; 
-* -> so it will **throw a runtime exception** if the **`ViewBag property name matches with the key of ViewData`** (_in case using both_)
-* -> if we assign the **same property multiple times**, it will only **`consider last value assigned`**
-* -> both `ViewData` and `ViewBag` are valid **`only for the duration of the current HTTP request`**; if a **redirection** occurs, their values will not persist
+* -> if we assign value to the **same property/key multiple times** (regardless using ViewData, ViewBag or both), it will only **`consider last value assigned`**
+* -> both "ViewData" and "ViewBag" are **`valid only for current HTTP request`**; if a **redirection** occurs, their values will not persist
   
 # ViewBag
 * -> it is a **`dynamic`** type - so we can **assign any number of properties and values to ViewBag** 
