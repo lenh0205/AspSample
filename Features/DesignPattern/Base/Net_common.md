@@ -1,7 +1,19 @@
-# The Singleton Pattern
-The Singleton Pattern The singleton pattern is used to ensure that only one instance of a class is created, and that this instance can be accessed globally. A common use case for this pattern is when you need to control access to a shared resource, such as a database connection. Here’s an example of a singleton class in C#:
+https://medium.com/@serasiyasavan14/5-powerful-design-patterns-every-c-developer-should-master-b0a214617375
+https://www.csharp.com/article/the-importance-of-design-patterns-in-net-core-development/
+https://www.csharp.com/UploadFile/bd5be5/design-patterns-in-net/
 
-```cs
+======================================================================
+# The Singleton Pattern
+* -> ensure that **`only one instance of a class is created`** and that this **`instance can be accessed globally`**
+* -> a common use case for this pattern is when we need to **`control access to a shared resource`** (_such as logging, configuration settings or a database connection_)
+* => avoid inconsistencies, resource wastage, or slowdowns
+
+## Implementation
+* -> create **`a private static variable`** that **holds the instance**
+* -> the class has **`a private constructor`** to prevent external instantiation
+* -> **`a public method`** **returns the instance**
+
+```cs - Example
 public class Singleton
 {
     private static Singleton _instance;
@@ -20,9 +32,16 @@ public class Singleton
 }
 ```
 
-# The Factory Pattern
+## Use Case
+* _Global logging systems, configuration managers, and thread pools_
 
-The Factory Pattern The factory pattern is used to create objects without exposing the instantiation logic to the client. This allows for greater flexibility and maintainability, as the client can be decoupled from the specific class being instantiated. Here’s an example of a factory class in C#:
+```cs - Example:
+
+```
+
+# The Factory Pattern
+* -> is used to create objects without exposing the instantiation logic to the client
+* -> this allows for greater flexibility and maintainability, as the client can be decoupled from the specific class being instantiated. Here’s an example of a factory class in C#:
 
 ```cs
 public abstract class Creator
@@ -105,7 +124,7 @@ public class ConcreteDecoratorA : Decorator
 }
 ```
 
-# 5. The Template Method Pattern
+# The Template Method Pattern
 The template method pattern is used to define the skeleton of an algorithm, and allow subclasses to fill in the details. This pattern is useful when you have a common algorithm that can be reused, but with different implementation details. Here’s an example of a template method class in C#:
 
 ```cs
@@ -133,3 +152,73 @@ public class ConcreteClass : AbstractClass
     }
 }
 ```
+
+## The Command Pattern
+The Command pattern is used to encapsulate a request as an object, which allows for greater flexibility and separation of concerns. This pattern is useful when you need to handle different requests in a similar way or need to support undo/redo functionality. Here’s an example of a Command class in C#:
+
+```cs
+public interface ICommand
+{
+    void Execute();
+    void Undo();
+}
+
+public class ConcreteCommand : ICommand
+{
+    private Receiver _receiver;
+    private string _state;
+
+    public ConcreteCommand(Receiver receiver)
+    {
+        _receiver = receiver;
+    }
+
+    public void Execute()
+    {
+        _state = _receiver.Action();
+    }
+
+    public void Undo()
+    {
+        _receiver.Undo(_state);
+    }
+}
+```
+
+## The Adapter Pattern
+The Adapter pattern is used to adapt an interface of a class to another interface that the client expects. This pattern is useful when you need to integrate with existing systems or frameworks that have a different interface than what you are expecting. Here’s an example of an Adapter class in C#:
+
+```cs
+public interface ITarget
+{
+    void Request();
+}
+
+public class Adaptee
+{
+    public void SpecificRequest()
+    {
+        // Original functionality
+    }
+}
+
+public class Adapter : ITarget
+{
+    private Adaptee _adaptee;
+
+    public Adapter(Adaptee adaptee)
+    {
+        _adaptee = adaptee;
+    }
+
+    public void Request()
+    {
+        _adaptee.SpecificRequest();
+    }
+}
+```
+
+======================================================================
+# Example
+https://stackoverflow.com/questions/3252499/what-design-patterns-are-used-throughout-the-net-framework
+https://learn.microsoft.com/en-us/archive/msdn-magazine/2005/july/discovering-the-design-patterns-you-re-already-using-in-net
