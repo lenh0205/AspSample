@@ -42,10 +42,16 @@ public ActionResult Index()
 ```
 
 =========================================================================
+# common point of 'ViewBag' and 'ViewData'
+* -> internally, `ViewBag` is a wrapper around `ViewData` (_`ViewBag` internally inserts data into `ViewData` dictionary_); so it will **throw a runtime exception** if the **`ViewBag property name matches with the key of ViewData`** (_in case using both_)
+* -> both `ViewData` and `ViewBag` are valid **`only for the duration of the current HTTP request`**; if a **redirection** occurs, their values will not persist
+  
 # ViewBag
 * -> used to **transfer temporary data** (_which is **`not included in the model`**_) from the **controller to the view, not visa-versa** 
 * -> it is a **dynamic** type - so we can **assign any number of properties and values to ViewBag** (_if we assign the `same property multiple times`, it will only **`consider last value assigned`**_)
-* -> property of the **ControllerBase** class - means it is **`available in any controller or view`** in the ASP.NET MVC application 
+* -> property of the **ControllerBase** class - means it is **`available in any controller or view`** in the ASP.NET MVC application
+* -> _ViewBag_ **doesn't require typecasting** while **`retrieving values from it`** - this can throw a run-time exception if the wrong method is used on the value
+* -> _ViewBag_ is a dynamic type and **`skips compile-time checking`**; so **ViewBag property names must match between controller and view** while writing it manually 
 
 ```cs - action method using "ViewBag"
 namespace MVC_BasicTutorials.Controllers
@@ -70,18 +76,9 @@ namespace MVC_BasicTutorials.Controllers
 <label>Total Students:</label>  @ViewBag.TotalStudents
 ```
 
-# Note 
-* -> internally, `ViewBag` is a wrapper around **ViewData**; it will **`throw a runtime exception`**, **if the ViewBag property name matches with the key of ViewData** (_in case using both_)
-* -> both `ViewData` and `ViewBag` are valid **`only for the duration of the current HTTP request`**; if a **redirection** occurs, their values will not persist
-* -> _ViewBag_ **doesn't require typecasting** while **`retrieving values from it`** - this can throw a run-time exception if the wrong method is used on the value
-* -> _ViewBag_ is a dynamic type and **`skips compile-time checking`**; so, **ViewBag property names must match between controller and view** while writing it manually
-
-=========================================================================
 # ViewData
 * -> similar to **`ViewBag`**, but is a **Dictionary** type (_not `dynamic` like ViewBag_) - contain **key-value pair** where **`each 'key' is a string`** 
-* -> however, both **store data in the same dictionary internally**; if the **`ViewData Key matches with the property name of ViewBag`** it will throw a runtime exception
 * -> in view, to **`retrieve the value using ViewData`**, we need to **typecasting it to an appropriate data type**
-* -> **`ViewBag` internally inserts data into `ViewData` dictionary**, so **`the key of ViewData and property of ViewBag must NOT match`**
 
 ```cs
 public ActionResult Index()
