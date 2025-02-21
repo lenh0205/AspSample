@@ -1,11 +1,13 @@
 > _https://learn.microsoft.com/en-us/previous-versions/aspnet/2wawkw1c(v=vs.100)_
 
-# Default Pages
+# ASP.NET Web Site Structure
+
+## Default Pages
 * config to server when users navigate to our site **`without specifying a particular page`**
 * For example, create a **Default.aspx** page in site's root folder
 * usually use as **`home page`** for site or a page contain code **`redirect users to other pages`** 
 
-# Application Folders
+## Application Folders
 * **`certain folder`** for specific types of content (`ASP.NET recognizes it`)
 * not served in response to Web requests; but to be **`accessed from application code`**
 
@@ -18,11 +20,12 @@
 * **App_WebReferences** - contains **`reference contract files`** (.wsdl files), **`schemas`** (.xsd files), and **`discovery document`** files (.disco and .discomap files) defining a Web reference for use in an application
 * **Bin** - contains **compiled assemblies** (.dll files) for controls, components, or other code; classes represented by code are **automatically referenced** in our application
 
-# Web.config
+## Web.config
 * to **manage configuration settings** for our site
 * located in the site's **`root folder`** -> but we can **`creating a Web.config file in subfolder`** to maintain separate configuration settings for files in that folder
 * we can config settings to **`restrict access to site content`** (individual files or subfolders) by individuals or by roles
 
+===========================================================================
 # Web Site File Types
 * Web site applications can contain file types supported and managed by **ASP.NET** or **IIS server**
 
