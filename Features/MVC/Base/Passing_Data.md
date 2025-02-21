@@ -122,10 +122,11 @@ public ActionResult Index()
 * -> however, we can still **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
 
 ```cs
-// Transfer data from one "Action Method" to another "Action Method"
+// Transfer data from one "Action Method" to another "Action Method" (Controller to Controller)
 // -> user visit "Index" page first and then to the "About" page and assume that Index.chtml not retrieve TempData 
 // -> add data in the 'TempData' in the "Index()" action method and access it in the "About()" action method
-// -> sau khi About() retrive data từ TempData thì nó sẽ tự động bị remove, Contact() không thể retrieve nữa
+// -> sau khi About() retrieve data bởi key đó từ TempData thì nó sẽ tự động bị remove, Contact() không thể retrieve nữa
+// -> nếu sau đó ta truy cập vào Contact() và cố retrieve data bằng key đó thì nó sẽ trả về null
 
 public class HomeController : Controller
 {
@@ -161,7 +162,23 @@ public class HomeController : Controller
 ```
 
 ```cs
-// Transfers data from an "Action method" to a "View"
+// Ví dụ khác cho "Controller to Controller"
+
+public ActionResult Index() {  
+    Customer data = new Customer() { CustomerID = 1, CustomerName = "Abcd", Country = "PAK" };
+    TempData["mydata"] = data;
+    return RedirectToAction("Index", "Home2");  
+}  
+
+// inside the Index() of Home2:
+public ActionResult Index() {  
+    Customer data = TempData["mydata"] as Customer;  
+    return View(data);  
+} 
+```
+
+```cs
+// Transfers data from an "Action method" to a "View" (Controller to View)
 // -> added data in the TempData in the Index() action method, so we can access it in the Index.cshtml view
 // -> because we have accessed it in the index view first, we cannot access it anywhere else
 
@@ -206,7 +223,10 @@ public class HomeController : Controller
 @TempData["name"]
 ```
 
-```cs - Transfer data from a "View" to "Action method"
+```cs
+// Transfer data from a "View" to "Action method" (View to Controller)
+
+// Index.cshtml
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -247,7 +267,8 @@ public class HomeController : Controller
 ```
 
 ```cs
-// retain TempData value for the subsequent requests even after accessing it
+// sử dụng Keep() để retain TempData value for the subsequent requests even after accessing it
+
 public class HomeController : Controller
 {
     public ActionResult Index()
@@ -282,20 +303,3 @@ public class HomeController : Controller
 }
 ```
 
-=========================================================================
-# Passing data from Controller to Controller
-* -> we store the data to be passed in the **`TempData`** dictionary in the **sender action method** and reads that data from the **`TempData`** dictionary in **receiving action method**
-
-```cs
-public ActionResult Index() {  
-    Customer data = new Customer() { CustomerID = 1, CustomerName = "Abcd", Country = "PAK" };
-    TempData["mydata"] = data;
-    return RedirectToAction("Index", "Home2");  
-}  
-
-// inside the Index() of Home2:
-public ActionResult Index() {  
-    Customer data = TempData["mydata"] as Customer;  
-    return View(data);  
-}  
-```
