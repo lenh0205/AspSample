@@ -43,14 +43,14 @@ public ActionResult Index()
 
 =========================================================================
 # common point of 'ViewBag' and 'ViewData'
-* -> **'ViewBag' is a wrapper around 'ViewData'**- internally, ViewBag uses ViewData (ViewDataDictionary) to store values dynamically; 
+* _**`'ViewBag' is a wrapper around 'ViewData'`**- internally, ViewBag uses ViewData (ViewDataDictionary) to store values dynamically_
 * -> used to transfer temporary data (_which is not included in the model_) from the **`controller to the view, not visa-versa`** 
 * -> if we assign value to the **same property/key multiple times** (regardless using ViewData, ViewBag or both), it will only **`consider last value assigned`**
-* -> both "ViewData" and "ViewBag" are **`valid only for current HTTP request`**; if a **redirection** occurs, their values will not persist
+* -> both are **`limited to the current HTTP request`** (_if a **`redirection`** occurs, their values will not persist_)
   
 # ViewBag
 * -> it is a **`dynamic`** type - so we can **assign any number of properties and values to ViewBag** 
-* -> **`doesn't require typecasting`** while **retrieving values from it** - this can throw a run-time exception if the wrong method is used on the value
+* -> **`doesn't require typecasting`** while **retrieving values from it** (Razor view will automatically call **`.ToString()`** when we directly render the value of it) (_ensure we know the actual type before calling an method of it or it will throw exception at runtime_) 
 * _Note: since it is a dynamic type (skips compile-time checking), **`mismatch in naming between controller and view will cause a runtime error`**_
 
 ```cs - action method using "ViewBag"
@@ -62,6 +62,7 @@ namespace MVC_BasicTutorials.Controllers
             new Student(){ StudentID=1, StudentName="Steve", Age = 21 },
             new Student(){ StudentID=2, StudentName="Bill", Age = 25 }
         };
+
         // GET: Student
         public ActionResult Index()
         {
@@ -77,7 +78,7 @@ namespace MVC_BasicTutorials.Controllers
 ```
 
 # ViewData
-* -> **stores key-value pairs** in a **`Dictionary`** (ViewDataDictionary) 
+* -> **stores key-value pairs** in a **`Dictionary<string, object>`** (ViewDataDictionary) 
 * -> **`requires typecasting`** when **retrieving values in the View** and **`require case-sensitive key access`** (_while ViewBag properties are case-insensitive_)
 
 ```cs
@@ -105,6 +106,7 @@ public ActionResult Index()
 
 // Index.cshtml
 <ul>
+    {/* require type casting */}
     @foreach (var std in ViewData["students"] as IList<Student>)
     {
         <li>
@@ -118,7 +120,7 @@ public ActionResult Index()
 # TempData
 * -> is used to **`transfer data`** from **view to controller**, **controller to view**, or **from one action method to another action method** of the same or a different controller
 * -> **`stores the data temporarily`** and **automatically removes key-value after retrieving a value** (_tức là sau khi đọc data từ nó thì data đó sẽ mất_)
-* -> however, we can still **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
+* -> but able to **`keep it for the subsequent request`** by calling **TempData.Keep(keyName)** method (_if not specific **`keyName`**, it will keep all_)
 
 ```cs
 // Transfer data from one "Action Method" to another "Action Method" (Controller to Controller)
