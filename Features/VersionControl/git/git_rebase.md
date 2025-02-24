@@ -32,12 +32,23 @@ git rebase main
 * -> 1 là ta sẽ merge 2 nhánh này thành 1 để xử lý những conflict tồn tại nhưng nó sẽ có thể tạo một nùi commit giống nhau; 
 * -> 2 là ta sẽ **git push --force** lên remote, khi team member kéo code về thì họ sẽ thấy là những commit xa lạ
 
-* => vậy nên ta không nên git rebase nhánh riêng, không nên có nhiều người đang làm việc
+* => vậy nên ta không git rebase nhánh riêng, không nên có nhiều người đang làm việc (_việc rebase làm thay đổi commit history, rồi update nó vô 1 shared branch nơi mà công việc của mọi người đang dựa vào lịch sử cũ có thể gây xáo trộn_)
 
 ### Advance
 https://200lab.io/blog/git-rebase-vs-git-merge
 
 ======================================================================================
+# Common command for working with rebase
+```bash
+# fetches the latest changes, rebases your local branch, linear commit history 
+$ git pull --rebase origin master 
+
+# we should "git pull --rebase origin master" only on local branches that have not been pushed
+# tốt nhất với 1 shared branch như master
+$ git fetch origin
+$ git rebase origin/master
+```
+
 # Rebase with conflict
 https://stackoverflow.com/questions/161813/how-do-i-resolve-merge-conflicts-in-a-git-repository
 https://www.simplilearn.com/tutorials/git-tutorial/merge-conflicts-in-git
