@@ -127,21 +127,13 @@ using (var connection = new SqlConnection(connectionString))
 ## LINQ to SQL
 * -> deprecated
 
-## Compare
-* **`Performance`**: 
-* -> **Dapper is faster ADO.NET is faster EF**; 
-* -> however, ADO.NET may offers more **`control over the performance of queries`** as it allows developers to write SQL queries directly 
-
-* **`Ease of Use`**:
-* -> **EF Core** is the clear winner - provide **`a high-level API`** that abstracts the database operations and supports LINQ to **`write queries in C# instead of SQL`**
-* -> **Dapper** is also easy to use **`but requires developers to write SQL queries`**
-
-* **`Features`**:
-* -> **EF Core** is the clear winner
-* -> **Dapper** require to self-implement some features
-* -> **ADO.NET** doesn't provide as many features as EF Core
-
-* **`Flexibility`**
-* -> **Dapper** is the most flexible because it allows developers to **`write SQL queries`** and **`map the results to any class or structure`**
-* -> **EF Core** is less flexible because it requires developers to define classes that map to database tables
-* -> **ADO.NET** is also less flexible because it requires developers to write more code to map the results to classes or structures
+=============================================================
+# Why 'LINQ' instead of 'SQL'
+https://www.linqpad.net/WhyLINQBeatsSQL.aspx
+https://medium.com/@uptoamir/linq-query-syntax-vs-raw-sql-b5a229409eb7
+https://stackoverflow.com/questions/22916574/what-is-best-way-sql-raw-queries-or-linq
+https://learn.microsoft.com/vi-vn/ef/ef6/querying/raw-sql
+https://visualstudiomagazine.com/articles/2011/04/01/pcnet_using-linq.aspx
+https://eekayonline.medium.com/linq-vs-sql-unleashing-the-power-of-data-manipulation-a9ea95edc532
+https://www.scholarhat.com/tutorial/linq/comparing-linq-with-stored-procedure
+https://learn.microsoft.com/en-us/ef/core/querying/sql-queries?tabs=sqlserver
