@@ -164,6 +164,23 @@ string[] arr = str.Split(", ");
 var str2 = string.Join(", "); // Davis, Clyne, Fonte
 ```
 
+# Cắt string
+```cs
+string text = "Hello, World!";
+
+// extracts a portion of a string based on "start index" and "length"
+string cut = text.Substring(7, 5); // "World"
+string cut = text.AsSpan(7, 5).ToString(); // the same as ".Substring()" but works better with large strings in performance-critical (avoiding extra string allocations) applications
+
+// extract from "start index" to "end index"
+string cut = text[7..12]; // "World"
+string cut = text[..5]; // "Hello"
+string lastPart = text[7..]; // "World!"
+
+// removes a portion of a string starting from an index
+string cut = text.Remove(5); // "Hello"
+```
+
 ===================================================================
 # get time span between 2 timeline contain minutes and seconds
 
