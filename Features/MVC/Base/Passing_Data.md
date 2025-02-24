@@ -1,4 +1,5 @@
 > know how to passing data from controller to view, view to controller, controller to controller, view to view
+> ta cần nhớ rằng **RedirectToAction** thì Browser sẽ là thằng gửi request đến method action khác, còn dùng HttpClient thì thằng server sẽ tự gửi request đến 1 action khác của nó
 
 =========================================================================
 # Strongly Typed Model (Recommended Approach)
