@@ -1,6 +1,8 @@
 > **REST APIs** are one of the most common kinds of **`web interfaces`** available today
 > have to take into **`account security`**, **`performance`**, and **`ease of use`** for API consumers
 > https://blog.postman.com/rest-api-examples/
+> https://www.integrate.io/blog/how-to-make-a-rest-api/
+
 ===========================================================================
 # REST API
 * -> **`REST (representational state transfer)`** is a software architectural style commonly used for building web services such as APIs
