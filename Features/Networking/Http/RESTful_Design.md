@@ -27,7 +27,7 @@
 ## Layered system
 * -> The REST client does not know (and does not need to know) if it is communicating with an intermediary layer in the architecture, or with the server itself
 
-## Code on demand
+## Code on demand (Optional)
 * -> The client can optionally download code such as a JavaScript script or Java applet in order to extend its functionality at runtime
 
 ===========================================================================
