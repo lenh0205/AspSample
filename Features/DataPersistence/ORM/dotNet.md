@@ -66,6 +66,11 @@ using (var connection = new SqlConnection(connectionString))
 
 * -> Dapper offers more control over the SQL queries generated; it can be beneficial when you need to optimize queries for performance or execute complex operations
 
+## Đọc thêm
+https://learn.microsoft.com/en-us/archive/msdn-magazine/2016/may/data-points-dapper-entity-framework-and-hybrid-apps
+https://exceptionnotfound.net/dapper-vs-entity-framework-core-query-performance-benchmarking-2019/
+https://salihcantekin.medium.com/the-big-fight-dapper-vs-entity-framework-detailed-benchmark-2345af933382
+
 =============================================================
 # ADO.NET (ActiveX Data Objects for .NET)
 * ->  is part of the **`.NET Framework`**, provides a set of "classes" and "interfaces" that allow .NET applications to interact with databases (or XML files)
