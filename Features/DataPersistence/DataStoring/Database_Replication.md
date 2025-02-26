@@ -238,8 +238,11 @@ Handling Replication Lag: Since replication is asynchronous in some setups, ensu
 Retry Policies: If a replica is down, configure retries or fallback to the primary database
 
 ===================================================================================
+> https://medium.com/@vijmoorthy/practical-ways-to-implement-cqrs-f84a577c7bd2
+> https://tech.cybozu.vn/cqrs-thiet-ke-he-thong-chiu-tai-lon-va-de-bao-tri-99f4b/
+> https://stackoverflow.com/questions/75751508/cqrs-vs-database-replica-set
 
-# 'CQRS' pattern
+# 'CQRS' pattern with Replication
 * -> **`CQRS fits naturally with database replication`** but doesn't require it (_we can use CQRS even without replication_)
 
 * -> install **MediatR** packages
