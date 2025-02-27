@@ -137,3 +137,16 @@ https://www.youtube.com/watch?v=Xb2PSCkkaaE
 * -> when **connection.Close()** or **Dispose()** is called, **`the connection is returned to the pool instead of being closed permanently`**
 
 ## Entity Framework Core
+* -> EF Core **internally uses ADO.NET (SqlClient for SQL Server)**, which **`already has connection pooling`**
+
+## Default ADO.NET pools connections
+* _By default, ADO.NET pools connections when using SqlClient with_
+* -> **default pool size`**: 100 connections
+* -> **`idle timeout`**: 4 minutes
+
+```bash
+Server=myServer;Database=myDb;User Id=myUser;Password=myPass;Max Pool Size=200;Min Pool Size=10;
+# configure pooling via the connection string
+# to increases max connections in the pool to 200
+# and keeps at least 10 connections ready
+```
