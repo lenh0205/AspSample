@@ -6,6 +6,9 @@
 
 
 ======================================================================
+> https://risingwave.com/blog/top-5-rules-for-faster-sql-queries-2/
+> https://www.thoughtspot.com/data-trends/data-modeling/optimizing-sql-queries
+
 ## SQL Performance Tuning
 * -> is the process of **optimizing SQL queries** to improve the **`speed and efficiency of database operations`**
 * -> involves various techniques to **optimize the execution of queries**, **manage system resources more effectively**, and **ensure that the database responds quickly to user requests**
