@@ -22,6 +22,8 @@
 * -> Frequently Updated Columns: Avoid indexing columns that are frequently updated, as the index will need to be updated with each change, adding overhead.
 
 ===============================================================================
+> thường thì biết 3 thằng Clustered Index, Non-Clustered Index và Unique Index là oke rồi
+
 # Creating an 'Index' in SQL Sever
 * -> SQL indexes can be applied to **one or more columns** and can be either **unique or non-unique**
 * -> _**unique indexes** ensure that **no duplicate values** are entered in the indexed columns, while **non-unique indexes** simply speed up queries without enforcing uniqueness_
