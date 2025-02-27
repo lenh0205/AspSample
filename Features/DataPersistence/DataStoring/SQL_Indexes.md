@@ -1,3 +1,6 @@
+> thường thì ta sẽ triển khai Index ngay trong giai đoạn phát triển, thiết kế database dựa vào sự đo lường, kinh nghiệm, tầm nhìn
+> database đã có dữ liệu, thì đánh index cần phải xem xét rất kỹ impact so với lợi ích
+
 ===============================================================================
 # SQL Indexes
 * -> an **`index`** in SQL is **`a schema object that improves the speed of data retrieval operations on a table`**
@@ -83,6 +86,8 @@ https://www.geeksforgeeks.org/sql-indexes/
 # Renaming an Index
 
 ===============================================================================
+> đọc thêm: https://medium.com/@murataslan1/database-indexing-855a249fd9df
+
 # Apply Indexes in ASP.NET Core Web API Project
 
 ## Identify Performance Issues
