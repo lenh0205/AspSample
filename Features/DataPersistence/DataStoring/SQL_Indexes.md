@@ -2,6 +2,8 @@
 > database đã có dữ liệu, thì đánh index cần phải xem xét rất kỹ impact so với lợi ích
 
 ===============================================================================
+> đọc thêm: https://medium.com/@murataslan1/database-indexing-855a249fd9df
+
 # SQL Indexes
 * -> an **`index`** in SQL is **`a schema object that improves the speed of data retrieval operations on a table`**
 * => **speed up SELECT queries** especially on **`large datasets`**, they can **slow down data manipulation operations (INSERT, UPDATE, DELETE)**
@@ -86,8 +88,6 @@ https://www.geeksforgeeks.org/sql-indexes/
 # Renaming an Index
 
 ===============================================================================
-> đọc thêm: https://medium.com/@murataslan1/database-indexing-855a249fd9df
-
 # Apply Indexes in ASP.NET Core Web API Project
 
 ## Identify Performance Issues
