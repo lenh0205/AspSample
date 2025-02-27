@@ -127,3 +127,13 @@ https://www.youtube.com/watch?v=Xb2PSCkkaaE
 * -> this involves the **`main application thread quickly placing the log entry into an in-memory buffer`**, 
 * -> while **`a seperate logging thread writes the log entries to the file or sends them to logging service`**
 * _with asynchronous logging, there's a small chance we might lose some logs if our application crashes before the logs have been written_
+
+============================================================================
+# Connection Pooling with 'EntityFramework Core' and 'ADO.NET'
+
+## ADO.NET
+* -> ADO.NET **`automatically manages connection pooling`** when using **SqlClient (SQL Server)**
+* -> whenever we create a **new SqlConnection** (from System.Data.SqlClient), ADO.NET **`check the connection pool`** then **reuses pooled connection if it's existed and creates a new connection if not`**
+* -> when **connection.Close()** or **Dispose()** is called, **`the connection is returned to the pool instead of being closed permanently`**
+
+## Entity Framework Core
