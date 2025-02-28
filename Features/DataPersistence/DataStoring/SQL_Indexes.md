@@ -10,7 +10,7 @@
 
 ## Mechanism
 * -> works by creating **`a separate data structure that provides pointers to the rows in a table`**
-* => making it faster to look up rows based on specific column values by reducing the need for full table scans
+* => making it faster to **look up rows based on specific column values** by reducing the need for **`full table scans`**
 
 ## Benifit
 * -> Large Data Tables: SQL queries on tables with millions of rows can significantly slow down due to full table scans. Indexes provide a faster alternative by allowing quick access to relevant rows.
