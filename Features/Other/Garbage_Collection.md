@@ -17,10 +17,7 @@
 * -> GC won't release the file handle immediately, causing potential issues.
 * -> If the program crashes, the file remains locked until the OS reclaims the handle
 *  _ta cần lưu ý **File Hanlde Resource** của ta là "FileWrite" chỉ khởi tạo instance của FileStream một lần và sử dụng cho những lần sau đó, vậy nên nếu bất cẩn Dispose() nó ngay khi sử dụng thì nếu gọi Write() method lần nữa thì nó sẽ throw Exception ngay_
-*  _Ngoài ra, It Doesn't Follow Standard Resource Management
-
-The caller of FileWriter has no control over when the file is disposed.
-Normally, a class that uses a resource should own the responsibility of disposing it at the right time, not inside an unrelated method._
+*  _Ngoài ra, it doesn't follow **Standard Resource Management**:The caller of FileWriter has no control over when the file is disposed; Normally, a class that uses a resource should own the responsibility of disposing it at the right time, not inside an unrelated method._
 ```cs
 public class FileWriter
 {
