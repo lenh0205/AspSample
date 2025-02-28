@@ -50,9 +50,10 @@ public ActionResult Index()
 * -> both are **`limited to the current HTTP request`** (_if a **`redirection`** occurs, their values will not persist_)
   
 # ViewBag
-* -> it is a **`dynamic`** type - so we can **assign any number of properties and values to ViewBag** 
-* -> **`doesn't require typecasting`** while **retrieving values from it** (Razor view will automatically call **`.ToString()`** when we directly render the value of it) (_ensure we know the actual type before calling an method of it or it will throw exception at runtime_) 
-* _Note: since it is a dynamic type (skips compile-time checking), **`mismatch in naming between controller and view will cause a runtime error`**_
+* -> it is a **`dynamic`** type (_skips compile-time checking_) - so we can **assign any number of properties and values to ViewBag** 
+* -> **`doesn't require typecasting`** while **retrieving values from it** (Razor view will automatically call **`.ToString()`** when we directly render the value of it)
+* => _Note: ensure we know the actual type before calling an method of it or it will throw exception at runtime_
+* => _Note: **`mismatch in naming between controller and view will cause a runtime error`**_
 
 ```cs - action method using "ViewBag"
 namespace MVC_BasicTutorials.Controllers
