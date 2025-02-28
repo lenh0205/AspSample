@@ -1,22 +1,14 @@
+================================================================================
+## Dispose
+* ->
 
-## Unmanage Resource
-* -> Unmanaged resources are resources that are not directly managed by the .NET runtime (CLR). These include things that interact with the operating system, such as:
-* File handles (e.g., working with raw file descriptors)
-* Database connections (e.g., using native database drivers)
-* Network sockets (e.g., raw TCP/UDP connections)
-* Native memory allocations (e.g., allocated using Marshal.AllocHGlobal())
-* COM objects (e.g., using Microsoft Office Interop)
-
-### Why Doesn't .NET Manage These Automatically?
-* .NET automatically manages memory for objects created in managed heap (like string, List<T>, etc.).
-* However, unmanaged resources come from outside the .NET runtime (e.g., OS handles, external DLLs).
-* Garbage Collector (GC) only cleans up managed objects, so unmanaged resources must be released manually.
+## 'Using' vs 'Dispose'
 
 ### Example: Class Without IDisposable That Leaks "File Handle" Resources
 * -> When FileWriter is no longer in use, the file is still locked.
 * -> GC won't release the file handle immediately, causing potential issues.
 * -> If the program crashes, the file remains locked until the OS reclaims the handle
-*  _ta cần lưu ý **File Hanlde Resource** của ta là "FileWrite" chỉ khởi tạo instance của FileStream một lần và sử dụng cho những lần sau đó, vậy nên nếu bất cẩn Dispose() nó ngay khi sử dụng thì nếu gọi Write() method lần nữa thì nó sẽ throw Exception ngay_
+*  _ta cần lưu ý **File Hanlde Resource** của ta là "FileWriter" chỉ khởi tạo instance của FileStream một lần và sử dụng cho những lần sau đó, vậy nên nếu bất cẩn Dispose() nó ngay khi sử dụng thì nếu gọi Write() method lần nữa thì nó sẽ throw Exception ngay_
 *  _Ngoài ra, it doesn't follow **Standard Resource Management**:The caller of FileWriter has no control over when the file is disposed; Normally, a class that uses a resource should own the responsibility of disposing it at the right time, not inside an unrelated method._
 ```cs
 public class FileWriter
@@ -61,9 +53,21 @@ public class FileWriter : IDisposable
 }
 ```
 
-## Dispose
+================================================================================
+# Finalize
 
-## 'Using' vs 'Dispose'
+## Unmanage Resource
+* -> Unmanaged resources are resources that are not directly managed by the .NET runtime (CLR); these include things that interact with the operating system, such as:
+* File handles (e.g., working with raw file descriptors)
+* Database connections (e.g., using native database drivers)
+* Network sockets (e.g., raw TCP/UDP connections)
+* Native memory allocations (e.g., allocated using Marshal.AllocHGlobal())
+* COM objects (e.g., using Microsoft Office Interop)
+
+## Why Doesn't .NET Manage These Automatically?
+* .NET automatically manages memory for objects created in managed heap (like string, List<T>, etc.).
+* However, unmanaged resources come from outside the .NET runtime (e.g., OS handles, external DLLs).
+* Garbage Collector (GC) only cleans up managed objects, so unmanaged resources must be released manually.
 
 ## Finalize vs Dispose
 * https://www.scholarhat.com/tutorial/net/difference-between-finalize-and-dispose-method
