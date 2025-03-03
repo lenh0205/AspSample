@@ -3,7 +3,8 @@
 * -> ta thấy là khi triển khai UnitOfWork pattern, thì thường mỗi API enpoint sẽ là 1 Transaction
 * -> vậy nên là cần thiết kế 1 API chứa 1 business logic đầy đủ (những cập nhật cần thực hiện đồng thời, có liên quan chặt chẽ về logic; một cái fail thì revert lại hết) 
 * -> để tương ứng với 1 transaction của ta nhằm đảm bảo ACID
-* -> client sẽ chỉ gọi 1 API để thực hiện 1 business logic đây đủ với action của user thay vì phải gọi nhiều API để thực hiện logic đó 
+* -> client sẽ chỉ gọi 1 API để thực hiện 1 business logic đây đủ với action của user thay vì phải gọi nhiều API để thực hiện logic đó
+* => khi Application của ta cần thiết lập làm việc với Database thì cái **ta cần quan tâm đầu tiên là Transaction** để đảm bảo business logic của ta phản ánh đúng trong database 
 
 =======================================================================
 # Khi gặp 1 lỗi có liên quan đến việc lấy dữ liệu
