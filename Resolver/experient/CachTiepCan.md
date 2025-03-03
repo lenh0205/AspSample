@@ -1,7 +1,8 @@
 =======================================================================
 # Trong 1 app thì ta nên gom những operation như nào thành 1 Transaction
-* -> ta thấy là khi triển khai UnitOfWork pattern, thì thường mỗi request sẽ là 1 Transaction
-* -> vậy nên là cần thiết kế 1 API chứa đầy đủ 1 business logic để transaction của ta đảm bảo ACID
+* -> ta thấy là khi triển khai UnitOfWork pattern, thì thường mỗi API enpoint sẽ là 1 Transaction
+* -> vậy nên là cần thiết kế 1 API chứa 1 business logic đầy đủ (những cập nhật cần thực hiện đồng thời, có liên quan chặt chẽ về logic; một cái fail thì revert lại hết) 
+* -> để tương ứng với 1 transaction của ta nhằm đảm bảo ACID
 * -> client sẽ chỉ gọi 1 API để thực hiện 1 business logic đây đủ với action của user thay vì phải gọi nhiều API để thực hiện logic đó 
 
 =======================================================================
