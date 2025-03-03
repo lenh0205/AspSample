@@ -1,3 +1,10 @@
+=======================================================================
+# Trong 1 app thì ta nên gom những operation như nào thành 1 Transaction
+* -> ta thấy là khi triển khai UnitOfWork pattern, thì thường mỗi request sẽ là 1 Transaction
+* -> vậy nên là cần thiết kế 1 API chứa đầy đủ 1 business logic để transaction của ta đảm bảo ACID
+* -> client sẽ chỉ gọi 1 API để thực hiện 1 business logic đây đủ với action của user thay vì phải gọi nhiều API để thực hiện logic đó 
+
+=======================================================================
 # Khi gặp 1 lỗi có liên quan đến việc lấy dữ liệu
 * -> bước đầu tiên cần làm là **`bắt được chính xác câu lệnh SQL đã thực thi lên database`**, nếu database là _SQL Server_ thì ta có thể dung phần mềm **SQL Server Profiler**
 * -> kiểm tra tham số đầu vào, cũng như đầu ra của câu SQL
