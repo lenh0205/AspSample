@@ -34,18 +34,30 @@
 * -> _**unique indexes** ensure that **no duplicate values** are entered in the indexed columns, while **non-unique indexes** simply speed up queries without enforcing uniqueness_
 
 ## Clustered Index
-* -> Determines the physical order of data in a table.
-* -> There can be only one clustered index per table because data can be stored in only one order.
-* -> Primary keys automatically create a clustered index.
+* determines **`the physical order of data in a table`**
+* -> there can be **`only one clustered index per table`** because data can be stored in only one order
+* -> **`primary keys automatically create a clustered index`**
 
 ```sql
 CREATE CLUSTERED INDEX IX_Employees_ID ON Employees(ID);
 ```
 
+```sql
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,  -- Clustered index is automatically created on the primary key
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Email VARCHAR(100)
+);
+
+-- this query benefits from the clustered index because the rows are physically stored in the order of "CustomerID", making range queries efficient
+SELECT * FROM Customers WHERE CustomerID BETWEEN 100 AND 200;
+```
+
 ## Non-Clustered Index
-* -> Stores pointers to the actual data instead of sorting the table.
-* -> You can have multiple non-clustered indexes per table.
-* -> Best for frequently searched columns but not for every column (too many indexes slow down inserts/updates).
+* **`stores pointers to the actual data`** instead of **sorting the table**
+* -> we can have **`multiple non-clustered indexes per table`**
+* -> best for **`frequently searched columns`** but **not for every column** (_too many indexes slow down inserts/updates_)
 
 ```sql
 CREATE NONCLUSTERED INDEX IX_Employees_Department
@@ -53,27 +65,31 @@ ON Employees(Department);
 ```
 
 ## Unique Index
-* -> Ensures values in a column are unique.
-* -> Created automatically when defining a UNIQUE constraint
+* -> ensures **`values in a column are unique`**
+* -> **`created automatically when defining a UNIQUE constraint`**
 
 ```sql
 CREATE UNIQUE INDEX IX_Employees_Email ON Employees(Email);
 ```
+
 ## Composite Index
-* -> index on multiple columns, useful for queries filtering by multiple conditions.
-* -> order of columns matters for query optimization.
+* -> index on multiple columns, useful for queries filtering by multiple conditions
+* -> order of columns matters for query optimization
+
 ```sql
 CREATE NONCLUSTERED INDEX IX_Employees_Department_Name ON Employees(Department, Name);
 ```
 
 ## Filtered Index
 * -> improves performance for queries filtering specific values
+
 ```sql
 CREATE NONCLUSTERED INDEX IX_Employees_Active ON Employees(Status) WHERE Status = 'Active';
 ```
 
 ## Covering Index
 * -> includes additional columns to avoid extra lookups
+
 ```sql
 CREATE NONCLUSTERED INDEX IX_Orders_CustomerId ON Orders(CustomerID) INCLUDE (OrderDate, TotalAmount);
 ```
