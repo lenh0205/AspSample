@@ -1,3 +1,8 @@
+# common concept
+https://github.com/slthomason/StartupHakkSamples/blob/main/119_SQL_Queries_with_EF_Core/Program.cs
+
+========================================================
+# cookie
 https://www.dnnsoftware.com/wiki/dotnetnuke-cookie-usage
 https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
 https://learn.microsoft.com/en-us/answers/questions/558746/asp-net-sessionid
