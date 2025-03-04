@@ -156,6 +156,13 @@ fetch("/update-profile", {
 * -> **`secure authentication cookies`** (HttpOnly, Secure, SameSite=Strict) to protect against theft via JavaScript
 * -> implement proper **`session expiration, token expiration, rotate tokens periodically, refresh tokens and logout mechanisms`** to prevent long-term unauthorized access
 * -> **`hashing passwords (BCrypt, Argon2)`** prevents password leaks
+* -> implement **`rate limiting`** to prevent **brute-force attacks** (attacker tries many password combinations)
+
+```bash
+# Secure cookies 
+options.Cookie.HttpOnly = true;
+options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+```
 
 ```cs
 // ❌ Vulnerable Code (No JWT, No Expiration)
@@ -343,5 +350,23 @@ app.Use(async (context, next) =>
 });
 ```
 
+# Denial of Service (DoS)
+Attackers send excessive requests to slow down or crash a server.
+
+# Method:
+* -> a bot sends millions of requests that overwhelms the server
 
 
+## Mitigation:
+* -> **`rate limiting`** in ASP.NET Core:
+```cs
+services.Configure<IpRateLimitOptions>(options => 
+{ 
+    options.GeneralRules = new List<RateLimitRule> 
+    {
+        new RateLimitRule { Endpoint = "*", Limit = 100, Period = "1m" }
+    }; 
+});
+```
+
+* -> Use **Cloudflare** or **WAF** to **`block attack patterns`**
