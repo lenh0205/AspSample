@@ -1,4 +1,4 @@
-
+==============================================================
 # Elasticsearch
 * -> is **`a distributed search and analytics engine`** built on Apache Lucene
 * -> the most popular search engine and is commonly used for **log analytics**, **full-text search**, **security intelligence**, **business analytics**, and **operational intelligence** use cases
@@ -32,3 +32,6 @@ Elasticsearch operations such as reading or writing data usually take less than 
 
 Easy application development
 Elasticsearch provides support for various languages including Java, Python, PHP, JavaScript, Node.js, Ruby, and many more.
+
+==============================================================
+# Elasticsearch vs SQL Full-Text Search
