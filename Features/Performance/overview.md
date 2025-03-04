@@ -107,19 +107,10 @@ LEFT JOIN comments ON comments.post_id = posts.id;
 * -> when returning JSON responses from our API, the **`speed of our serialization process can make a noticeable difference in response times`**
 * => consider using a **`fast serialization library`** to **minimize the time spent converting our data into JSON format**
 
-https://www.youtube.com/watch?v=HhyBaJ7uisU
-https://www.youtube.com/watch?v=w7ZfEVC76ho
-https://www.youtube.com/watch?v=w7ZfEVC76ho
-
 ## Compression
 * -> by enabling **compression on large API response payloads**, we can **`reduce the amount of data tranferred over the network`**, the client then decompresses the data
 * => nowadays, there are even more efficient algorithms like **`Brotli`** that provide **better compression ratios**
 * => also many **`Content Delivery Networks (CDN) like Cloudflare`** can **handle compression for us** - **`offloading this task from our server`**
-
-https://www.youtube.com/watch?v=g7qyEgxz9kE
-https://www.youtube.com/watch?v=NLtt4S9ErIA
-https://www.youtube.com/watch?v=D4Xq_9_FM1g
-https://www.youtube.com/watch?v=Xb2PSCkkaaE
 
 ## Asynchronous logging
 * -> in many applications, the time it takes to write logs is negligible; however, in high-throughput systems where every milisecond counts **the time taken to write logs can add up**
