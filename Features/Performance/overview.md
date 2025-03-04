@@ -61,7 +61,7 @@ https://www.youtube.com/watch?v=TbQZXayzzTg
 https://www.youtube.com/watch?v=zK3jDkLBgcM
 https://www.youtube.com/watch?v=nwBBd9GrcqI
 
-### Serverless Architecture
+### Connection Pool in Serverless Architecture
 * -> connection management can be a bit **more challenging** - because each serverless function instance typically **`opens its own database connection`**
 * -> and because serverless can **scale rapidly**, this could potentially lead to a large number of open connections that can **`overwhelm the database`** 
 
