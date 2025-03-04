@@ -11,7 +11,10 @@ https://www.youtube.com/watch?v=jwek4w6als4
 * -> this approach in Demo improves performance by reducing database queries
 * -> the way it is implemented just like **Memory Cache (IMemoryCache)**, but memory cache only efficient for single a app on a single server
 * -> Redis still the best choice for **distributed system** (_scalable applications or microservices_)
-* -> allows multiple app instances need to **`share cache data`**; **`caching large datasets`** (Redis can handle more than what memory allows); **`persistent cache storage`** even if the app restarts; **`advanced features`** (_eviction policies, data replication, and pub/sub messaging_)
+* => allows multiple app instances need to **`share cache data`**;
+* => **`caching large datasets`** (Redis can handle more than what memory allows);
+* => **`persistent cache storage`** even if the app restarts;
+* => **`advanced features`** (_eviction policies, data replication, and pub/sub messaging_)
 
 ## Steps
 * -> install **`Redis`** on your system (e.g., using Docker: docker run --name redis -d -p 6379:6379 redis).
