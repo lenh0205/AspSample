@@ -1,7 +1,8 @@
 
 # Response Compression
-* -> reduce the **size of responses sent to clients**, **`improving performance`** and **`reducing bandwidth usage`**
+* -> reduce the **size of responses sent to clients** (có khi cả 10 lần), **`improving performance`** and **`reducing bandwidth usage`**
 * -> using the **`Response Compression Middleware`** provided by ASP.NET Core
+* -> **`Brotli`** compression is newer and generally offer **better compression ratios** than **`Gzip`**
 
 ## Best practice
 * -> enable compression **globally**, but **`limit it to specific MIME types (e.g., JSON, HTML)`**
@@ -54,10 +55,14 @@ builder.Services.AddResponseCompression(options =>
 // Optional: Configure Brotli compression level
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {
+    // level options: Fastest, Optimal, SmallestSize, NoCompression
+    // "default" is 'Fastest'
+    // -> Fastest - complete as quickly as possible, even if the resulting output isn't optimally compressed
+    // -> Optimal - optimally compressed even if the compression take more time to complete
     options.Level = CompressionLevel.Optimal;
 });
 
-// Optional: Configure Gzip compression level
+// Optional: Configure Gzip compression level (similar to Brotli)
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
     options.Level = CompressionLevel.Fastest; // Other options: Optimal, NoCompression
@@ -103,7 +108,7 @@ axios.get('/api/data', {
 
 * -> **ASP.NET Core checking**
 ```bash
-# Example:
+# Example the compression support of a client look like this:
 Accept-Encoding: br, gzip, deflate
 ```
 * _checks the **"Accept-Encoding" header** from the client_
@@ -111,3 +116,4 @@ Accept-Encoding: br, gzip, deflate
 * _in this case, the client supports Brotli (br), it will be used_
 * _however, if in case the client does not support Brotli but supports Gzip (gzip), then Gzip is used instead_
 * _and if neither is supported, the response is sent **`uncompressed`**_
+
