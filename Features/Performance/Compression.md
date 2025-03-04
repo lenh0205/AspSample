@@ -1,8 +1,77 @@
+=====================================================================================
+# Compression mechanism
+* -> https://www.youtube.com/watch?v=NLtt4S9ErIA
 
-# Response Compression
+## Compression in 'Server' level or 'Application' level
+* -> **`Server Compression`** is much better and easier
+* -> **`Application Compression`** may be considered in some cases like **server compression is disabled**, require compression for **additional media types**, not concern about **BREACH type of attacks** which exploit response compression
+
+=====================================================================================
+# Compression 
+
+```cs
+using System;
+using System.IO;
+using System.IO.Compression;
+
+namespace ConsoleApp
+{
+    internal class Compressor
+    {
+        public static byte[] CompressBytes(byte[] bytes)
+        {
+            using(var outputStream = new MemoryStream())
+            {
+                using(var compressionStream = new GZipStream(outputStream, CompressionLevel.Optimal))
+                {
+                    compressionStream.Write(bytes, 0, bytes.Length);
+                }
+                return outputStream.ToArray();
+            }
+        }
+
+        public static byte[] DecompressBytes(byte[] bytes)
+        {
+            using(var inputStream = new MemoryStream(bytes))
+            {
+                using(var outputStream = new MemoryStream())
+                {
+                    using(var compressionStream = new GZipStream(inputStream, CompressionMode.Decompress))
+                    {
+                        compressionStream.CopyTo(outputStream);
+                    }
+                    return outputStream.ToArray();
+                }
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var bytes = System.IO.File.ReadAllBytes("TEMP.txt");
+            Console.WriteLine("INPUT FILE IS " + bytes.Length + " bytes");
+
+            bytes = Compressor.CompressBytes(bytes);
+            Console.WriteLine("COMPRESS FILE IS " + bytes.Length + " bytes");
+
+            System.IO.File.WriteAllBytes("TEMP.gzipped", bytes);
+
+            bytes = Compressor.DecompressBytes(bytes);
+            Console.WriteLine("DECOMPRESSED FILE IS " + bytes.Length + " bytes");
+
+            System.IO.File.WriteAllBytes("TEMP2.txt", bytes);
+        }
+    }
+}
+```
+
+=====================================================================================
+# Response Compression in ASP.NET Core
 * -> reduce the **size of responses sent to clients** (có khi cả 10 lần), **`improving performance`** and **`reducing bandwidth usage`**
 * -> using the **`Response Compression Middleware`** provided by ASP.NET Core
-* -> **`Brotli`** compression is newer and generally offer **better compression ratios** than **`Gzip`**
+* -> **`Brotli`** compression is newer and generally offer **better compression ratios** than **`Gzip`**, **Deflate**
 
 ## Best practice
 * -> enable compression **globally**, but **`limit it to specific MIME types (e.g., JSON, HTML)`**
@@ -95,6 +164,10 @@ public IActionResult GetUncompressedData()
 * _**`by default, Axios sends an "Accept-Encoding" header`** that allows compressed responses_ 
 * _i **`Browsers automatically handle decompression`**; if we use SSR app (like NextJS), we may need to configure Axios to support decompression_
 * _data inside compression usually large, so we should **pagination** or **lazy loading** before actually rendering it and **cache response** (Redux, React Query, or local storage) to avoid unnecessary re-fetching_
+```bash
+# the default header when Chrome browser send the request
+Accept-Encoding: gzip, deflate, br
+```
 ```js
 // however, in some cases (like when using Node.js), we might need to explicitly set 'Accept-Encoding' header
 axios.get('/api/data', {
