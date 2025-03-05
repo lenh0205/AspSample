@@ -2,6 +2,12 @@
 > https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/collections
 
 # Iterators 
+* -> enable us to **`maintain the simplicity of a 'foreach' loop`** when we **`need to use complex code to populate a list sequence`**
+
+* _this can be useful when we want to do the following:_
+* _modify the list sequence after the first foreach loop iteration_
+* _avoid fully loading a large list before the first iteration of a foreach loop. An example is a paged fetch to load a batch of table rows. Another example is the EnumerateFiles method, which implements iterators in .NET_
+* _encapsulate building the list in the iterator. In the iterator method, you can build the list and then yield each result in a loop_
 
 ## Usage
 * -> **an iterator** can occur as **`a method`** or **`get accessor`** (_an iterator cannot occur in an event, instance constructor, static constructor, or static finalizer_)
