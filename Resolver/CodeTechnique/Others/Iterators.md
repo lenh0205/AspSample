@@ -1,6 +1,7 @@
 > https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/iterators
-> https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/collections
+> https://stackoverflow.blog/2022/06/15/c-ienumerable-yield-return-and-lazy-evaluation/
 
+=================================================================================
 # Iterators 
 * -> enable us to **`maintain the simplicity of a 'foreach' loop`** when we **`need to use complex code to populate a list sequence`**
 
@@ -50,6 +51,7 @@ public static System.Collections.IEnumerable SomeNumbers()
 // -> The loop completes when the end of the iterator method is reached
 ```
 
+=================================================================================
 ## Technical Implementation
 * -> although we **write an iterator as a method**, the compiler translates it into a **`nested class`** that is, in effect, a state machine; this class **`keeps track of the position of the iterator`** as long the foreach loop in the client code continues
 
@@ -327,3 +329,5 @@ public class Stack<T> : IEnumerable<T>
 
 }
 ```
+=================================================================================
+# Extension
