@@ -1,0 +1,89 @@
+
+===============================================================================
+## Use Eager Loading (Include)
+Use the .Include() method to load related entities in a single query.
+
+```cs
+var orders = _context.Orders
+    .Include(o => o.Customer)
+    .Include(o => o.OrderItems)
+    .ThenInclude(oi => oi.Product)
+    .ToList();
+```
+This ensures that EF retrieves all related entities in one SQL query instead of multiple queries.
+
+## Use Projection (Select)
+Instead of loading entire entities, fetch only the necessary fields to optimize performance.
+
+```cs
+var orders = _context.Orders
+    .Select(o => new 
+    {
+        o.Id,
+        CustomerName = o.Customer.Name,
+        OrderItems = o.OrderItems.Select(oi => new 
+        {
+            oi.Product.Name,
+            oi.Quantity
+        })
+    })
+    .ToList();
+```
+
+This avoids loading unnecessary columns and prevents EF from tracking unwanted entities.
+
+## Use Explicit Loading for Large Data
+If eager loading is too expensive, use explicit loading to fetch related entities when needed.
+
+```cs
+var order = _context.Orders.FirstOrDefault(o => o.Id == orderId);
+_context.Entry(order).Collection(o => o.OrderItems).Load();
+```
+
+This avoids unnecessary joins and loads related data only when required.
+
+## Use Batch Queries with AsSplitQuery (EF Core 5+)
+EF Core 5+ introduced AsSplitQuery(), which improves performance when dealing with multiple one-to-many relationships.
+
+```cs
+var orders = _context.Orders
+    .Include(o => o.Customer)
+    .Include(o => o.OrderItems)
+    .AsSplitQuery()
+    .ToList();
+```
+
+This executes multiple queries efficiently instead of a single massive join, reducing data duplication.
+
+## Use Lazy Loading (If Necessary) – But Be Cautious
+Lazy loading loads related data only when accessed. However, it can lead to unexpected N+1 queries if not managed properly.
+Enable Lazy Loading:
+
+```cs
+public class Order
+{
+    public int Id { get; set; }
+    
+    public virtual Customer Customer { get; set; }  // Virtual enables lazy loading
+}
+```
+
+Lazy loading works, but use it cautiously, as accessing a related entity inside a loop can trigger multiple queries.
+
+## Use Raw SQL Queries (FromSqlInterpolated) for Performance-Critical Cases
+For complex queries, use raw SQL to fetch only necessary data efficiently.
+
+```cs
+var orders = _context.Orders
+    .FromSqlInterpolated($"SELECT * FROM Orders WHERE CustomerId = {customerId}")
+    .ToList();
+```
+
+Use this only when needed to optimize query execution.
+
+## Summary: Best Practices
+✔ Use .Include() for eager loading when you need related data.
+✔ Use .Select() to fetch only necessary fields.
+✔ Use AsSplitQuery() for multiple one-to-many relationships.
+✔ Avoid lazy loading unless explicitly required.
+✔ Optimize performance with raw SQL when needed.
