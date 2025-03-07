@@ -37,7 +37,7 @@ docker run -d --hostname my-rabbit --name ecomm-rabbit -p 15672:15672 -p 5672:56
 # -> giờ chạy "docker logs -f e67" thì ta có thể thấy Management Console is up and running, and the RabbitMQ is ready to use
 
 # giờ ta có thể truy cập thử "http://localhost:15672" trên Browser để xem RabbitMQ Management Console (or Administration Console); and by default RabbitMQ has username/password as "guest/guest"
-# RabbitMQ is listening on port 5672 for AMQP; we have mapped the port of the Docker container to localhost:5672 nên nếu ta s/d localhost:5672, it going to call it back to Docker container 
+# RabbitMQ is listening on port 5672 for AMQP; because we have mapped the port of the Docker container to localhost:5672 nên, khi ta truy cập localhost:5672, it going to call it back to Docker container 
 ```
 
 * setup 1 Console App as "producer"
@@ -52,7 +52,7 @@ static class Program
         // create a connection factory
         var factory = new ConnectionFactory
         {
-            // pass the URI of RabbitMQ client that we created include AMQP pattern
+            // pass the URI of RabbitMQ client that we created include AMQP pattern (amqp://...)
             Uri = new Uri("amqp://guest:guest@localhost:5672");
         };
 
@@ -118,8 +118,13 @@ public static class QueueConsumer
 {
     public static void Consume(IModel channel)
     {
-        channel.QueueDeclare("demo-queue", durable: true, 
-            exclusive: false, autoDelete: false, arguments: null);
+        channel.QueueDeclare(
+            "demo-queue",
+            durable: true, 
+            exclusive: false,
+            autoDelete: false,
+            arguments: null
+        );
 
         // create a Consumer
         var consumer = new EventingBasicConsumer(channel);
@@ -177,7 +182,7 @@ public static class QueueProducer
 # Running
 * -> first, ta sẽ chạy 2 instances của Console App "Consumer" (click file ".exe" 2 lần để chạy 2 chương trình)
 * -> sau đó ta sẽ chạy Producer
-* -> ta sẽ thấy Consumers is getting the message theo cách tuần tự; 1 Consumer sẽ chỉ nhận toàn message chẵn còn 1 Consumer sẽ chỉ nhận toàn message lẻ (_xem phần $"Hello! Count: {count}" được log ra_)
+* -> ta sẽ thấy Consumers is getting the message theo cách tuần tự - 1 Consumer sẽ chỉ nhận toàn message chẵn còn 1 Consumer sẽ chỉ nhận toàn message lẻ (_xem phần $"Hello! Count: {count}" được log ra_)
 
 * => if we have **multiple consumers to a single queue**, **`the messages will be evenly distributed across the consumers`**
 * => ensure that **`one consumer gets a unique message`** - the **`same message is not delivered to multiple consumers`** 
