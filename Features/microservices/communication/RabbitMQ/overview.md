@@ -12,7 +12,7 @@
 
 ======================================================================
 # RabbitMQ 
-* -> one of the most widely used Message Broker - lightweight and very easy to deploy, support mulitple protocols, highly available and scalable, support multiple OS
+* -> one of the most widely used **`Message Broker`** - lightweight and very easy to deploy, support mulitple protocols, highly available and scalable, support multiple OS
 * _written in the **Erlang** programming language, which itself is famous for powering the **Open Telecom** platform_
 * => allows microservices to communicate asynchronously with variety of different protocols
 * => the end result is an architecture that allows servers to both **Publish** and **Subscribe** to data thanks to the RabbitMQ middleman
@@ -22,9 +22,13 @@
 * -> other protocols will be supported through plugins like **STOMP**, **MQTT**, **AMQP 1.0**, **HTTP and WebSocket**
 
 ## Process
-* -> produces a message with the required data and **`publishes`** it to **an Exchange**
-* -> the Exchange is then responsible for **`routing`** it to one or more **`Queues`**, which are linked to the Exchange with **`a binding and routing key`**
-* -> the Exchange can route directly to a specific queue (**`Direct`**) or to multiple queues with a shared pattern (**`Topic`**) or to every queues it know about (**`Fanout`**) 
+* -> **Producer** publish a message with the required data (_Ex: **`routing key`**_) into **an Exchange**
+* -> the Exchange is then responsible for **`routing`** (_Ex: compare **routing key** and **binding key**) it to one or more **`Queues`**
+* -> **`Binding`** connects an Exchange with a Queue using **`binding key`**
+
+* -> the messages distribution depends on **exchange type**
+* -> the Exchange can route directly to a specific queue (**`Direct`** - exact routing key), or to multiple queues with a shared pattern (**`Topic`** - có phần giống nhau là đc), or to every queues it know about (**`Fanout`** - ignore routing key), or using message header instead of routing key (**`Header`**)
+* -> the Default (nameless) Exchange compares the **routing key** with the **queue name** (_not "binding key"_), if matched then forward message to the queue (_therefore makes it seemingly possible to send a message directly to a queue but under the hood each message goes through an Exchange_)
 * -> now the message sits in the queue until it's handled by the **`Consumer`** 
 
 ===================================================================
