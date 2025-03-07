@@ -331,3 +331,130 @@ public class Stack<T> : IEnumerable<T>
 ```
 =================================================================================
 # Extension
+
+## IEnumerable 
+* -> enables **iterating over a collection** (_ta có thể nghĩ về nó như list hoặc array_)
+* -> is the **return type from an iterator**
+* => we can use a **`foreach`** statement to loop through it,
+* => use **`LINQ`** to map or reduce it in a hundred different ways
+* => can explicitly cast it to an array with **`.ToArray()`** and access elements by **`index`**
+
+```cs
+IEnumerable<int> GetOneTwoThree() {
+  yield return 1;
+  yield return 2;
+  yield return 3;
+  // We could put "yield break;" here but there's no need, the end of the function signals the same thing.
+}
+var numbers = GetOneTwoThree();
+
+foreach (var number in numbers) {
+  Console.WriteLine(number);
+  // Output:
+  // 1
+  // 2
+  // 3
+}
+
+var doubledNumbers = numbers.Select(num => num * 2);
+
+foreach (var number in doubledNumbers) {
+  Console.WriteLine(number);
+  // Output:
+  // 2
+  // 4
+  // 6
+}
+
+var numberArray = numbers.ToArray();
+Console.WriteLine(numberArray[0]); // Output: 1
+```
+
+## Lazy evaluation
+* -> is when we **wait to execute a piece of code until we absolutely, positively have to**
+* -> when we **call iterator method**, we'll **`get a return value despite the fact that none of the code in the function has actually been executed yet`**
+
+```cs
+// LinqPad
+bool didTheCodeRun = false;
+
+IEnumerable<bool> RunTheCode() {
+  didTheCodeRun = true;
+  yield return true;
+}
+
+void Main() {
+  var results = RunTheCode();
+  didTheCodeRun.Dump(); // false => None of the code in our iterator runs 
+}
+```
+
+### benefit
+* -> if we **never end up iterating through the IEnumerable** at all then **`a bunch of code the computer didn't have to execute`**
+* -> if we're using a LINQ method like **.First()** to try to find a specific item in the collection; we **`don't need to run all the code in the iterator`**, once .First() finds a value that matches the predicate it will stop iterating
+* => if we're working with an IEnumerable that potentially has thousands of values (or more), we can **`save a lot of CPU cycles`** by **`only iterating as far as we need to`**
+
+```cs
+// Here's a variable to track execution of code in an iterator
+int lastYielded = -1;
+
+// Here's an iterator for us to play with
+IEnumerable<int> GetOneToTen() {
+  for (var num = 1; num <= 10; num++) {
+    lastYielded = num;
+    yield return num;
+  }
+}
+
+void Main() {
+  var numbers = GetOneToTen();
+  lastYielded.Dump(); // Output: -1
+
+  // This gives us an 'instance' of the iteration
+  var enumerator = numbers.GetEnumerator();
+
+  // This executes the iterator until the first yield return is reached
+  enumerator.MoveNext();
+
+  // This gives us the current (most recently yielded) value of the iterator
+  enumerator.Current.Dump(); // Output: 1
+  lastYielded.Dump(); // Output: 1
+
+  // This will iterate from 1 to 4, then stop
+  foreach (var num in numbers) {
+    if (num >= 4) {
+      break;
+    }
+  }
+
+  lastYielded.Dump(); // Output: 4
+
+  // This will not execute any code in the iterator.
+  //  LINQ methods are lazily evaluated as well
+  var numbersTimesTwo = numbers.Select(num => num * 2);
+  lastYielded.Dump(); // Output: 4
+
+  // This will force the entire iterator to run, yielding all values
+  var arr = numbers.ToArray();
+  lastYielded.Dump(); // Output: 10
+}
+```
+
+## Rules when implement IEnumerable 
+* -> try to avoid **`side effects**` when writing an iterator method**`
+* -> avoid **`iterating over the same IEnumerable multiple times`**
+* _if we know we're going to access every value (for example, **iterating it using a foreach with no break or return**), we should **`enumerate it sooner rather than later by coercing the IEnumerable to a list or array type`**; then **use that list or array for all future operations**_
+
+### Side Effect
+ Anyone who uses the method should be able to treat it as though it synchronously returns an array. If an iterator changes or executes anything outside of itself, the caller may end up confused. This applies to functions passed to LINQ methods as well, since many of them return IEnumerable and are lazily evaluated.
+
+### iterating over the same IEnumerable multiple times
+* _it’s important to point out that many iterators are not as simple as the ones we've been using here_
+* -> an iterator could **query a database**, for example - including the unfortunate possibility that it might **alter data**, or that iterating through it twice might **`yield completely different results!`**
+* => some tools (like ReSharper) will warn us against multiple enumeration for this reason
+* => an **iterator** is, from one perspective, nothing more than a synchronous method that may not execute its code right away (or at all)
+* => however, to muddy the waters just a little, **not all iterators are synchronous**; there’s also an **`IAsyncEnumerable`** interface (_we can **loop through it with "await" foreach**_)
+
+* -> most of the time none of this is a problem, almost all the time we can treat an IEnumerable like a list; but we shouldn't rely on this
+* -> Ex: we may use .Select() to transform a collection while using an external variable to track a small piece of state on each iteration, then got very confused when the external variable wasn't updated later in the method
+* => in the end, we will fix the problem by **`forcing the iteration to complete with .ToArray()`** (_there are multiple ways to approach something like this, depending on the expected size of the collection and what we're trying to track_)
