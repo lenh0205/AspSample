@@ -6,7 +6,7 @@
 ## Setup
 * first, install a **Docker images of RabbitMQ** and also run start it in at a particular Port
 ```bash
-docker run -d --hostname my-rabbit --name ecomm-rabbit -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+$ docker run -d --hostname my-rabbit --name ecomm-rabbit -p 15672:15672 -p 5672:5672 rabbitmq:3-management
 # hostname is "my-rabbit"
 # name of the instance is "ecomm-rabbit"
 # expose the port which we want to access from outside: fist is 5672 (the port used by AMQP protocol), second is 15672 (port used by the Management Console)
@@ -17,11 +17,15 @@ docker run -d --hostname my-rabbit --name ecomm-rabbit -p 15672:15672 -p 5672:56
 # -> giờ chạy "docker logs -f e67" thì ta có thể thấy Management Console is up and running, and the RabbitMQ is ready to use
 
 # giờ ta có thể truy cập thử "http://localhost:15672" trên Browser để xem RabbitMQ Management Console (or Administration Console); and by default RabbitMQ has username/password as "guest/guest"
-# RabbitMQ is listening on port 5672 for AMQP; because we have mapped the port of the Docker container to localhost:5672 nên, khi ta truy cập localhost:5672, it going to call it back to Docker container 
+# RabbitMQ is listening on port 5672 for AMQP; because we have mapped the port of the Docker container to localhost:5672 nên, khi ta truy cập localhost:5672 it going to call it back to Docker container 
+```
+```bash
+# the installation also contain a CLI tool to manage and inspect or Broker "rabbitmqctl"
+$ rabbitmqctl list_queues
 ```
 
 * setup 1 Console App as "producer"
-* -> ta cần cài NuGet package **`RabbitMQ.Client`** for RabbitMQ
+* -> ta cần cài NuGet package (_implements a messaging protocol like "AMQP 0-9-1"_) **`RabbitMQ.Client`** for RabbitMQ 
 ```cs
 using RabbitMQ.Client;
 
