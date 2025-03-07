@@ -14,6 +14,10 @@ https://pandaquests.medium.com/difference-between-event-bus-message-queue-and-me
 * _it also really help in decouple things completely_
 
 ======================================================================
+# gRPC vs Message Broker for Microservices
+https://www.geeksforgeeks.org/grpc-vs-message-broker-for-microservices/?ref=ml_lbp
+
+======================================================================
 # RabbitMQ Message Bus
 * -> Event Driven Design
 * -> an microservice will publish an event onto Message Bus, and there will be another microservice subscribe to the Message Bus and receive those published events
