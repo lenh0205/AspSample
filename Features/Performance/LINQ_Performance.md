@@ -19,16 +19,16 @@
 
 ## 'Index' important
 * -> **`the main deciding factor in whether a query runs fast or not`** is whether it will **properly utilize `indexes` where appropriate**
-* -> databases are typically used to hold large amounts of data, and queries which **traverse entire tables are typically sources of serious performance issues** 
+* -> databases are typically used to hold large amounts of data, and queries which **`traverse entire tables`** are typically **sources of serious performance issues** 
 
 ## 'Index' in Entity Framework
 * -> as a general rule, there isn't any special EF knowledge to **using indexes** or **diagnosing performance issues related to them** 
 * -> general database knowledge related to indexes is just **`as relevant to EF applications as to applications not using EF`**
 
 ## Detect 'Indexing' issue
-* -> **`Indexing issues aren't easy to spot`**, because it **isn't immediately obvious whether a given query will use an index or not**
+* -> **Indexing issues aren't easy to spot**, because it **isn't immediately obvious `whether a given query will use an index or not`**
 * -> a good way to spot indexing issues is to **`first pinpoint a slow query`**, and then **`examine its query plan via our database's favorite tool`**
-* -> the query plan displays **whether the query traverses the entire table, or uses an index**
+* -> the **`query plan`** displays **whether the query traverses the entire table, or uses an index**
 
 * _For example:_
 ```cs
@@ -131,8 +131,7 @@ var blogs25 = await context.Posts
 * -> "Pagination" refers to **`retrieving results in pages, rather than all at once`**; 
 * -> this is typically done for **large resultsets**, where a user interface is shown that **allows the user to navigate to the next or previous page of the results**
 
-* => a common way to implement pagination with databases is to use the **`Skip`** and **`Take`** operators (_**OFFSET** and **LIMIT** in SQL_)
-* -> while this is an **intuitive implementation**, it's also **`quite inefficient`**
+* => a common way to implement pagination with databases is to use the **`Skip`** and **`Take`** operators (_**OFFSET** and **LIMIT** in SQL_) - while this is an **intuitive implementation**, it's also **`quite inefficient`**
 
 * => for pagination that allows moving one page at a time (as opposed to jumping to arbitrary pages), consider using **`keyset pagination`** instead
 
@@ -169,8 +168,8 @@ ORDER BY [b].[BlogId], [p].[PostId]
 * => in these cases, **`explicit or lazy loading`** can be used to fetch related entities separately, and populate the Blog's Posts navigation
 
 ## Beware of lazy loading
-* -> **`Lazy loading`** (or **`explicit loading`**) often **seems like a very useful way to write database logic**, since EF Core automatically loads related entities from the database as they are **accessed by our code**
-* => this **`avoids loading related entities that aren't needed`**, and seemingly frees the programmer from having to deal with related entities altogether
+* -> **`Lazy loading`** often **seems like a very useful way to write database logic**, since EF Core automatically loads related entities from the database as they are **accessed by our code**
+* => this **`avoids loading related entities that aren't needed`** (like **`explicit loading`**), and seemingly frees the programmer from having to deal with related entities altogether
 * => however, lazy loading is particularly prone for **`producing unneeded extra roundtrips`** which can **`slow the application`**
 * => a typical problem is so called the **`N+1 problem`**, and it can **`cause very significant performance issues`**
 
@@ -219,6 +218,7 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
 * -> assuming we're going to need all of the blogs' posts, it makes sense to use **eager loading** here instead; we can use the "Include" operator to perform the loading, 
 * -> but since we only need the Blogs' URLs (and we should only load what's needed), so we'll use a **projection** instead
 ```cs
+// this will make EF Core fetch all the Blogs - along with their Posts - in a single query
 await foreach (var blog in context.Blogs.Select(b => new { b.Url, b.Posts }).AsAsyncEnumerable())
 {
     foreach (var post in blog.Posts)
@@ -278,12 +278,12 @@ var doubleFilteredBlogs = context.Posts
 
 ## Default
 * -> **`EF tracks entity instances by default`**, so that changes on them are **detected and persisted when SaveChanges is called**
-* -> **`identity resolution`** - another effect of tracking queries is that EF **detects if an instance has already been loaded for our data** and will automatically return that tracked instance rather than returning a new one
+* -> **`identity resolution`** - another effect of tracking queries is that EF **detects if an instance has already been loaded for our data** and **will automatically return that tracked instance rather than returning a new one**
 
 ## Performance perspective of "changing tracking"
 * -> **`EF internally maintains a dictionary of tracked instances`**
-* => when **new data is loaded**, EF checks the dictionary to see **if an instance is already tracked for that entity's key (identity resolution)**
-* => the dictionary maintenance and lookups take up some time when loading the query's results
+* => when **new data is loaded**, EF checks the dictionary to see **if an instance is already tracked for that entity's key (`identity resolution`)**
+* => the dictionary maintenance and lookups **take up some time when loading the query's results**
 
 * -> **before handing a loaded instance to the application**, **`EF snapshots that instance`** and keeps the snapshot internally
 * => when **SaveChanges** is called, the **`application's instance is compared with the snapshot`** to discover the changes to be persisted
@@ -300,7 +300,7 @@ var doubleFilteredBlogs = context.Posts
 // -> A "no-tracking query", in contrast, duplicates the same Blog 100 times - and application code must be written accordingly
 ```
 
-## Improve performance
+## Efficient "updating" with 'change tracking'
 * -> Finally, it is possible to **`perform updates without the overhead of change tracking`**, 
 * -> by utilizing a **`no-tracking query`** and then **`attaching the returned instance to the context`**, **`specifying which changes are to be made`**
 * => this **transfers the burden of change tracking `from EF to the user`** - should only be attempted **`if the change tracking overhead has been shown to be unacceptable`** via profiling or benchmarking.
