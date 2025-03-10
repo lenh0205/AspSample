@@ -1,6 +1,9 @@
 > Load balancing ? cơ chế của load balancing là gì, nó có distribute the load over time
 > Load balancing vs Rate Limiting ?
 > bottleneck vs system resources overwhelmed ?
+> Message model: Pub/Sub, point-to-point
+> Event-Driven design vs Pub/Sub
+> Event-Drivent design vs Request/Response
 
 ================================================================================
 # Message Broker vs. Message Queue
