@@ -7,8 +7,8 @@
 ```cs
 // Ví dụ user gửi request cho 1 WebAPI, WebAPI này phải gửi 5 HTTP request đến 5 services khác để hoàn thành business logic
 // thì nó sẽ cần chờ tất cả 5 Service khác response thì WebAPI này mới có thể response cho user
-// và trường hợp này sẽ tệ hơn nếu 1 Service nó gọi tới bị chết, nó sẽ phải request over and over again
-// hoặc WebAPI gửi một lượng request đến nỗi Service kia không chịu nổi, nó sẽ làm sập Service
+// và trường hợp này sẽ tệ hơn nếu 1 Service nó gọi tới bị chết, nó sẽ phải request over and over again và chờ cho Service này ok thì mới phản hồi cho user được
+// hoặc trường hợp WebAPI gửi một lượng request đến nỗi Service kia không chịu nổi, nó sẽ làm sập Service
 ```
 
 ## Một số vấn đề trong RabbitMQ 
