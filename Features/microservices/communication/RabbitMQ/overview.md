@@ -23,7 +23,7 @@
 
 ## Process
 * -> **Producer** publish a message with the required data (_Ex: **`routing key`**_) into **an Exchange**
-* -> the Exchange is then responsible for **`routing`** (_Ex: compare **routing key** and **binding key**) it to one or more **`Queues`**
+* -> the **`Exchange`** is then responsible for **`routing`** (_Ex: compare **routing key** and **binding key**) it to one or more **`Queues`**
 * -> **`Binding`** connects an Exchange with a Queue using **`binding key`**
 
 * -> the messages distribution depends on **exchange type**
