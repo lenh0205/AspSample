@@ -88,7 +88,81 @@ lenFilled--
 * -> The index of y - the index of x + 1 (use two binary searches).
 
 # Dynamic Array
+
+## Về cơ bản là cần lưu ý những điểm này
 Approach: When we enter an element in array but array is full then you create a function, this function creates a new array double size or as you wish and copy all element from the previous array to a new array and return this new array. Also, we can reduce the size of the array. and add an element at a given position, remove the element at the end default and at the position also.
 
 Key Features of Dynamic Array
 Add Element: Add element at the end if the array size is not enough then extend the size of the array and add an element at the end of the original array as well as given index. Doing all that copying takes O(n) time, where n is the number of elements in our array. That’s an expensive cost for an append. In a fixed-length array, appends only take O(1) time. But appends take O(n) time only when we insert into a full array. And that is pretty rare, especially if we double the size of the array every time we run out of space. So in most cases appending is still O(1) time, and sometimes it’s O(n) time. In dynamic array you can create fixed-size array when required added some more element in array then use this approach:
+
+## Implement:
+* -> ta sẽ sử dụng 1 Array bên trong để implement Dynamic array
+* -> ta sẽ cần 1 "size" (khác với Length của mảng) property để track số lượng phần tử bên trong để implement các method khác 
+
+```cs
+// Design a Dynamic Array (aka a resizable array) class, such as an ArrayList in Java or a vector in C++.
+
+Your DynamicArray class should support the following operations:
+
+DynamicArray(int capacity) will initialize an empty array with a capacity of capacity, where capacity > 0.
+int get(int i) will return the element at index i. Assume that index i is valid.
+void set(int i, int n) will set the element at index i to n. Assume that index i is valid.
+void pushback(int n) will push the element n to the end of the array.
+int popback() will pop and return the element at the end of the array. Assume that the array is non-empty.
+void resize() will double the capacity of the array.
+int getSize() will return the number of elements in the array.
+int getCapacity() will return the capacity of the array.
+If we call void pushback(int n) but the array is full, we should resize the array first.
+```
+```cs
+public class DynamicArray {
+        private int[] array;
+        private int size;
+
+        public DynamicArray(int capacity) {
+            if (capacity <= 0) throw new ArgumentException("Not Allowed");
+            array = new int[capacity];
+            size = 0;
+        }
+
+        public int Get(int i) {
+            if (i < 0 || i >= size) throw new IndexOutOfRangeException();
+            return array[i];
+        }
+
+        public void Set(int i, int n) {
+            if (i < 0 || i >= size) throw new IndexOutOfRangeException();
+            array[i] = n;
+        }
+
+        public void PushBack(int n) {
+            if (size == array.Length) Resize();
+            array[size] = n;
+            size++; 
+        }
+
+        public int PopBack() {
+            var lastIndexValue = array[size - 1];
+            size--;
+            return lastIndexValue;
+        }
+
+        private void Resize() {
+            var newLength = array.Length * 2;
+            var newArray = new int[newLength];
+            for (var i = 0; i < array.Length; i++)
+            {
+                newArray[i] = array[i];
+            }
+            array = newArray;
+        }
+
+        public int GetSize() {
+            return size;
+        }
+
+        public int GetCapacity() {
+            return array.Length;
+        }
+    }
+```
