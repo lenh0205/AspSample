@@ -13,7 +13,7 @@
 * how to use View and Function in EntityFramework
 
 ===============================================================================
-> Efficient Querying - making your queries faster and and pitfalls users typically encounter
+> **Efficient Querying** - making your queries faster and and pitfalls users typically encounter
 
 # Use 'indexes' properly
 
@@ -338,90 +338,84 @@ var doubleFilteredBlogs = context.Posts
 * -> **`synchronous APIs block the thread for the duration of database I/O`**, **increasing the need for threads and the number of thread context switches that must occur**
 
 ===============================================================================
-## Use Eager Loading (Include)
-Use the .Include() method to load related entities in a single query.
+> Efficient Updating
 
+# Batching
+* -> EF Core helps **minimize roundtrips** by **`automatically batching together all updates in a single roundtrip`**
+
+## How EF handle Batching
+* -> **`the number of statements that EF batches in a single roundtrip`** depends on the **`database provider`** being used
+* -> _For example, performance analysis has shown batching to be generally less efficient for **SQL Server** when **less than 4 statements are involved**_
+* -> _similarly, the benefits of batching degrade **after around 40 statements** for **SQL Server**_
+* => so EF Core will by **`default only execute up to 42 statements in a single batch`**, and **`execute additional statements in separate roundtrips`**
+
+## Example
 ```cs
-var orders = _context.Orders
-    .Include(o => o.Customer)
-    .Include(o => o.OrderItems)
-    .ThenInclude(oi => oi.Product)
-    .ToList();
-```
-This ensures that EF retrieves all related entities in one SQL query instead of multiple queries.
+var blog = await context.Blogs.SingleAsync(b => b.Url == "http://someblog.microsoft.com");
+blog.Url = "http://someotherblog.microsoft.com";
+context.Add(new Blog { Url = "http://newblog1.microsoft.com" });
+context.Add(new Blog { Url = "http://newblog2.microsoft.com" });
+await context.SaveChangesAsync();
 
-## Use Projection (Select)
-Instead of loading entire entities, fetch only the necessary fields to optimize performance.
-
-```cs
-var orders = _context.Orders
-    .Select(o => new 
-    {
-        o.Id,
-        CustomerName = o.Customer.Name,
-        OrderItems = o.OrderItems.Select(oi => new 
-        {
-            oi.Product.Name,
-            oi.Quantity
-        })
-    })
-    .ToList();
+// -> the above loads a blog from the database, changes its URL, and then adds two new blogs;
+// -> to apply this, two SQL INSERT statements and one UPDATE statement are sent to the database
+// -> Rather than sending them one by one, as Blog instances are added, EF Core tracks these changes internally,
+// -> and executes them in a single roundtrip when SaveChanges is called
 ```
 
-This avoids loading unnecessary columns and prevents EF from tracking unwanted entities.
-
-## Use Explicit Loading for Large Data
-If eager loading is too expensive, use explicit loading to fetch related entities when needed.
-
+## Options for user 
+* -> users can also **`tweak these thresholds to achieve potentially higher performance`**
+* -> but **`benchmark carefully before modifying these`**
 ```cs
-var order = _context.Orders.FirstOrDefault(o => o.Id == orderId);
-_context.Entry(order).Collection(o => o.OrderItems).Load();
-```
-
-This avoids unnecessary joins and loads related data only when required.
-
-## Use Batch Queries with AsSplitQuery (EF Core 5+)
-EF Core 5+ introduced AsSplitQuery(), which improves performance when dealing with multiple one-to-many relationships.
-
-```cs
-var orders = _context.Orders
-    .Include(o => o.Customer)
-    .Include(o => o.OrderItems)
-    .AsSplitQuery()
-    .ToList();
-```
-
-This executes multiple queries efficiently instead of a single massive join, reducing data duplication.
-
-## Use Lazy Loading (If Necessary) – But Be Cautious
-Lazy loading loads related data only when accessed. However, it can lead to unexpected N+1 queries if not managed properly.
-Enable Lazy Loading:
-
-```cs
-public class Order
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 {
-    public int Id { get; set; }
-    
-    public virtual Customer Customer { get; set; }  // Virtual enables lazy loading
+    optionsBuilder.UseSqlServer(
+        @"Server=(localdb)\mssqllocaldb;Database=Blogging;Trusted_Connection=True",
+        o => o
+            .MinBatchSize(1)
+            .MaxBatchSize(100));
 }
 ```
 
-Lazy loading works, but use it cautiously, as accessing a related entity inside a loop can trigger multiple queries.
+# Use 'ExecuteUpdate' and 'ExecuteDelete' when relevant (EF Core 7)
 
-## Use Raw SQL Queries (FromSqlInterpolated) for Performance-Critical Cases
-For complex queries, use raw SQL to fetch only necessary data efficiently.
+## Update performance issue
 
 ```cs
-var orders = _context.Orders
-    .FromSqlInterpolated($"SELECT * FROM Orders WHERE CustomerId = {customerId}")
-    .ToList();
+// assume we want to give all our employees a raise. A typical implementation for this in EF Core would look like the following:
+
+foreach (var employee in context.Employees)
+{
+    employee.Salary += 1000;
+}
+await context.SaveChangesAsync();
 ```
 
-Use this only when needed to optimize query execution.
+* _while this is perfectly valid code, let's analyze what it does from a performance perspective:_
 
-## Summary: Best Practices
-✔ Use .Include() for eager loading when you need related data.
-✔ Use .Select() to fetch only necessary fields.
-✔ Use AsSplitQuery() for multiple one-to-many relationships.
-✔ Avoid lazy loading unless explicitly required.
-✔ Optimize performance with raw SQL when needed.
+* -> a database roundtrip is performed, to load all the relevant employees; note that this **brings all the Employees'row data to the client, even if only the salary will be needed**
+* -> EF Core's change tracking creates **snapshots when loading the entities**, and then compares those snapshots to the instances to find out which properties changed
+* -> typically, a second database roundtrip is performed to save all the changes (note that some database providers split the changes into multiples roundtrips)
+* -> although this batching behavior is far better than doing a roundtrip for each update, EF Core still **sends an UPDATE statement per employee, and the database must execute each statement separately**
+
+## Solution
+* -> the **UPDATE** by using "ExecuteUpdateAsync" and "ExecuteDeleteAsync" methods **`performs the entire operation in a single roundtrip`**
+* -> **`without loading or sending any actual data to the database`**, and **`without making use of EF's change tracking machinery`**, which imposes an additional overhead
+```cs
+await context.Employees.ExecuteUpdateAsync(s => s.SetProperty(e => e.Salary, e => e.Salary + 1000));
+```
+```sql
+-- This sends the following SQL statement to the database:
+UPDATE [Employees] SET [Salary] = [Salary] + 1000;
+```
+
+## Older version
+* _if we're using an older version of EF Core which doesn't yet support ExecuteUpdate and ExecuteDelete,_
+* _or want to execute a complex SQL statement which isn't supported by these methods, we can still use a SQL query to perform the operation_
+```sql
+context.Database.ExecuteSql($"UPDATE [Employees] SET [Salary] = [Salary] + 1000");
+```
+
+===============================================================================
+# Advanced Performance
+* https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics?tabs=with-di%2Cexpression-api-with-constant
