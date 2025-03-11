@@ -417,5 +417,17 @@ context.Database.ExecuteSql($"UPDATE [Employees] SET [Salary] = [Salary] + 1000"
 ```
 
 ===============================================================================
-# Advanced Performance
-* https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics?tabs=with-di%2Cexpression-api-with-constant
+> Advanced Performance
+> https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics?tabs=with-di%2Cexpression-api-with-constant
+
+# DbContext pooling
+
+## Performance perspective
+* -> A DbContext is generally a light object: creating and disposing one doesn't involve a database operation, and most applications can do so without any noticeable impact on performance. However, each context instance does set up various internal services and objects necessary for performing its duties, and the overhead of continuously doing so may be significant in high-performance scenarios. For these cases, EF Core can pool your context instances: when you dispose your context, EF Core resets its state and stores it in an internal pool; when a new instance is next requested, that pooled instance is returned instead of setting up a new one. Context pooling allows you to pay context setup costs only once at program startup, rather than continuously
+
+## DbContext pooling vs Database Connection pooling
+* -> note that **context pooling** is orthogonal to **database connection pooling**, which is managed at a lower level in the database driver
+
+* => _tức là 2 thằng này là 2 separate/independent mechanism that work at **different levels** in our application (Even if we dispose of a DbContext, the underlying database connection may still be pooled and reused by another DbContext)_
+* -> **DbContext Pooling** - is reusing **`DbContext instances`** that managed by **`Entity Framework Core`**
+* -> **Database Connection Pooling*** - **`actual database connections (e.g., TCP connections to SQL Server)`** that managed by the **`database driver (e.g., ADO.NET for SQL Server)`**
