@@ -86,3 +86,9 @@ lenFilled--
 * -> We can use modifications of merge routine of Merge Sort,
 * -> We can use two pointers method,
 * -> The index of y - the index of x + 1 (use two binary searches).
+
+# Dynamic Array
+Approach: When we enter an element in array but array is full then you create a function, this function creates a new array double size or as you wish and copy all element from the previous array to a new array and return this new array. Also, we can reduce the size of the array. and add an element at a given position, remove the element at the end default and at the position also.
+
+Key Features of Dynamic Array
+Add Element: Add element at the end if the array size is not enough then extend the size of the array and add an element at the end of the original array as well as given index. Doing all that copying takes O(n) time, where n is the number of elements in our array. That’s an expensive cost for an append. In a fixed-length array, appends only take O(1) time. But appends take O(n) time only when we insert into a full array. And that is pretty rare, especially if we double the size of the array every time we run out of space. So in most cases appending is still O(1) time, and sometimes it’s O(n) time. In dynamic array you can create fixed-size array when required added some more element in array then use this approach:
