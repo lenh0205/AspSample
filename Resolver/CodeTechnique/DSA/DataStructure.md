@@ -1,3 +1,4 @@
+
 # Array
 If M is too big, then the unused spaces are wasted.
 If M is too small, then we will run out of space easily
