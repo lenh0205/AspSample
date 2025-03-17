@@ -21,3 +21,6 @@
 * -> object của ta chắc chắn là phải có thêm **`1 constructor có 1 tham số để ta có thể truyền this (an object of that class as an argument) vào`** và **`clone()`** method
 * -> vì trong trường hợp object của ta có private field, thì khi clone() method khởi tạo 1 object mới bằng new thì giá trị của các private field không thể init bằng setter được 
 * -> nên bắt buộc ta phải pass **`prototype`** (**`this`** của origin object) vào constructor của object mới này và bắt đầu map lại tất cả các field bằng cách **this.field1 = prototype.field1** (**`this`** ở đây là object ta mới tạo)
+* -> clone() method usually consists of just one line: running a **new** operator with the prototypical version of the constructor
+
+* -> Optionally, create a centralized **`prototype registry`** to store a catalog of frequently used prototypes
