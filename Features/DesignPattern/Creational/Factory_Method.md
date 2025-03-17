@@ -2,7 +2,7 @@
 # Factory Method (or Virtual Constructor)
 * -> is a creational design pattern that **`provides an interface for creating objects in a superclass`** and  **`subclasses will alter the type of objects that will be created`**
 
-## Example
+## Summary
 * -> tại sao cần 1 "Creator" (abstract class/interface/base class) có 1 method trả về 1 interface để tạo instance implement cái interface do, mà không đơn giản định nghĩa interface rồi tạo instance dựa trên DI
 * -> ta cần hiểu ta gọi là nó là "Creator" vì nó chứa factory method, nhưng thực tế những "Creator" này thường là những business hoàn chỉnh nó sẽ chứa nhiều logic khác nữa
 * -> và những logic này cần phụ thuộc vào những instance khác nhau của cùng interface (Ví dụ: để thực hiện 1 hành động consistence), ta nên **`decoupling`** việc create instance và việc thực sự sử dụng nó 

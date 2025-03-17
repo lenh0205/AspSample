@@ -1,3 +1,34 @@
+https://refactoring.guru/design-patterns/abstract-factory
+
+===============================================================
+# Abstract Factory
+* -> is a creational design pattern that lets you **produce families of `related objects` without specifying their concrete classes**
+
+## Example
+
+## Summary
+* -> **Abstract Factory inteface** thực chất là 1 abstraction để **`decoupling logic creation of related objects`** khỏi các logic khác 
+* -> nó là tập hợp các **`Factory Method`**, mỗi cái sẽ return 1 **`abstract product`** riêng; nhớ là **concrete factory's methods** cũng return **abstract product** nhưng bên trong sẽ initiate **concrete product**
+* -> each distinct product of a product family should have a base interface; all variants of the product must implement this interface (_để client code sử dụng behavior của 1 product 1 cách consitent_)
+
+* -> thế nào là **related products** ? thì 1 business logic hoàn chỉnh sẽ cần sử dụng nhiều object khác nhau; thế nên tập hợp các object này sẽ là "related" - hay gọi **`product family`**
+* -> thì những product nào hay thường được collaborate với nhau thì ta nên để nó trong 1 variant of product family; 
+* -> products của variant này sẽ incompatible với products của variant kia; còn factory sẽ đảm bảo những products trong 1 variant sẽ compatible với nhau
+
+* -> each **`Concrete Factory`** phải tạo ra 1 **variant** riêng cho **product family** 
+* -> sẽ có nhiều **`variant`** (biến thể) của **product family**, và trong từng variant **`each abstract product must be implemented in all`** 
+
+* => client code sẽ communicate với objects nhưng không coupled to the specific variant thông qua abtract interface - Abstract Factory; việc sửa đổi hoặc thêm mới 1 product sẽ không breaking existing client code
+* => và nó đảm bảo khi client code sử dụng 1 concrete factory thì tất cả các objects/products/elements bên trong nó là consitent với nhau (tránh việc ta tự implement sai loại product)
+* => tất cả những gì ta cần modify là app's initialization code để chọn concrete factory phù hợp
+
+## Use case
+* -> Use the Abstract Factory when your code needs to work with various families of related products, but you don’t want it to depend on the concrete classes of those products
+* -> Consider implementing the Abstract Factory when you have a class with a set of Factory Methods that blur its primary responsibility
+
+## Consideration
+* -> ta thường biết sẽ tạo concrete type nào vào thời điểm start app dựa vào configuration hoặc enviroment settings, vậy nên ta sẽ chỉ sử dụng 1 concrete type cho 1 Abstract Factory trong toàn Application  
+* -> vậy trong trường hợp ta chỉ biết ta cần cái concrete type nào hoặc nhiều concrete type khác loại vào thời điểm runtime dựa vào 1 dynamic parameter thì sao ?
 
 ===============================================================
 # Arise
