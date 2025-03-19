@@ -16,34 +16,39 @@
 5. typically, a controller method calls RenderView() to render content back to the browser. The Controller.RenderView() method delegates its work to a particular ViewEngine
 
 ## Summary 
-> đúng là không nên viết hết logic trong controller vì như vậy khá khó nhìn vậy nên ta sẽ cho 1 lớp nữa là lớp Services
-> lớp Service này đơn giản là tách logic ra cho dễ nhìn và việc config DI từng thằng service vào controller sẽ không hợp lý
-> vậy nên tạo 1 Factory để tạo ra những class cùng tính chất (business service) khá là hợp lý - từng service tương ứng với từng Controller cụ thể; vì controller là Scoped nên ta cũng sẽ DI Factory là Scoped
-> ta sẽ truy cập service trong Factory dưới dạng property, nhưng ta sẽ không tạo sẵn instance cho các service (s/d **=**) mà chỉ tạo instance khi access property (s/d **=>**)
-> Interface của Factory sẽ có property với type là interface của Service, còn Implement property của Factory sẽ type là interface của service nhưng ta sẽ gán giá trị bằng implement của service
-> đồng thời khi khởi tạo instance cho service ta cần pass IServiceProvider mà Factory nhận được thông qua DI; đồng thời cache lại instance để tránh tạo lại mỗi lần access property trong 1 Scope
+ * ->đúng là không nên viết hết logic trong controller vì như vậy khá khó nhìn vậy nên ta sẽ cho 1 lớp nữa là lớp Services
+ * ->lớp Service này đơn giản là tách logic ra cho dễ nhìn và việc config DI từng thằng service vào controller sẽ không hợp lý
+ * ->vậy nên tạo 1 Factory để tạo ra những class cùng tính chất (business service) khá là hợp lý - từng service tương ứng với từng Controller cụ thể; vì controller là Scoped nên ta cũng sẽ DI Factory là Scoped
+ * ->ta sẽ truy cập service trong Factory dưới dạng property, nhưng ta sẽ không tạo sẵn instance cho các service (s/d **=**) mà chỉ tạo instance khi access property (s/d **=**)
+ * ->Interface của Factory sẽ có property với type là interface của Service, còn Implement property của Factory sẽ type là interface của service nhưng ta sẽ gán giá trị bằng implement của service
+ * ->đồng thời khi khởi tạo instance cho service ta cần pass IServiceProvider mà Factory nhận được thông qua DI; đồng thời cache lại instance để tránh tạo lại mỗi lần access property trong 1 Scope
 
-> 1 thằng service sẽ cần kế thừa interface của chính nó và base class; và interface của nó sẽ cần kết thừa interface của base class
-> các logic method, property xài chung giữa các service thì ta sẽ bỏ vào abstract class BaseService  
-> còn những member riêng thì ta sẽ để riêng - việc này đảm bảo khi ta truy cập service từ Factory nó sẽ cho ta biết method cụ thể của service đó
-> và đồng thời khi ta move 1 method từ 1 class cụ thể vào base class để cho các service sử dụng chung thì cũng không bị ảnh hưởng
+* -> 1 thằng service sẽ cần kế thừa interface của chính nó và base class; và interface của nó sẽ cần kết thừa interface của base class
+* -> các logic method, property xài chung giữa các service thì ta sẽ bỏ vào abstract class BaseService  
+* -> còn những member riêng thì ta sẽ để riêng - việc này đảm bảo khi ta truy cập service từ Factory nó sẽ cho ta biết method cụ thể của service đó
+* -> và đồng thời khi ta move 1 method từ 1 class cụ thể vào base class để cho các service sử dụng chung thì cũng không bị ảnh hưởng
 
-> các lớp service cần có khả năng sử dụng UnitOfWork để truy cập bất cứ repository nào 1 cách tuỳ ý; vậy nên ta sẽ DI scope thằng này
-> UnitOfWork sẽ cần được DI DbContext
-> trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 BaseService để kế thừa
+* -> các lớp service cần có khả năng sử dụng UnitOfWork để truy cập bất cứ repository nào 1 cách tuỳ ý; vậy nên ta sẽ DI scope thằng này
+* -> UnitOfWork sẽ cần được DI DbContext
+* -> trong trường hợp có những thằng Services cần sử dụng những logic lặp đi lặp lại thì sao - thiết nghĩ ta nên tạo 1 BaseService để kế thừa
 
-> nếu ApplicationDbContext : DbContext vậy thì typeof(ApplicationDbContext) == typeof(DbContext) ? có thể pass ApplicationDbContext instance cho method(DbContext db) ?
+* -> nếu ApplicationDbContext : DbContext vậy thì typeof(ApplicationDbContext) == typeof(DbContext) ? có thể pass ApplicationDbContext instance cho method(DbContext db) ?
 
-> 1 property chỉ với getter thì có thể set giá trị cho nó trong constructor được không ? nếu 1 property là readonly thì sau khi chạy constructor nó có thể gán được nữa không ?
-> hình như xài readonly thì không thể xài getter setter
-> interface cannot contain field ? vậy liệu ta có thể để 1 property là readonly (sử dụng getter) nhưng vẫn có thể set giá trị nó trong constructor
+* -> 1 property chỉ với getter thì có thể set giá trị cho nó trong constructor được không ? nếu 1 property là readonly thì sau khi chạy constructor nó có thể gán được nữa không ?
+* -> hình như xài readonly thì không thể xài getter setter
+* -> interface cannot contain field ? vậy liệu ta có thể để 1 property là readonly (sử dụng getter) nhưng vẫn có thể set giá trị nó trong constructor
 
-> tại sao trong interface cần để method là public ? và khi implement lại có thể để private ?
+* -> tại sao trong interface cần để method là public ? và khi implement lại có thể để private ?
 
-> nhưng mà tính ra ta đâu cần để Respository bên trong UnitOfWork, nếu ta sử dụng DI thì các Repository đều sử dụng chung 1 DbContext; UnitOfWork chỉ cần có hàm SaveChange lên DbContext được DI là xong ?
-> sau đó ta chỉ cần DI cả Repository và UnitOfWork vào Controller là xong; Repository for database operations; còn gọi UnitOfWork.SaveChange trong những action method dạng update
+* -> nhưng mà tính ra ta đâu cần để Respository bên trong UnitOfWork, nếu ta sử dụng DI thì các Repository đều sử dụng chung 1 DbContext; UnitOfWork chỉ cần có hàm SaveChange lên DbContext được DI là xong ?
+* -> sau đó ta chỉ cần DI cả Repository và UnitOfWork vào Controller là xong; Repository for database operations; còn gọi UnitOfWork.SaveChange trong những action method dạng update
 
 ## Note
+* -> ta cần hiểu là inteface được sử dụng là để tạo ra 1 giao diện để user tương tác, 
+* -> vậy nên tất cả members của interface đều là implicit public, còn những thành phần private chỉ có thể thêm (not "sửa") vào ở implementation
+* -> cũng như không thể định nghĩa field vì đây là state của logic chả liên quan gì đến user, nhưng có thể định nghĩa property bao gồm setter và getter để người dùng tương tác
+* -> không thể declare "private int PropertyA { get; set; }" hoặc "int PropertyA { private get; set; }" trong inteface; nhưng có thể "int PropertyA { get; private set; }"
+
 * -> ta cần viết interface cho 1 class khi muốn sử dụng method hoặc property của class đó; nó đảm bảo ta có thể thay bằng một implementation khác của interface đó khi cần thiết
 * -> base class nên được viết bằng abstract class để đảm bảo nó chỉ để kế thừa không thể khởi tạo, tạo sẵn 1 số method dùng chung cho thằng còn, tạo abstract method để bắt thằng con phải implement
 
