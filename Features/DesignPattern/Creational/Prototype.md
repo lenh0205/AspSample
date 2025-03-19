@@ -3,7 +3,7 @@
 > sử dụng abstract class nếu ta chắc rằng tất cả các subclasses đều thực hiện 1 behavior theo cách giống nhau trong mọi trường hợp, việc đổi logic của concrete behavior trong base class không làm ảnh hưởng đến tính đúng đắn
 >  You can get rid of repeated initialization code in favor of cloning pre-built prototypes ?
 
-# Prototype
+# Prototype / Clone
 * -> cách tiếp cận đầu tiên là First, you have to create a new object of the same class
 * ->  Then you have to go through all the fields of the original object and copy their values over to the new object
 * ->  But there’s a catch. Not all objects can be copied that way because some of the object’s fields may be private and not visible from outside of the object itself. 
