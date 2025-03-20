@@ -20,9 +20,13 @@
 
 ## Implementation
 * -> make our **`commands implement the same interface`**, usually it has **`just a single execution method that takes no parameters`**
-* -> so how would we pass the request details to the receiver? it turns out the command should be either **`pre-configured with this data, or capable of getting it on its own`**
 * => this interface lets us **use various commands with the same request sender, without `coupling` it to concrete classes of commands**
 * => as a bonus, now we can switch command objects linked to the sender, effectively **changing the sender's behavior at runtime**
+
+* -> so how would we pass the request details to the receiver? it turns out the command should be either **`pre-configured with this data, or capable of getting it on its own`**
+* => **parameters required to execute a method on a receiving object** can be declared as **`fields in the concrete command`**;
+* => must pass all of the **`request parameters`**, including **`a receiver instance`**, into the **`command's constructor`** - most commands only handle the details of how a request is passed to the receiver, while the receiver itself does the actual work
+* => we can make command objects **`immutable`** by only allowing the initialization of these fields via the constructor.
 
 * -> first, we are no longer need all the subclasses; put **`a single field`** into the **`base class`** that **`stores a reference to a command object`** and execute that command when needed
 * => Ex: we'll implement **a bunch of command classes for every possible operation** and link them with particular buttons, depending on the buttons' intended behavior
