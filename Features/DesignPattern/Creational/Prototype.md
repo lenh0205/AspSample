@@ -1,7 +1,6 @@
 > Prototype là để giải quyết việc clone object, nhưng có 1 vấn đề đằng sau nó là tại sao phải cloning 1 object ?
 > ví dụ, when your objects have dozens of fields and hundreds of possible configurations, cloning them might serve as an alternative to subclassing.
-> sử dụng abstract class nếu ta chắc rằng tất cả các subclasses đều thực hiện 1 behavior theo cách giống nhau trong mọi trường hợp, việc đổi logic của concrete behavior trong base class không làm ảnh hưởng đến tính đúng đắn
->  You can get rid of repeated initialization code in favor of cloning pre-built prototypes ?
+>  You can get rid of repeated initialization code in favor of cloning pre-built prototypes
 
 # Prototype / Clone
 * -> cách tiếp cận đầu tiên là First, you have to create a new object of the same class
