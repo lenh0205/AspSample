@@ -1,4 +1,7 @@
 > những thằng pattern này tăng độ phức tạp cho project nên chỉ nên sử dụng trong project lớn
+> từ **communication** sử dụng trong pattern này có giống từ **dependence** không ? No, "communication" là nói về việc exchange information dù chúng có **`dependent directly or not`**;
+> nên là "Mediator" come in khi 1 thằng object nó chỉ muốn notify event, nó không cần biết về những thằng khác chứa logic xử lý cho event này; mediator mới là thằng biết/refer tất cả những thằng nó cần communicate để xử lý event này;
+> vậy nên mỗi object là self-contain không reference lẫn nhau; chỉ có refer đến Mediator để thực hiện việc communicate nhằm xử lý những business logic thuộc về class khác
 
 ==============================================================
 # 'Mediator' pattern
