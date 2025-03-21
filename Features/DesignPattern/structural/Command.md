@@ -1,3 +1,4 @@
+> về cơ bản, thay vì 1 class làm cùng lúc 2 việc render UI và xử lý business logic; thì ta sẽ tách 
 
 # Command
 
