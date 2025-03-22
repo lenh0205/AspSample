@@ -4,18 +4,31 @@
 > vậy nên mỗi object là self-contain không reference lẫn nhau; chỉ có refer đến Mediator để thực hiện việc communicate nhằm xử lý những business logic thuộc về class khác
 
 ==============================================================
-# 'Mediator' pattern
+# Mediator
 * -> **`reduce chaotic dependencies between objects`**
 * -> by **restricts direct communications** between the objects and forces them to **depend only on a single mediator object**
+
 * _nó kiểu đổi quan hệ many-to-many thành one-to-many bằng cách tạo ra 1 thằng trung gian; tránh những giao tiếp phức tạp giữa các component_
 
+## Problem
+* -> Elements can have lots of relations with other elements. Hence, changes to some elements may affect the others.
+* -> By having this logic implemented directly inside the code of the form elements you make these elements’ classes much harder to reuse in other forms of the app
+
+* => the components depend only on a single mediator class instead of being coupled to dozens of their colleagues
+* => encapsulate a complex web of relations between various objects inside a single mediator object. The fewer dependencies a class has, the easier it becomes to modify, extend or reuse that class.
+* => we can go further and make the dependency even looser by extracting the common interface for all types of dialogs - so we can reuse the component in other programs by linking it to a different mediator
+
+## Implement
+* -> Previously, each time a user clicked the button, it had to validate the values of all individual form elements. Now its single job is to notify the dialog about the click. 
+* -> Upon receiving this notification, the dialog itself performs the validations or passes the task to the individual elements
+* -> the interface declares methods of communication with components, which usually include just a single notification method - which all form elements can use to notify the dialog about events happening to those elements
+* -> Concrete mediators often keep references to all components they manage and sometimes even manage their lifecycle
+* -> When the mediator receives the notification, it can easily identify the sender, which might be just enough to decide what component should be triggered in return
+
+
+## Pros and Cons
 * => **`Single Responsibility Principle`** - communication giữa các component được tổng hợp về một nơi
 * => **`Open/Closed Principle`** - trường hợp cần mở rộng, có thể dễ dàng tạo ra mediator mới (_vì các component chỉ phụ thuộc vào "Mediator Interface"_)
-
-## Members
-* -> **`Components`** là các class chứa logic xử lí business; ta sẽ DI **Mediator Interface** đồng thời establish connection trong constructor của nó
-* -> **`Mediator Interface`** khai báo những method phục vụ **giao tiếp với components** - thường bao gồm 1 method là **notification method**
-* -> **`ConcreteMediator`** **giữ tham chiếu tới tất cả component cũng như đóng gói relation giữa chúng**, đôi khi còn **quản lý vòng đời của component**
 
 ## Others
 * -> if we implement **`Mediator`** in **subscribe and unsubscribe**, nó sẽ khá giống **`Observer pattern`**
