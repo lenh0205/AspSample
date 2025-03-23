@@ -20,8 +20,15 @@
 * -> _NoSQL databases_ provide **highly functional APIs and data types** that are **purpose-built** for **`each of their respective data models`**
 
 ================================================================
+> there are several different _NoSQL database systems_ due to variations in the way they **`manage and store schema-less data`**
+
 # Common types of NoSQL databases
-* -> there are several different _NoSQL database systems_ due to variations in the way they **`manage and store schema-less data`**
+* -> Document: MongoDB, CouchDB
+* -> Key-Value: Redis, DynamoDB
+* -> Realtime: Firebase, RethinkDB
+* -> Graph DBs: Neo4j, AWS Neptune
+* -> Column DBs: Cassandra, Base
+* -> Time Series: InfluxDB, TimeScale
 
 ## Key-value databases
 * -> _Key-value databases_ are **highly partitionable** and **allow horizontal scaling at a high level** that **`other types of NoSQL databases may not achieve`**

@@ -4,6 +4,10 @@
 * -> typically maintained as **`an external service`** - the cached data is **`stored on individual app servers`** (_vậy nên rất thích hợp với app is hosted by a `cloud service` hoặc a `server farm`_)
 
 ==================================================================================
+# All concepts
+* https://roadmap.sh/redis
+
+==================================================================================
 # Implementation
 
 # Prerequisites
