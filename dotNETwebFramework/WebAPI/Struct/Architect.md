@@ -70,6 +70,14 @@
 
 * -> nếu dùng DI để inject DbContext thì trong Dipose method của UnitOfWork ta có thể không cần gọi _dbContext.Dispose(); nhưng ta vẫn nên để vậy để sử dụng UnitOfWork trong trường hợp không có DI
 
+## Question
+
+### Tại sao trong .NET không có đa kế thừa?
+* -> trong .NET, ta có thể mô phỏng đa kế thừa bằng interface ? vậy câu hỏi cụ thể hơn sẽ là "tại sao 1 class có thể kể thừa nhiều interface mà không thể kế thừa nhiều class khác?"
+* -> thiết nghĩ là do sự consistence trong implementation, tức là dù các behavior đến từ nhiều interface khác nhau nhưng implementation của chúng phải compatible với nhau
+* -> thử tưởng tượng trong trường hợp trong derived class ta viết thêm 1 behavior reference tới 2 behavior từ 2 base class khác nhau, khi ta sửa behavior từ base class để một số subclasses thỏa mãn 1 scenarios nào đó
+* -> thì 1 số subclasses khác lại bị conflict về behavior do implement nhiều base class 
+
 ## Reference
 > cái gì làm nên sự phân biệt giữa controller này và controller kia ? (không lẽ là model)
 > https://github.com/ardalis/CleanArchitecture/tree/main
