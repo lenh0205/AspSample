@@ -31,6 +31,9 @@
 * -> cài Crystal Reports Runtime (thường thì khi cài cái trên thì nó sẽ có option cài Runtime luôn)
 * -> chạy setup wizard cho tệp tin vừa tải
 
+## Extend
+* https://learn.microsoft.com/en-us/archive/msdn-magazine/2002/may/crystal-reports-add-professional-quality-reports-to-your-application-with-visual-studio-net
+
 ========================================================================
 # Example1: hiển thị Crystal Report in WinForms
 * -> tạo project Window Forms mới 
