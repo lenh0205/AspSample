@@ -19,7 +19,8 @@
 * => we can go further and make the dependency even looser by extracting the common interface for all types of dialogs - so we can reuse the component in other programs by linking it to a different mediator
 
 ## Implement
-* -> Previously, each time a user clicked the button, it had to validate the values of all individual form elements. Now its single job is to notify the dialog about the click. 
+* -> Previously, each time a user clicked the button, it had to validate the values of all individual form elements. 
+* -> Now its single job is to notify the dialog (Mediator) about the click. 
 * -> Upon receiving this notification, the dialog itself performs the validations or passes the task to the individual elements
 * -> the interface declares methods of communication with components, which usually include just a single notification method - which all form elements can use to notify the dialog about events happening to those elements
 * -> Concrete mediators often keep references to all components they manage and sometimes even manage their lifecycle

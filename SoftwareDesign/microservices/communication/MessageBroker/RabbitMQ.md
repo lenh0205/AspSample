@@ -13,7 +13,8 @@
 ======================================================================
 # RabbitMQ 
 * -> one of the most widely used **`Message Broker`** - lightweight and very easy to deploy, support mulitple protocols, highly available and scalable, support multiple OS
-* _written in the **Erlang** programming language, which itself is famous for powering the **Open Telecom** platform_
+* (_written in the **Erlang** programming language, which itself is famous for powering the **Open Telecom** platform_)
+
 * => allows microservices to communicate asynchronously with variety of different protocols
 * => the end result is an architecture that allows servers to both **Publish** and **Subscribe** to data thanks to the RabbitMQ middleman
 
@@ -22,192 +23,31 @@
 * -> other protocols will be supported through plugins like **STOMP**, **MQTT**, **AMQP 1.0**, **HTTP and WebSocket**
 
 ## Process
-* -> **Producer** publish a message with the required data (_Ex: **`routing key`**_) into **an Exchange**
+* -> **Producer** publish a message with the required data (_Ex: **`routing key`** in "direct" or "topic" exchange_) into **an Exchange**
 * -> the **`Exchange`** is then responsible for **`routing`** (_Ex: compare **routing key** and **binding key**) it to one or more **`Queues`**
-* -> **`Binding`** connects an Exchange with a Queue using **`binding key`**
-
-* -> the messages distribution depends on **exchange type**
-* -> the Exchange can route directly to a specific queue (**`Direct`** - exact routing key), or to multiple queues with a shared pattern (**`Topic`** - có phần giống nhau là đc), or to every queues it know about (**`Fanout`** - ignore routing key), or using message header instead of routing key (**`Header`**)
-* -> the Default (nameless) Exchange compares the **routing key** with the **queue name** (_not "binding key"_), if matched then forward message to the queue (_therefore makes it seemingly possible to send a message directly to a queue but under the hood each message goes through an Exchange_)
-* -> now the message sits in the queue until it's handled by the **`Consumer`** 
-
-===================================================================
-> ta sẽ cần tạo 1 **Exchange** để **`manage multiple queues at the same time`**
-> a **`Fanout`** or **`Topic`** exchange would allow multiple servers to subscribe to the same messages but consume them at different times
-
-# Exchange in RabbitMQ
-* -> **`routes messages`** from a producer to a single or multiple consumers
-* -> **an Exchange** uses **`header attributes`**, **`routing keys`** and **`binding`** to route messages
-
-* -> it's very important to notice that in **`RabbitMQ messages are never published to a queue (directly)`**, they **always goes through an Exchange**
-* -> the **Exchange is going to route the message to the queue** 
-* -> event when we send message to a queue, it uses **`default exchange (AMQP default)`**
-
-## Type of Exchanges
-* **`Direct Exchange`** - the Exchange uses **`exact match routing key`** in the header to **identify which queue** the message should be send to
-* -> **`Routing key`** is **a header value set by the Producer**
-* -> **Consumer uses the routing key** to **`bind to the queue`**
-
-* **`Topic Exchange`** - also uses **routing key but not in exact match** instead it does a **`pattern match`**
-
-* **`Header Exchange`** - routes messages based on **header values**
-
-* **`Fanout Exchange`** - fans out all the messages to all the queues bound to it
-
-# Example: Direct Exchange
-
-```cs - create a Direct Exchange Publisher
-static class Program
-{
-    static void Main(string[] args)
-    {
-        var factory = new ConnectionFactory
-        {
-            Uri = new Uri("amqp://guest:guest@localhost:5672");
-        };
-        using var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
-        DirectExchangePublisher.Publish(channel);
-    }
-}
-
-public static class DirectExchangePublisher 
-{
-    public static void Publish(IModel channel)
-    {
-        // declare exchange with: exchange name, type of exchange
-        channel.ExchangeDeclare("demo-direct-exchange", ExchangeType.Direct);
-
-        var count = 0;
-        while (true)
-        {
-            var message = new { Name = "Producer", Message = $"Hello! Count: {count}" };
-            var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-
-            channel.BasicPublish("demo-direct-exchange", "account.init", null, body);
-            // value của "routing key" là tuỳ ý
-
-            count++;
-            Thread.Sleep(1000);
-        }
-    }
-}
-```
-
-* Đầu tiên, ta sẽ chạy "Consumer"
-* -> trong Management Console, ta sẽ thấy "demo-direct-queue" được tạo và Consumer connected to it trong **Queues** section; 
-* -> và "demo-direct-exchange" được tạo và bind to "demo-direct-queue" trong **Exchanges** section
-```cs - Consumer
-static class Program
-{
-    static void Main(string[] args)
-    {
-        var factory = new ConnectionFactory
-        {
-            Uri = new Uri("amqp://guest:guest@localhost:5672");
-        };
-
-        using var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
-
-        DirectExchangeConsumer.Consume(channel);
-    }
-}
-
-public static class DirectExchangeConsumer
-{
-    public static void Consume(IModel channel)
-    {
-        // declare Exchange
-        channel.ExchangeDeclare("demo-direct-exchange", ExchangeType.Direct);
-
-        // declare Queue
-        channel.QueueDeclare("demo-direct-queue", durable: true, 
-            exclusive: false, autoDelete: false, arguments: null);
-
-        // make a mapping between the Queue and the Exchange - told the Exchange to bind to specific Queue
-        channel.QueueBind("demo-direct-queue", "demo-direct-exchange", "account.init")
-
-        var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (sender, e) => {
-            var body = e.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            Console.WriteLine(message);
-        };
-        channel.BasicConsume("demo-direct-queue", true, consumer);
-
-        Console.WriteLine("Consumer started");
-        Console.ReadLine(); // để chương trình không bị thoát sau khi chạy xong
-    }
-}
-```
+* -> **`Binding`** connects an **Exchange** with a **Queue** using **`binding key`** (_defining the routing rules_)
+* -> now the **`message sits in the queue`** until it's **handled by the Consumer** 
 
 ======================================================================
-> lifetime of a message 
+# Why RabbitMQ
+* -> **`Asynchronous`** - với những hành động không cần thực hiện và phản hổi kết quả ngay thời điểm đó (TCP request-response) thì ta cứ cho nó vô queue cho các Consumer tự lấy, 1 service không cần phải chờ thực hiện xong tất cả hành động để mà cứ phản hổi đã làm thành công về cho user luôn cho nhanh
+* -> **`Decoupling`** - thay vì 1 server phải quản lý việc giao tiếp với nhiều server khác, thì nó chỉ cần giao tiếp với RabbitMQ rồi RabbitMQ sẽ quản lý việc giao tiếp với những thằng còn lại
+* -> **`Rate Limit`** - (Ví dụ: chương trình sale một sản phẩm bắt đầu, số lượng request trên giây tăng đột biến lên 5000; nhưng MySQL chỉ có thể xử lý 2000 request per second Database thì nó sẽ sập ngay); Lúc này ta cứ ném hết 5000 request cho RabbitMQ nó sẽ chỉ gửi 2000 request per second; còn 3000 request còn lại cứ từ từ xử lý sau
+* -> **`Scalibility`** - nếu có hàng tá tin nhắn mà 1 Consumer không thể xử lý hết được làm queue bị đầy, ta có thể nhân đôi Consume lên lấy message
 
-# Prefetch count 
-* -> if we have **multiple consumers connected to a queue**, then prefetch tells **`how many messages that particular consumer can prefetch and process`**
-* -> this is really important feature when building **a realtime RabbitMQ application with multiple Queues and Exchanges**
-* _Ex: if the prefetch count is 2 and there're like 10 messages came to the queue immediately, 2 messages will be deliverd per consumer_
-
-## Setup
-```cs - Producer
-// to do that we declare an argument attribute in the Exchange
-// declare a dictionary of string and object, in that we pass the argument attribute that needed by RabbitMQ to identify the time to live
-
-public static class DirectExchangePublisher 
-{
-    public static void Publish(IModel channel)
-    {
-        var ttl = new Dictionary<string, object> // this line
-        {
-            { "x-message-ttl", 30000 }
-        }
-        channel.ExchangeDeclare("demo-direct-exchange", ExchangeType.Direct, arguments: ttl);
-
-        var count = 0;
-        while (true)
-        {
-            var message = new { Name = "Producer", Message = $"Hello! Count: {count}" };
-            var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-
-            channel.BasicPublish("demo-direct-exchange", "account.init", null, body);
-            // value của "routing key" là tuỳ ý
-
-            count++;
-            Thread.Sleep(1000);
-        }
-    }
-}
+```cs
+// Ví dụ user gửi request cho 1 WebAPI, WebAPI này phải gửi 5 HTTP request đến 5 services khác để hoàn thành business logic
+// thì nó sẽ cần chờ tất cả 5 Service khác response thì WebAPI này mới có thể response cho user
+// và trường hợp này sẽ tệ hơn nếu 1 Service nó gọi tới bị chết, nó sẽ phải request over and over again và chờ cho Service này ok thì mới phản hồi cho user được
+// hoặc trường hợp WebAPI gửi một lượng request đến nỗi Service kia không chịu nổi, nó sẽ làm sập Service
 ```
 
-```cs - Consumer
-public static class DirectExchangeConsumer
-{
-    public static void Consume(IModel channel)
-    {
-        channel.ExchangeDeclare("demo-direct-exchange", ExchangeType.Direct);
-        channel.QueueDeclare("demo-direct-queue", durable: true, 
-            exclusive: false, autoDelete: false, arguments: null);
-        channel.QueueBind("demo-direct-queue", "demo-direct-exchange", "account.init");
+## Một số vấn đề trong RabbitMQ 
+* -> nhưng RabbitMQ không đảm bảo 100% là không bị miss message; một vấn đề nữa là tuy RabbitMQ đã gửi message thành công và báo về những việc xử lý Data Persitance có thành công không thì chưa chắc
 
-        // make the Consumer to fetch 10 messages at a time
-        channel.BasicQos(0, 10, false); // this line
+# RabbitMQ, Kafka, ActiveMQ, RocketMQ
+* -> thông lượng của Kafka cao hơn RabbitMQ
+* -> Kafka ít mất dữ liệu hơn
+* -> độ tin cậy của tin nhắn thì RabbitMQ là toàn vẹn; còn Kafka cao nhưng vẫn có thể bị mất
+* -> Lantency của RabbitMQ rất thấp dưới mức milisecond; còn Kafka độ trễ trong vòng milisecond 
 
-        var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (sender, e) => {
-            var body = e.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            Console.WriteLine(message);
-        };
-        channel.BasicConsume("demo-direct-queue", true, consumer);
-
-        Console.WriteLine("Consumer started");
-        Console.ReadLine(); 
-    }
-}
-```
-
-## Running
-* -> trước tiên ta sẽ vào Management Console để delete the Queue and Exchange
-* -> h ta sẽ start Producer và Consumer, thì trong Management Console ta sẽ thấy "demo-direct-exchange" have "x-message-ttl" attribute and the "demo-direct-queue" has a prefetch count of 10

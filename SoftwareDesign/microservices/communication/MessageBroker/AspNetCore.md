@@ -1,4 +1,12 @@
 ======================================================================
+# Integrating RabbitMQ with ASP.NET Core
+* -> Using RabbitMQ.Client NuGet package for connecting
+* -> Setting up a ConnectionFactory and channels
+* -> Publishing messages to exchanges
+* -> Consuming messages with background workers (IHostedService or BackgroundService)
+* -> Handling failures, retries, and dead-letter queues (DLQ)
+
+======================================================================
 > basic setup
 
 # Example 1: using Queue for message communication between a Producer application and a Consumer application
@@ -131,11 +139,10 @@ public static class QueueConsumer
 * -> giờ ta sẽ run Producer
 * -> giờ ta vào **"Queues" section**, ta sẽ thấy 1 message comming in
 
-======================================================================
-> 1 Producer with multiple Consumer - how the messages are distributed across multiple Consumers
-> **Exchange** in RabbitMQ
 
-# Example: using Queue for message communication between a Producer application and multiple Consumer applications
+# Example 2: using Queue for message communication between a Producer application and multiple Consumer applications
+* -> 1 Producer with multiple Consumer - how the messages are distributed across multiple Consumers
+* -> **Exchange** in RabbitMQ
 
 ## Setup
 ```cs - Producer
