@@ -50,7 +50,8 @@ CREATE TABLE Customers (
     Email VARCHAR(100)
 );
 
--- this query benefits from the clustered index because the rows are physically stored in the order of "CustomerID", making range queries efficient
+-- this query benefits from the clustered index
+-- because the rows are physically stored in the order of "CustomerID", making range queries efficient
 SELECT * FROM Customers WHERE CustomerID BETWEEN 100 AND 200;
 ```
 
