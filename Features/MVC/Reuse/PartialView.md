@@ -106,6 +106,7 @@ public ActionResult Show(string param)
 
 =========================================================================
 # RenderPage vs Html.RenderPartial
+* hiểu đơn giản là 1 thằng sẽ tự tìm view theo 1 pattern mặc định ta chỉ cần cho tên view, còn một thằng thì cần cung cấp đường dẫn phù hợp khi ta đặt file view ở bất kỳ đâu ta muốn
 
 ## Html.RenderPartial
 * -> Html.RenderPartial follow **standard rules for view lookup** (_Ex: check current directory, then check the "Shared" directory_), so we only to provide it the **`view name`** to lookup
