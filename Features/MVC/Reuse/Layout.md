@@ -1,11 +1,14 @@
 ===================================================================================
 # Layout
 * -> define a **common template** - **`inherit a consistent look and feel`** across all the views/pages of ASP.NET MVC application
-* -> the **_ViewStart.cshtml** within the `Views` folder for defining the **default Layout page** for our ASP.NET MVC application
 
-* -> _Layout views_ are **`shared with multiple views`**, so it must be stored in the **Shared** folder
+## Structure of a Layout
 * -> _Layout view_ contain **`common portion`** (_Header, Left Menu, Right bar, and Footer sections_) and **`placeholder for the center section that changes dynamically`** 
 * -> the placeholder can be render by using **RenderBody()** and **RenderSection** (_đây cũng là cách ta nhận biết Layout view so với những view thường_)
+
+## "Layout" usage
+* -> the **_ViewStart.cshtml** within the `Views` folder for defining the **default Layout page** for our ASP.NET MVC application
+* -> _Layout views_ are **`shared with multiple views`**, so it must be stored in the **Shared** folder
 
 ```js - Basic structure of Layout page
 <!DOCTYPE html>
