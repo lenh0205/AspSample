@@ -6,6 +6,7 @@
 
 ## "@RenderSection" and "@section" directive
 * -> the contents define in **`@section` blocks of child view** will be insert into the **corresponding named sections (`@RenderSection`) in the master page**
+* _tức là view con định nghĩa UI mà sẽ được render tại vị trí ta đặt RenderBody() trong view cha; nhưng @RenderSection trong view cha cho phép ta đặt những UI (trong @section block) được định nghĩa trong view con ở ví trí khác_
 
 * -> the **second parameter** is false (**`@RenderSection("Footer", false)`**) denotes that the section is optional and we can choose to use it or not
 * -> if using **true** then it is **`compulsory to have this section defined in child page`** otherwise we will get the error: _[HttpException (0x80004005): Section not defined: "MySection"]_
