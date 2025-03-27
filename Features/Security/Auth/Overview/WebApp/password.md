@@ -52,3 +52,8 @@ var hash = bcrypt(password); // $2a$10.....
 // <=> có thể có đến 256^8 mật khẩu <=> 2^64 mật khẩu 
 // nhưng mà password không có tính random như key (tức là user đưa ra mật khẩu theo 1 rule nào đó dễ nhớ) 
 ```
+
+* làm sao để đặt password đủ phức tạp mà lại dễ nhớ ?
+* -> password based on passphrase - tức là ta viết lái đi so với mật khẩu bình thường (_VD: IloveU2_)
+* -> tỷ lệ bẻ khoá tương đương với việc đặt mật khẩu với 8 random characters `nhưng dễ nhớ hơn`
+* -> search `leet speak` để biết thêm chi tiết về cách viết leet speak cho mật khẩu
