@@ -1,11 +1,11 @@
-* 3 Pages:
+# Example: Web Application 
 
-* Register:
-* -> tạo 1 Form HTML gồm 4 fields required từ user: firstName, lastName, email, password
-* -> tạo 1 table "User" trong database với 4 field như trên; email sẽ là unique 
+## Register:
+* -> tạo table "User" trong database; email sẽ là unique 
 ```js 
 // Tạo "User" collection trong Database; field "_id" is unique Id like primary key on table
-
+```
+```
 // Định nghĩa "User" Model cho "User" Collection bằng Mongoose ORM
 const mongoose = require("mongoose");
 let User = mongoose.model("User", new mongoose.Schema({
@@ -14,7 +14,10 @@ let User = mongoose.model("User", new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 }));
+```
 
+* -> tạo 1 Form đăng ký HTML gồm 4 fields required từ user: firstName, lastName, email, password
+```js
 // Register API:
 app.post("/register", (req, res) => {
     // use "bcrypt" function from "bcryptjs" library to hash password
@@ -36,8 +39,9 @@ app.post("/register", (req, res) => {
 })
 ```
 
-* Login:
-```js - Tìm email và kiểm tra password; 
+## Login:
+```js
+// Tìm email và kiểm tra password; 
 app.post("/login", (req, res) => {
     User.findOne({ email: req.body.email }, (err, user) => { // tìm theo unique "email"
         if (
@@ -57,7 +61,8 @@ app.post("/login", (req, res) => {
 })
 ```
 
-* Dashboard - trang dữ liệu cần xác minh danh tính để vào được
+## '/Dashboard' as protected route 
+* -> trang dữ liệu cần xác minh danh tính để vào được
 ```js
 app.get("/dashboard", (req, res, next) => {
     if (!(req.session && req.session.userId)) { // check if session variable and userId available
