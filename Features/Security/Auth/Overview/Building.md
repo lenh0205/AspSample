@@ -172,7 +172,7 @@ app.get("/dashboard", loginRequired, (req, req, next) => {
 })
 ``` 
 
-# Cross Site Request Forgery - CSRF 
+## Cross Site Request Forgery - CSRF 
 * -> **`tấn công giả mạo chính chủ thể của nó`**, hacker lạm dụng sự tin tưởng của một ứng dụng web trên trình duyệt của nạn nhân để tấn công vào chứng thực request trên web thông qua việc sử dụng Cookies
 * -> **Mechanism**: attacker point user to a site they're logged into to perform actions they didn't intend to like _submitting a payment, chaging password,..._
 * -> **Rish**: very low espectially using modern web framework to implement code 
@@ -191,7 +191,7 @@ app.get("/dashboard", loginRequired, (req, req, next) => {
 <img src="http://bank.com/withdraw?account=John&amp;amount=100000000&amp;for=BadGuy">
 ```
 
-## Solution
+### Solution
 * _gồm 2 phần:_
 * -> generating a random token every time a new page request is made
 * -> insert that token in a cookie
@@ -199,7 +199,7 @@ app.get("/dashboard", loginRequired, (req, req, next) => {
 * -> when someone go to our Web Server to view FormData; we check value in that cookie is the one was actually submitted by the form
 * -> nếu 2 cái khác nhau, thì bỏ qua
 
-## Implement
+### Implement
 ```js
 const csurf = require("csurf");
 app.use(csurf());
@@ -220,15 +220,15 @@ form (method="post")
     input(type="hidden", name="_csrf", value=csrfToken)
 ```
 
-# Additional security in Best Practices
+## Additional security in Best Practices
 
-## SSL
+### SSL
 * always use SSL because 
 * -> if not, any information a user sends from their browser to our Web Server that can be view by anyone in between like Internet service Provide, NSA, Canadian police, ...
 * -> SSL encrypted information from browser to server; it really sercure
 * -> not matter type of Authentication we using, if we're not use SSL it's not secure 
 
-## Config Cookie for better secure:
+### Config Cookie for better secure:
 * add additional flag: 
 ```js
 app.use(session({
@@ -242,11 +242,11 @@ app.use(session({
 }))
 ```
 
-## Helmet library:
+### Helmet library:
 * set a  bunch of HTTP Headers on our sites and secure them
 * prevent clickjacking, ...
 
-## Don't Roll Your Own
+### Don't Roll Your Own
 * nên s/d nhưng thư viện như: Passport, Node-Login, Aqua, Okta
 
 
