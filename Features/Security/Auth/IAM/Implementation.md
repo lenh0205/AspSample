@@ -22,28 +22,19 @@
 * -> **Role-based access control (RBAC)** - as **`the number of users grows`**, managing the access of each individual quickly becomes impractical. With RBAC, people who have the **`same role have the same access to resources`**
 
 ===========================================================
-# Why use an IAM platform?
-* -> User expectations, customer requirements, and compliance standards introduce significant technical challenges
-* -> with multiple user sources, authentication factors, and open industry standards, the amount of knowledge and work required to build a typical IAM system can be enormous
-* -> built-in support for all identity providers and authentication factors, offers APIs for easy integration with our software
-* -> relies on the most secure industry standards for authentication and authorization
-
-* => we should **`build on an identity and access management platform`** (_Ex: Auth0_) instead of building our own solution from the ground up
-
-=============================================================
 # Integrate IAM in Web Development
-* -> IAM solution is a **`gatekeeper to the resources`** we provide **`to customers`** **`as web applications, APIs, ...`** 
-* -> the gatekeeper initiates **`authorization`** as outlined in **OAuth 2.0**
-* -> the addition of the **OpenID Connect layer** adds **`authentication`** to secure our users’ digital identities and our product
+* -> IAM solution is a **gatekeeper to the resources** we provide to **customers** as **web applications, APIs, ...** 
+* -> the gatekeeper initiates **`authorization`** as outlined in **`OAuth 2.0`**
+* -> the addition of the **`OpenID Connect layer`** adds **`authentication`** to secure our users' digital identities and our product
 
 ## Choosing Identity platform  
-* -> have to supports **different application types and frameworks (_whether our application is **`a regular web app, a mobile app, or a machine-to-machine app`**_)
-* -> supporting **secure protocols**
-* -> allows us to **customize login services** to **`fit our business, our technology, and our customer base`**
-* -> connect our **user data store**, **`manage those users, choose an authorization grant, and establish authentication factors`** for a seamless, scalable product with an impactful user experience
+* -> have to **`supports different application types and frameworks`** (_whether our application is **a regular web app, a mobile app, or a machine-to-machine app**_)
+* -> **`supporting secure protocols`**
+* -> **`allows to customize login services`** to fit our business, our technology, and our customer base
+* -> **`connect our user data store, manage those users, choose an authorization grant, and establish authentication factors`** for a seamless, scalable product with an impactful user experience
 
 ## Authenticate
-* -> the **`vehicle of authentication`** is the **login form**, or **`the intermediary`** to allow our users access to our application
+* -> the **vehicle of authentication** is the **`login form`**, or **`the intermediary`** to allow our users access to our application
 * -> users provide **pre-determined credentials** (_such as username or password_), in the **`login form`** to verify their digital identities
 
 ### the "Login form" 
