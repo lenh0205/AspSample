@@ -1,35 +1,4 @@
 ===========================================================
-# Identity providers
-* **The reason:**
-* -> in the past, _the standard for identity and access management_ was for a system to **`create and manage its own identity information for its users`**
-* -> each time a user wanted to **`use a new web application`**, they **filled in a form** to **`create an account`**
-* -> the application **stored all of their information**, including **`login credentials`**, and **`performed its own authentication`** whenever a user signed in
-* -> as the internet grew and more and more applications became available, most people **`amassed countless user accounts`**, each with its **own account name and password to remember**
-* -> _there are many applications that continue to work this way_
-
-* => but many others now **`rely on identity providers`** to **reduce their development and maintenance burden and their users’ effort**
-* -> an identity provider **`creates, maintains, and manages identity information, and can provide authentication services to other applications`**
-* -> Identity providers **don’t share your authentication credentials** with the apps that rely on them
-
-```r 
-// Google Accounts is an "identity provider"
-// they store account information such as our user name, full name, job title, and email address
-// a web like Slate online magazine lets us log in with Google (or another identity provider) rather than go through the steps of entering and storing our information anew 
-// but Slate doesn’t ever see our Google password; Google only lets Slate know that we’ve proven our identity. 
-```
-
-* other identity providers include **`social media`** (_such as Facebook or LinkedIn_), **`enterprise`** (_such as Microsoft Active Directory_), and **`legal identity providers`** (_such as Swedish BankID_)
-
-# Authentication factors
-* -> _Authentication factors_ are **`methods for proving a user’s identity`**
-* -> IAM systems require one or many authentication factors to verify identity
-
-* _commonly fall into these basic types:_
-* -> **Knowledge** (something you know): Pin, password
-* -> **Possession** (something you have): Mobile phone, encryption key device
-* -> **Inherence** (something you are):	Fingerprint, facial recognition, iris scan
-
-===========================================================
 # Authentication and authorization standards
 * **`Authentication and authorization standards`** are **open specifications and protocols** that provide guidance on how to:
 * -> **`Design IAM systems to manage identity`**
