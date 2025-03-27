@@ -1,7 +1,7 @@
 > bài viết này đề cập đến những API để server của ta tương tác với Auth server
 > khi nói về "confidential applications" thì ta cần hiểu là những yếu tố được đề cập liên quan đến việc giao tiếp giữa server của ta với Auth server (nơi mà securely store secrets), chứ không phải user với server 
 
-=================================================================================================
+======================================================================
 # Authentication API
 * -> enables us to **manage all aspects of user identity** when we use Auth Server; it offers **endpoints** so our users can **`log in, sign up, log out, access APIs,...`**
 * => used by **`front-ends`** and **`untrusted parties`**
