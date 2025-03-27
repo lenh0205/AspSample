@@ -1,5 +1,9 @@
-> bài viết này đề cập đến những API để server của ta tương tác với Auth server
-> khi nói về "confidential applications" thì ta cần hiểu là những yếu tố được đề cập liên quan đến việc giao tiếp giữa server của ta với Auth server (nơi mà securely store secrets), chứ không phải user với server 
+======================================================================
+# Summary
+* -> bài viết này là về how **`client applications`** interact with **`authentication-related APIs`** provided by an **`authentication server`** or identity provider (IdP) (_such as Auth0 or Azure AD_)
+
+* -> **`Authentication API ()`** used by **clients** (SPAs, mobile apps, web apps) to authenticate users, manage tokens, and retrieve user data.
+* -> **`Management API`** used by **backend** (APIs, admin dashboards) to manage authentication settings and users
 
 ======================================================================
 # Authentication API
