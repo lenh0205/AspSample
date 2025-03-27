@@ -27,8 +27,8 @@
 
 ===========================================================
 # IAM - Identity and Access Management 
-* -> provides control over **user validation** and **resource access**
-* -> this technology ensures that the **`right people`** access the **`right digital resources`** at the **`right time`** and for the **`right reasons`**
+* -> hiểu đơn giản nó là 1 cách gọi chung để chỉ các **systems handle user validation and resource access**
+* => ensures that the **`right people`** access the **`right digital resources`** at the **`right time`** and for the **`right reasons`**
 
 ===========================================================
 # What does "IAM" do?
@@ -71,20 +71,15 @@
 * -> gain insights into the security and usage patterns of our environment
 
 ===========================================================
-## How does IAM work? 
-* -> IAM is **`not one clearly defined system`**; IAM is **`a discipline and a type of framework`** for **solving the challenge of secure access to digital resources**
-* -> there’s no limit to the different approaches for implementing an IAM system
-
+## Common practices of how does IAM work? 
+* _IAM is not one clearly defined system, it is a discipline and a type of framework; so there’s no limit to the different approaches for implementing an IAM system_
 * _there're elements and practices in common implementations:_
-* -> The user (resource owner) initiates an authentication request with the identity provider/authorization server from the client application.
-
-If the credentials are valid, the identity provider/authorization server first sends an ID token containing information about the user back to the client application.
-
-The identity provider/authorization server also obtains end-user consent and grants the client application authorization to access the protected resource. Authorization is provided in an access token, which is also sent back to the client application.
-
-The access token is attached to subsequent requests made to the protected resource server from the client application.
-
-The identity provider/authorization server validates the access token. If successful the request for protected resources is granted, and a response is sent back to the client application.
+* -> **the user (resource owner)** initiates an **authentication request** with the **identity provider/authorization server** from the **client application**
+* -> if the **credentials** are valid, the identity provider/authorization server first sends an **ID token** containing information about the user back to the client application.
+* -> the identity provider/authorization server also obtains **end-user consent** and **grants the client application authorization** to access the **protected resource**
+* -> **Authorization** is provided in an **access token**, which is also sent back to the **client application**
+* -> the **access token** is attached to **subsequent requests** made to the **protected resource server** from the **client application**
+* -> the **identity provider/authorization server** validates the **access token**; if successful the request for protected resources is granted, and **a response is sent back to the client application**
 
 
 
