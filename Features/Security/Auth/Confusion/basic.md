@@ -37,6 +37,33 @@ Employees in a company are required to authenticate through the network before a
 After an employee successfully authenticates, the system determines what information the employees are allowed to access
 ```
 
+## Authen/Author with Client or Server ?
+* **Authentication and Authorization happen in "Server"** , **`not Client`**
+* -> Lý do là **can not trust Client** 
+```cs - VD: Auth on client 
+// như kiểu ta có 1 user, what button can they click ?
+``` 
+
+* nhưng nó **vẫn hoàn toàn OK to show and hide UI base on actual user datas or user information** để nói cho user what they can do (_VD: ta s/d 1 Boolean variable like "isAdmin" to able to show and hide different part of UI_) (_nhưng verification và check phải ở server_)
+```cs - VD:
+// Nếu User là "Admin", ta sẽ show "delete" and "edit" button while "normal user" don't have that
+// Kể cả khi ta change UI/ change Client để "delete" button hiện ra cho "normal user" 
+// => Server vẫn không cho phép ta thực hiện hành động đó
+```
+
+* ta có thể vào DevTool/Application để view Session trong Cookie, nó chỉ là 1 đoạn text **it doesn't matter what that is, it's just a unique identifier**
+* -> nếu ta xoá nó thì giống như ta logout
+
+* và ta cần đảm bảo ta **`securely store sessionID`** vì nếu **someone else has access to sessionID, they can logged in as user without knowing "user name" and "password"**
+```cs - VD: Ta có được sessionID của user
+// Ta vào DevTool/Application/Cookies của 1 trang web ta đang login copy lại value của "session"
+// Ta mở tab ẩn danh -> mở trang web -> DevTool/Application -> paste lại cặp key/value vừa copy vào "Cookies"
+// Refresh lại trang và ta sẽ thấy trang được login
+```
+
+* Vậy nên it a good idea to **periodically remove current sessions** from our session map
+* -> if a user have **`inactive for a certain period of time, we'll remove that session`**, means that user is `logout`
+
 # Identity providers
 * **The reason:**
 * -> in the past, _the standard for identity and access management_ was for a system to **`create and manage its own identity information for its users`**
