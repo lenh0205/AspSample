@@ -20,7 +20,7 @@
 * -> but it also has the **`Hydrid Flow`** - combine steps from **Implicit Flow with Form Post** and **Authorization Code Flow**
 
 ================================================================
-# Authorization Code Flow - - is the Client a web app executing on the server?
+# Authorization Code Flow - is the Client a web app executing on the server?
 * if the **Client** is a **`regular web app executing on a server`**, then the "Authorization Code Flow" is the flow we should use
 * -> using this the "Client" can exchanges an **Authorization Code** an **`Access Token`** and, optionally, a **`Refresh Token`**
 * -> it's considered the **safest choice** since the **`Access Token is passed directly to the web server hosting the Client`**, without going through the user's web browser and risking exposure; also **the source code is not publicly exposed**
