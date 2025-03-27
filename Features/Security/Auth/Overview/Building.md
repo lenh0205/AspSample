@@ -82,10 +82,8 @@ app.get("/dashboard", (req, res, next) => {
 })
 ```
 
-==================================================
-# Refactoring
-* Không cần care về session khi xử lý business nữa; ta chỉ cần có 1 `"user object" in all of our routes` if a user exists 
-* -> bằng cách **`tạo 1 Middleware để lấy user info ra 1 lần thôi`** (_s/d session_) và lưu vào 1 biến local "req.user" để Middleware sau sử dụng
+## Middleware 
+* -> thay vì check user exist và lấy user info với mỗi endpoint thì ta **tạo 1 Middleware để lấy user info ra 1 lần thôi** và lưu vào 1 biến local **req.user** để các Middleware sau sử dụng
 ```js 
 app.use((req, res, next) => {
     // check if session exist
@@ -110,9 +108,7 @@ app.use((req, res, next) => {
 })
 ```
 
-* Tách phần code `check if user logged in` ra thành 1 Middleware; và pass nó cho route cần Auth 
-* -> if user logged in, ta để họ làm bất cứ gì họ muốn
-* -> if not, force them to login
+* -> ta cũng tách phần logic handle khi user xác thực không thành công thành 1 function riêng và pass vào middleware của protected route, tùy trường hợp sẽ take những actions khác nhau
 ```js
 function loginRequired(req, res, next) {
     if (!req.user) { // s/d "req.user" có từ Middleware trên
@@ -126,15 +122,11 @@ app.get("/dashboard", loginRequired, (req, req, next) => {
 ``` 
 
 # Cross Site Request Forgery - CSRF 
-* **`tấn công giả mạo chính chủ thể của nó`**
-* -> hacker lạm dụng sự tin tưởng của một ứng dụng web trên trình duyệt của nạn nhân
-* -> tấn công vào chứng thực request trên web thông qua việc sử dụng Cookies
+* -> **`tấn công giả mạo chính chủ thể của nó`**, hacker lạm dụng sự tin tưởng của một ứng dụng web trên trình duyệt của nạn nhân để tấn công vào chứng thực request trên web thông qua việc sử dụng Cookies
+* -> **Mechanism**: attacker point user to a site they're logged into to perform actions they didn't intend to like _submitting a payment, chaging password,..._
+* -> **Rish**: very low espectially using modern web framework to implement code 
 
-* **Mechanism**: attacker point user to a site they're logged into to perform actions they didn't intend to like _submitting a payment, chaging password,..._
-
-* **Rish**: very low espectially using modern web framework to implement code 
-
-```html - 1 withdraw page có Form chuyển tiền ngân hàng
+```html - 1 withdraw page bình thường có Form chuyển tiền ngân hàng
 <form>
     <input type="text" name="account"/> <!-- my account name -->
     <input type="text" name="amount"/> <!-- the amount of money -->
@@ -148,14 +140,15 @@ app.get("/dashboard", loginRequired, (req, req, next) => {
 <img src="http://bank.com/withdraw?account=John&amp;amount=100000000&amp;for=BadGuy">
 ```
 
-* **Solution** gồm 2 phần
+## Solution
+* _gồm 2 phần:_
 * -> generating a random token every time a new page request is made
 * -> insert that token in a cookie
 * -> put that as an input field on a form so that we're able to send back to our Web Server
 * -> when someone go to our Web Server to view FormData; we check value in that cookie is the one was actually submitted by the form
 * -> nếu 2 cái khác nhau, thì bỏ qua
 
-* **Implement**
+## Implement
 ```js
 const csurf = require("csurf");
 app.use(csurf());
@@ -176,7 +169,7 @@ form (method="post")
     input(type="hidden", name="_csrf", value=csrfToken)
 ```
 
-# Additional security
+# Additional security in Best Practices
 ## SSL
 * always use SSL because 
 * -> if not, any information a user sends from their browser to our Web Server that can be view by anyone in between like Internet service Provide, NSA, Canadian police, ...
@@ -204,9 +197,5 @@ app.use(session({
 ## Don't Roll Your Own
 * nên s/d nhưng thư viện như: Passport, Node-Login, Aqua, Okta
 
-# Disavandtage of Session
-* **`Session Stored on server`** - we need to store the sessionId in a database or keep it in memory on server
-* Most of `today's cloud applications` are **`scaled horizontally`** 
-* -> this can be a huge bottleneck in production
-* -> that bring us to **Token-based**
+
 
