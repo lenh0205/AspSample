@@ -1,6 +1,6 @@
 # Example: Web Application 
 
-## Register:
+## Setup DB
 * -> tạo table "User" trong database; email sẽ là unique 
 ```js 
 // Tạo "User" collection trong Database; field "_id" is unique Id like primary key on table
@@ -16,6 +16,57 @@ let User = mongoose.model("User", new mongoose.Schema({
 }));
 ```
 
+## Password
+
+### Lưu mật khẩu:
+* **password** - user provide khi đăng ký tài khoản
+* **salt** - a random string do hệ thống tự sinh ra (tạo độ nhiễu cho mã băm)
+* dùng **Hash function** để tạo mã băm độc nhất từ chuỗi kết hợp `password` + `salt`
+* **`Lưu mã băm + salt + 1 số thông tin khác vào database`** 
+
+### Kiểm tra mật khẩu:
+* **password** - user enter password
+* lấy **salt** lưu trong database theo **`id`** hoặc **`username`**
+* lấy **password** vừa nhập + **salt** vừa lấy từ database cộng lại; rồi dùng **hash function** để tạo ra 1 mã băm
+* **`so sánh mã băm này với mã băm trong database`** -> khớp thì mật khẩu chỉnh xác
+
+### Password Hashing Algorithms - bcrypt
+* **scrypt**, **argon2** cũng rất tốt nhưng vẫn cần xem xét; hiện tại tố nhất vẫn là **`bcrypt`**
+* -> ensure **one-way function** and **same input same output**
+
+```js - "bcrypt" function
+var password = 'hi';
+var hash = bcrypt(password); // $2a$10.....
+```
+
+## Setup Session to store user info
+
+* -> Cách 1: sử dụng **`client-sessions`** để lưu trực tiếp **encrypted session data (VD: user info) trong Cookie luôn**, bị cái Cookie chỉ lưu được 4KB
+```js - secret, duration, name of "session"
+const sessions = require("client-sessions"); // use strong cryptograhy and signing Augorithms
+app.use(sessions({
+    cookieName: "session",
+    secret: "ldfgjl", // random
+    duration: 30 * 60 * 1000 // 30 mins - How long will allow user to stay login 
+}))
+```
+
+* -> Cách 2: sử dụng **`express-session`** (thường dùng cho production) để lưu **session data ở Server** và và lưu **SessionID** trong Cookie
+```js
+const session = require("express-session");
+
+// Middleware to set up express-session
+app.use(session({
+    secret: "your-secret-key",  // Secret for signing the session ID cookie
+    resave: false,  // Prevents saving unchanged sessions
+    saveUninitialized: true,  // Save uninitialized sessions
+    cookie: { maxAge: 30 * 60 * 1000 }  // 30 min session expiration
+}));
+```
+
+## Basic Logic
+
+### Register:
 * -> tạo 1 Form đăng ký HTML gồm 4 fields required từ user: firstName, lastName, email, password
 ```js
 // Register API:
@@ -39,7 +90,7 @@ app.post("/register", (req, res) => {
 })
 ```
 
-## Login:
+### Login:
 ```js
 // Tìm email và kiểm tra password; 
 app.post("/login", (req, res) => {
@@ -48,7 +99,7 @@ app.post("/login", (req, res) => {
             err 
             || !user 
             || !bcrypt.compareSync(req.body.password, user.password)
-            // so sánh "plain text passwor" từ request với "hashed password" trong Database
+            // so sánh "plain text password" từ request với "hashed password" trong Database
         ) 
         { 
             return res.render("login", { error: "Incorrect email / password" })
@@ -61,7 +112,7 @@ app.post("/login", (req, res) => {
 })
 ```
 
-## '/Dashboard' as protected route 
+### Access '/Dashboard' as protected route 
 * -> trang dữ liệu cần xác minh danh tính để vào được
 ```js
 app.get("/dashboard", (req, res, next) => {
@@ -170,6 +221,7 @@ form (method="post")
 ```
 
 # Additional security in Best Practices
+
 ## SSL
 * always use SSL because 
 * -> if not, any information a user sends from their browser to our Web Server that can be view by anyone in between like Internet service Provide, NSA, Canadian police, ...
