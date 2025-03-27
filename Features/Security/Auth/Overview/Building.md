@@ -5,7 +5,7 @@
 ```js 
 // Tạo "User" collection trong Database; field "_id" is unique Id like primary key on table
 ```
-```
+```js
 // Định nghĩa "User" Model cho "User" Collection bằng Mongoose ORM
 const mongoose = require("mongoose");
 let User = mongoose.model("User", new mongoose.Schema({
