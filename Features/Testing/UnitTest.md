@@ -1,6 +1,9 @@
 ===============================================================
 # Overview
 
+## Code Coverage
+* có thể biết được
+
 ## Reason
 * -> improve **`code quality`**: require our code cover various scenarios; the code also need to be modular and maintainable for easily testing
 * -> ensure making **`code changes`** did not break existing functionality
