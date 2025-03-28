@@ -179,4 +179,24 @@ https://www.scholarhat.com/tutorial/linq/comparing-linq-with-stored-procedure
 https://learn.microsoft.com/en-us/ef/core/querying/sql-queries?tabs=sqlserver
 
 # Stored Procedure or Application code
-* -> compare to Stored Procedure, put DAL code in application (using ADO.NET, ORM) can help centralize all database logic at one place - improve debugging and logging capabilities.
+https://medium.com/@amirayat20/why-should-you-migrate-from-coding-raw-sql-queries-in-your-app-to-stored-procedures-706d13810321
+https://stackoverflow.com/questions/2734007/when-is-it-better-to-write-ad-hoc-sql-vs-stored-procedures
+https://stackoverflow.com/questions/15142/what-are-the-pros-and-cons-to-keeping-sql-in-stored-procs-versus-code
+https://softwareengineering.stackexchange.com/questions/375638/db-queries-in-code-or-use-stored-procedures
+https://www.linkedin.com/pulse/orm-vs-stored-procedures-raw-sql-which-should-you-use-padmani-yjzrf
+https://dba.stackexchange.com/questions/4706/efficency-of-stored-procedures-vs-raw-queries
+https://www.reddit.com/r/learnprogramming/comments/1416or3/calling_sql_function_vs_plain_sql_query/#:~:text=Stored%20procedures%20tend%20to%20be,happen%20with%20plain%20SQL%20queries.
+https://www.quora.com/Which-one-is-better-using-ORM-or-a-native-query-using-the-store-procedure-for-build-e-commerce
+https://matthewdaly.co.uk/blog/2018/03/10/using-stored-procedures-in-your-web-app/
+https://erikdarling.com/signs-its-time-to-switch-from-orms-to-stored-procedures/
+https://www.ibm.com/docs/en/db2-for-zos/13?topic=procedures-stored
+* ->  Application code Easier to maintain - don't need to run a SQL script to update queries
+* ->  Application code Easier to port to another DB - no procs to port
+
+* Stored Procedure - don't need to recompile re-deploy the whole application just to change one query
+
+* The benefits of SQL stored procedures include the following:
+* -> Code reusability: Once a stored procedure is created, it can be called as many times as needed, eliminating redundancy in SQL code.
+* -> Enhanced performance: Stored procedures often execute faster because they are precompiled and stored on the database server, reducing network latency and compilation time.
+* -> Security: Stored procedures can improve data security and control over sensitive data access by granting users permission to execute a stored procedure without direct access to tables.
+
