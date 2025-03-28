@@ -30,7 +30,7 @@
 * -> then returns a **`SAML Authentication Request`** (302 HTTP Redirect) back to the browser
 
 ### Step 3: Redirect to Identity Provider (IdP)
-* -> the browser **`redirects the user to the Identity Provider`** (Okta, Auth0,...) for the company **specified in the SAML authentication request**
+* -> the browser **`redirects the user to the Identity Provider`** (Okta, Auth0,...) for **the company specified in the SAML authentication request**
 * -> the **`Identity Provider shows the login page`**, where the user enters the login credentials
 
 ### Step 4: User Authentication at the IdP
@@ -45,46 +45,23 @@
 * -> the Service Provider returns the **`protected resource`** to the browser based on what the user is allowed to access as specified in the SAML assertion
 * -> this completes the walkthrough of a basic SSO login flow
 
-=======================================================================
 # SSO for Multiple Applications
-* -> Let’s see what happens when the user navigates to another SSO-integrated application, say, Workday.
-
-* -> The Workday server, as in the previous example with Gmail, detects the work domain and sends a SAML authentication request back to the browser.
-
+* -> let’s see what happens when the user navigates to another SSO-integrated application, say, "Workday"
+* -> the "Workday" server, as in the previous example with Gmail, detects the work domain and sends a SAML authentication request back to the browser.
 * -> The browser again redirects the user to the Identity Provider.
-
 * -> Since the user has already logged in with the Identity Provider, it skips the login process and instead, generates a SAML assertion for Workday, detailing what the user can access there.
-
 * -> The SAML assertion is returned to the browser and forwarded to Workday.
-
 * -> Workday validates the signed assertion and grants the user access accordingly.
 
 # SSO with OpenID Connect
-Earlier, we mentioned that OpenID Connect is another common protocol.
+* -> the OpenID Connect flow is similar to SAML, but instead of passing signed XML documents, OpenID Connect passes around **`JWT`** - a signed JSON document
+* -> the implementation details are a little bit different, but the overall concept is similar
 
-The OpenID Connect flow is similar to SAML, but instead of passing signed XML documents, OpenID Connect passes around JWT.
+=======================================================================
+# Which SSO Method Should We Use?
+* -> Both implementations are secure.
+* -> For an enterprise environment where it is common to outsource identity management to a commercial identity platform, the good news is that many of these platforms provide strong support for both.
+* -> The decision then depends on the application being integrated and which protocol is easier to integrate with.
+* -> If we are writing a new web application, integrating with some of the more popular OpenID Connect platforms like Google, Facebook, and GitHub is probably a safe bet.
 
-JWT is a signed JSON document.
 
-The implementation details are a little bit different, but the overall concept is similar.
-
-Which SSO Method Should We Use?
-Both implementations are secure.
-
-For an enterprise environment where it is common to outsource identity management to a commercial identity platform, the good news is that many of these platforms provide strong support for both.
-
-The decision then depends on the application being integrated and which protocol is easier to integrate with.
-
-✅ If we are writing a new web application, integrating with some of the more popular OpenID Connect platforms like Google, Facebook, and GitHub is probably a safe bet.
-
-Conclusion
-If you like to learn more about system design, check out our books and free weekly newsletter.
-
-Please subscribe if you learned something new!
-
-Thank you so much, and we’ll see you next time! 🎉
-
-Changes Made:
-Only formatted the content (headings, bullet points, line breaks).
-
-Kept all words and sentences exactly as in your original text.
