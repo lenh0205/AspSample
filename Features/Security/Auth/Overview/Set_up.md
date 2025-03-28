@@ -14,23 +14,19 @@
 * -> to **allow our application to validate access tokens**, add a reference to the **`Microsoft.AspNetCore.Authentication.JwtBearer`** Nuget package
 
 ## Configure the middleware
-* set up the **authentication middleware** by configuring it in our application's **`Program.cs`** file:
-* -> register the **authentication services** by making a call to the **`AddAuthentication`** method; configure **`JwtBearerDefaults.AuthenticationScheme`** as the default scheme.
-* -> register the **JWT Bearer authentication scheme** by making a call to the **`AddJwtBearer`** method; configure our Identity platform **`domain as the authority`** and our Identity platform **`API Identifier as the audience`**, and be sure that our Identity platform domain and API Identifier are set in our application's **`appsettings.json`** file
-* -> add the **authentication and authorization middleware** to the middleware pipeline by adding calls to the **`UseAuthentication`** and **`UseAuthorization`** methods under the var app = builder.Build(); method
-
-* _in some cases, the **`access token`** will not have a **sub claim**_
-* -> in this case, the **"User.Identity.Name" will be null**
-* -> if we want to map a different claim to **`User.Identity.Name`**, add it to **options.TokenValidationParameters** within the **`AddJwtBearer()`** call
 
 ```c# - Program.cs
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme) // configure default scheme
+    .AddJwtBearer(options => // register the JWT Bearer authentication scheme
     {
+        // config our Identity platform domain as the authority
         options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+
+        // config Identity platform API Identifier as the audience
         options.Audience = builder.Configuration["Auth0:Audience"];
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = ClaimTypes.NameIdentifier
@@ -38,6 +34,8 @@ builder.Services
     });
 
 var app = builder.Build();
+
+// add the authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 ```
@@ -51,22 +49,15 @@ app.UseAuthorization();
 }
 ```
 
-## Validate scopes
-* to ensure that an **`access token contains the correct scopes`**, use **Policy-Based Authorization in the ASP.NET Core**:
-* -> create a new **authorization requirement** called **`HasScopeRequirement`**, which will check whether the **scope claim** issued by our Identity platform is present, and if so, will check that **`the claim contains the requested scope`**
--> under **`Program.cs`** file's _var builder = WebApplication.CreateBuilder(args);_ method, add a call to the **`app.AddAuthorization`** method
-* -> **add policies for scopes** by calling **`AddPolicy`** for each scope
-* -> register a **singleton** for the **`HasScopeHandler`** class
+## Validate scopes - Policy-Based Authorization in the ASP.NET Core
 
 ```c# - Program.cs
 builder.Services
     .AddAuthorization(options =>
     {
-        options.AddPolicy(
-        "read:messages",
-        policy => policy.Requirements.Add(
-            new HasScopeRequirement("read:messages", domain)
-        )
+        options.AddPolicy("read:messages", policy =>
+                // check the "scope" claim
+                policy.Requirements.Add(new HasScopeRequirement("read:messages", domain))
         );
     });
 
@@ -112,9 +103,6 @@ public class HasScopeRequirement : IAuthorizationRequirement
 ```
 
 ## Protect API endpoints
-* -> the **JWT middleware** integrates with the **`standard ASP.NET Core Authentication and Authorization mechanisms`**
-* -> to **secure an endpoint**, add the **`[Authorize] attribute`** to our **`controller action`** (_or the **`entire controller`** if you want to protect all of its actions_)
-* -> when securing endpoints that require **`specific scopes`**, make sure that the **correct scope is present in the access_token**. To do so, add the **`Authorize attribute to the Scoped action`** and pass **`Scope value`** (_VD: read:messages_) as the **policy parameter**
 
 ```c#
 [Route("api")]
@@ -131,7 +119,7 @@ public class ApiController : Controller
     }
 
     [HttpGet("private-scoped")]
-    [Authorize("read:messages")]
+    [Authorize("read:messages")] // validate "scope"
     public IActionResult Scoped()
     {
         return Ok(new
@@ -142,17 +130,12 @@ public class ApiController : Controller
 }
 ```
 
-## Call API
-* -> the way in which we call our API depends on the **`type of application`** we are developing and the **`framework`** we are using
-
-### Get an access token
-* -> regardless of the type of application we are developing or the framework we are using, **`to call our API`**, we need an **access token**
-
+## Get an access token
+* _regardless of the type of application we are developing or the framework we are using, we need an **`access token`** to call our API
 * -> if we are calling our API from a **Single-Page Application (SPA) or a Native application**, **`after the authorization flow completes`**, we will get an access token
-
-* -> if we are calling the API from **`a command-line tool`** or **`another service`** where **a user entering credentials does not exist**, use the **OAuth Client Credentials Flow**
-* -> to do so, register a **Machine-to-Machine Application**, and pass in the **Client ID** as the **`client_id`** parameter, the **Client Secret** as the **`client_secret`** parameter, 
-* -> and the **API Identifier** (the same value we used to configure the middleware earlier) as the **`audience`** parameter when making the following request:
+* -> if we are calling the API from **CLI or another service - where a user entering credentials does not exist**, use the **OAuth Client Credentials Flow**
+* _to do so, register a **`Machine-to-Machine Application`** and pass **client_id** and **client_secret** parameter_ 
+* _and the **API Identifier** (the same value we used to configure the middleware earlier) as the **`audience`** parameter when making the following request:_
 
 ```r 
 curl --request POST \
@@ -165,7 +148,6 @@ curl --request POST \
 ```
 
 ### Call a secure endpoint
-* -> now that we have an access token, we can use it to **`call secure API endpoints`**
 * -> When calling a secure endpoint, we must **include the access token** as a **`Bearer token`** in the **`Authorization header`** of the request
 * -> For example, we can make a request to the **`/api/private`** endpoint
 
