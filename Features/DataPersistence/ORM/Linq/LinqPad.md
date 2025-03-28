@@ -4,6 +4,11 @@
 * ->  chọn **`LINQ to SQL`** (tối ưu cho SQL Server) hoặc **`EF Core`** (dùng cho SQL Server, Oracle, MySQL, Postgres and SQLite) 
 * -> nhập tên SQL Server instance ta muốn kết nối + Window Authen
 
+# Point to DbContext
+* -> using LINQPad, we can point to our DLL
+* => so it will understand our DbContext and from there on you can write LINQ queries in the tool
+* => the tool will show you the resulting data, the SQL statements, and other details
+
 ## "C# Program" query
 * -> right-click on database ta muốn chọn **New Query**
 * -> trong cửa sổ "Query", right-click chọn **Namespace Imports** kiểm tra xem nó có 2 packages:
