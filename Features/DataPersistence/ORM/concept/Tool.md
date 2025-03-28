@@ -98,7 +98,7 @@ using (SqlConnection connection = new SqlConnection(connectionString))
 * -> provides a set of "classes" and "APIs" that **abstract the database operations** (_making it easier for developers to work with databases_)
 
 ## Features
-* ->  provides several features, such as **automatic schema migration**, **query translation**, and **change tracking**
+* ->  provides several features, such as **automatic schema migrations**, **query translation**, and **change tracking**
 * -> also supports **LINQ**, which **`allows developers to write queries in C# instead of SQL`**
 
 ```cs
@@ -133,6 +133,41 @@ using (var connection = new SqlConnection(connectionString))
 * -> deprecated
 
 =============================================================
+# Raw SQL statements in Entity Framework Core
+* -> when we **`can't achieve the desired query to optimize perfromance using LINQ`**; EF provides a Raw SQL API as an alternative
+* -> we can still take advantages of **SQL Schema migrations**, **C# object mapping**, **change tracking**
+
+```cs
+// write raw query
+private static void QueryPetsByType(string type)
+{
+    using var petContext = new PetContext();
+    List<Pet> pets = petContext.Pets
+        .FromSqlRaw("SELECT [PetId], [Name], [Type] FROM Pets WHERE [Type] = {0}", type)
+        .ToList();
+
+    foreach (var pet in pets)
+    {
+        Console.WriteLine($"Name: {pet.Name}");
+    }
+}
+
+// call Stored Procedure
+private static void QueryPetsByType(string type)
+{
+    using var petContext = new PetContext();
+    List<Pet> pets = petContext.Pets
+        .FromSqlRaw("EXEC GetPetsByType @Type={0};", type)
+        .ToList();
+
+    foreach (var pet in pets)
+    {
+        Console.WriteLine($"Name: {pet.Name}");
+    }
+}
+```
+
+=============================================================
 # Why 'LINQ' instead of 'SQL'
 https://www.linqpad.net/WhyLINQBeatsSQL.aspx
 https://medium.com/@uptoamir/linq-query-syntax-vs-raw-sql-b5a229409eb7
@@ -142,3 +177,6 @@ https://visualstudiomagazine.com/articles/2011/04/01/pcnet_using-linq.aspx
 https://eekayonline.medium.com/linq-vs-sql-unleashing-the-power-of-data-manipulation-a9ea95edc532
 https://www.scholarhat.com/tutorial/linq/comparing-linq-with-stored-procedure
 https://learn.microsoft.com/en-us/ef/core/querying/sql-queries?tabs=sqlserver
+
+# Stored Procedure or Application code
+* -> compare to Stored Procedure, put DAL code in application (using ADO.NET, ORM) can help centralize all database logic at one place - improve debugging and logging capabilities.
