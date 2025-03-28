@@ -9,7 +9,7 @@
 ## Common SDLC phases
 * _The details of the SDLC process vary for different teams_
 
- ### Plan
+### Plan
 The planning phase typically includes tasks like cost-benefit analysis, scheduling, resource estimation, and allocation. The development team collects requirements from several stakeholders such as customers, internal and external experts, and managers to create a software requirement specification document.
 
 The document sets expectations and defines common goals that aid in project planning. The team estimates costs, creates a schedule, and has a detailed plan to achieve their goals.
