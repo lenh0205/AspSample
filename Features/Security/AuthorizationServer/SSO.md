@@ -24,24 +24,23 @@
 
 ## Using SAML
 
-### Step 2: Gmail Requests Authentication
+### Step 1: Gmail Requests Authentication
 * -> an office worker visits an application like Gmail; in SAML terms, Gmail in this example is a **Service Provider**
-* -> the Gmail server detects that the user is from a work domain (e.g., @company.com)
-* -> then returns a **`SAML Authentication Request`** (302 HTTP Redirect) back to the browser
+* -> the Gmail server detects that the user is from a work domain (e.g., @company.com), then returns a **`SAML Authentication Request`** (302 HTTP Redirect) back to the browser
 
-### Step 3: Redirect to Identity Provider (IdP)
+### Step 2: Redirect to Identity Provider (IdP)
 * -> the browser **`redirects the user to the Identity Provider`** (Okta, Auth0,...) for **the company specified in the SAML authentication request**
 * -> the **`Identity Provider shows the login page`**, where the user enters the login credentials
 
-### Step 4: User Authentication at the IdP
+### Step 3: User Authentication at the IdP
 * -> once the user is authenticated, the **Identity Provider** generates a SAML response called a **`SAML assertion`** and returns that to the browser
 * -> the "SAML assertion" is a **cryptographically-signed** XML document that contains **`information about the user`**, and **`what the user can access with the service provider`**
 
-### Step 5: Returning the SAML Assertion to the Service Provider
+### Step 4: Returning the SAML Assertion to the Service Provider
 * -> the **browser forwards the signed SAML assertion to the Service Provider**
 * -> the **Service Provider validates that the assertion** was **`signed by the Identity Provider`** by (usually) using **`public key cryptography`**
 
-### Step 6: Access Granted
+### Step 5: Access Granted
 * -> the Service Provider returns the **`protected resource`** to the browser based on what the user is allowed to access as specified in the SAML assertion
 * -> this completes the walkthrough of a basic SSO login flow
 
