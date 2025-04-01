@@ -20,7 +20,7 @@ SELECT @UNI
 ```
 
 ## Clustered Index as PRIMARY KEY
-* -> a "clustered index" **`organizes the table rows physically on disk`** in the **order of the indexed column** - the data is sorted in ascending order
+* -> a "clustered index" **`organizes the table rows physically on disk`** in the **order of the clustered indexed column** - the data is sorted in ascending order
 * -> when we define a **`PRIMARY KEY`** in SQL Server, **`a clustered index is automatically created on that column by default`** unless we **explicitly specify it as a non-clustered index**
 
 ## Problem
@@ -115,12 +115,13 @@ public class Product
 * -> if we try to use it you will get this error: _Built-in function 'NEWSEQUENTIALID' is not supported in this version of SQL Server_
 
 ==================================================================================
-# 'integer' datatype vs 'IDENTITY' constraint
+# 'integer' datatype vs 'IDENTITY' (AUTO INCREMENT in MySQL) constraint in SQL Server
 
 ## integer
 * -> dễ đánh index nên là query performance tốt hơn;
 * -> debug và quản lý dễ hơn
 * -> lưu int chỉ tốn 4 bytes (_trong khi Guid đến 16 bytes can cause serious performance and storage implications if not careful_)
+* -> nhưng giá trị lưu có giới hạn (_Guid does not overflow_) và nó cần được gen dưới database
 
 ## IDENTITY
 * -> informs SQL Server to **`auto increment`** the **numeric value** within the specified column **anytime a new record is INSERTED**
