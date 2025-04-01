@@ -20,16 +20,31 @@ SELECT @UNI
 ```
 
 ## Clustered Index as PRIMARY KEY
+* -> a "clustered index" **`organizes the table rows physically on disk`** in the **order of the indexed column** - the data is sorted in ascending order
 * -> when we define a **`PRIMARY KEY`** in SQL Server, **`a clustered index is automatically created on that column by default`** unless we **explicitly specify it as a non-clustered index**
-* => table rows are **physically stored in clustered index** order on disk
 
 ## Problem
-* -> SQL Server will **`let us build a clustered index around a uniqueidentifier column`**, however it will **cause the SQL Server to do unnecessary work and cause performance slowdowns**
-* -> the reason for this is that to **`insert data into the middle of a clustered index`** (out of sequential order) causes SQL Server to make room for the data by rearranging the cluster
+* -> SQL Server will **`let us build a clustered index around a 'uniqueidentifier' column`**, however it will **cause the SQL Server to do unnecessary work and cause performance slowdowns**
+* -> the reason for this is that to **`insert data into the middle of a clustered index`** (out of sequential order -  insert it in the correct sorted position, not at the end)
+* => causes SQL Server to make room for the data by **rearranging the pages** - causes **`page splits`** 
+* 
+* => **`I/O Operations`** increasing - involve moving data, creating new pages, and updating indexes, which **slows down inserts**
+* => **`Fragmentation`** - more non-contiguous pages are created, making **reads slower** (_SQL Server must jump around to different disk location to seek for the scattered pages_)
+* => wasting **`storage`** - page splits leave empty space behind
 
-* => this is so called **`Index Fragmentation`**
-* => if we want a table with a **uniqueidentifier** data type as a **primary key** we need to change that index to a **non-clustered index**
-* => non-clustered indexes don't reorder the data as rows are inserted to the table, so they don't have the **performance impact of a clustered index on inserts of non-sequential data**
+## Page split
+* -> rows are **`physically stored in order (based on the clustered index key)`** within **`8 KB pages`**,
+* -> and SQL Server will try to **locate pages next to each other when possible** (for SQL Server to loading pages in a single block, fewer disk I/O operation, query more efficient) 
+* -> if the page has **enough free space**, the **new row is inserted directly**
+* -> if the page is **full**, SQL Server must **split the page** for the new row is inserted in the correct position
+
+* => a **`new page must be created`**
+* => some **rows are moved** to the new page;
+* => the **`index must be updated`** to reflect the changes
+  
+## Idea
+* -> if we want a table with a **uniqueidentifier** data type as a **primary key** we need to change that index to a **non-clustered index**
+* -> non-clustered indexes don't reorder the data as rows are inserted to the table, so they don't have the **performance impact of a clustered index on inserts of non-sequential data**
 
 ## Solution 1: Mark Primary Key as 'Non-Clustered'
 * -> if we want a table with a **uniqueidentifier** data type as a **primary key** we need to change that index to a **`non-clustered index`** then we need to pick a **`clustered index`** for the table also
