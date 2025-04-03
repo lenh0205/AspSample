@@ -1,5 +1,26 @@
+============================================================
+# Implement ElasticSearch in .NET
+https://stackoverflow.com/questions/44679986/how-to-implement-elasticsearch-with-asp-net-web-application
+http://code-maze.com/elasticsearch-aspnet-core/
 
-# 'Elasticsearch' with 'ASP.NET Core Web API' using 'Entity Framework' and 'SQL Server'
+============================================================
+# ElasticSearch .NET client
+https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/examples.html
+
+============================================================
+# ASP.NET Core, ElasticSearch, Kibana, Serilog 
+https://www.youtube.com/watch?v=zp6A5QCW_II
+
+============================================================
+# ElasticSearch with Dapper
+https://github.com/krisdaniels/ElasticConnection
+https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-scale-working-with-dapper?view=azuresql
+
+============================================================
+# ElasticSearch with ASP.NET MVC, Docker
+
+============================================================
+# 'ElasticSearch' with 'ASP.NET Core Web API' using 'Entity Framework' and 'SQL Server'
 
 * -> install Elasticsearch and run an Elasticsearch instance (_hoặc ta cũng có thể s/d **`cloud-hosted Elasticsearch service`**, ví dụ như **Elastic Cloud** cũng được_)
 ```bash

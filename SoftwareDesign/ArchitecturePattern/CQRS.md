@@ -2,6 +2,9 @@
 > áp CQRS cho 1 app sử dụng 1 DB duy nhất và 1 app sử dụng 2 DB đọc và ghi thì có giống nhau không ? và sẽ handle Transaction như nào ?
 > 1 logic cần cả đọc và ghi thì như nào, Command hay Query ? ta sẽ dựa vào Http Action GET là Query; còn POST, PUT, DELETE là Command
 
+https://viblo.asia/p/cqrs-design-pattern-trong-kien-truc-microservices-PAoJexlZ41j
+https://microservices.io/patterns/data/cqrs.html
+
 ==============================================================
 # 'CQRS' pattern (Command and Query Responsibility Segregation) 
 * -> tức là nó để seperate trách nhiệm của **`Query`** và **`Command`** - hay **`separates read and update operations for a data store`**
