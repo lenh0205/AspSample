@@ -1,4 +1,25 @@
 ===================================================================
+# request để lấy 1 quantity - count with condition
+* -> instead of fetching all the records and counting them in our application, we can use **`SQL Server's COUNT directly in the database`**, which is much more efficient
+* _ngoài ra ta còn có thể tăng performance nếu đánh **`index`** on the column in the WHERE clause_
+* _một số lưu ý: nếu ta count trên 1 cột cụ thể (e.g., COUNT(UserID)) nó sẽ **ignore NULL values** của cột đó; trong SQL Server COUNT(1) không performance hơn COUNT(*)_
+
+```sql
+-- count how many users are active
+SELECT COUNT(*) FROM Users WHERE IsActive = 1;
+```
+
+```js
+// MongoDB
+
+// -> count documents that satisfy a condition
+db.users.countDocuments({ isActive: true });
+
+// -> if no condition just count all document, "estimatedDocumentCount" is much faster - performance for large collection
+db.users.estimatedDocumentCount();
+```
+
+===================================================================
 # Parse an unvalid DateTime to valid DateTime
 ```cs
 string date = "20121004";
