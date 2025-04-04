@@ -51,6 +51,20 @@ print(string_operations.to_uppercase("hello"))  # Output: HELLO
 * => mỗi lần tạo mới 1 project ta nên tạo mới 1 Virtual Enviroment để tránh, hay nói cách khác "requirements.txt" được dùng để **managing dependencies in a virtual environment**
 
 ```bash
+# navigate to project
+cd my_project
+
+# create a virtual environment
+$ python -m venv myenv
+
+# activate the environment in Linux
+$ source myenv/bin/activate
+
+# deactivate the virtual enviroment
+deactivate
+```
+
+```bash
 # creating requirements.txt from an existing virtual environment
 # Ex: if we have installed packages inside a virtual environment, we can generate "requirements.txt"
 $ pip freeze > requirements.txt
@@ -65,20 +79,6 @@ $ pip install -r requirements.txt
 requests==2.31.0
 Flask==2.2.3
 numpy==1.24.2
-```
-
-```bash
-# navigate to project
-cd my_project
-
-# create a virtual environment
-$ python -m venv myenv
-
-# activate the environment in Linux
-# source myenv/bin/activate
-
-# deactivate the virtual enviroment
-deactivate
 ```
 
 ## Package Management
