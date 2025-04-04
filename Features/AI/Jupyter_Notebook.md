@@ -1,7 +1,8 @@
 =============================================================
 # Jupyter Notebook
-* nền tảng tính toán khoa học mã nguồn mở ghép từ ba ngôn ngữ lập trình Julia, Python và R
-* cốt lõi là **Markdown** - đưa dữ liệu, code, hình ảnh, công thức, video,.. vào trong cùng một file; ta có thể vừa trình chiếu vừa chạy code để tương tác trên đó
+* nói chung là nó cho phép ta viết các block code và block markdown xen kẽ nhau; ta cứ Shift+Enter để chạy từng dòng như 1 REPL, gặp block code thì nó sẽ show kết quả như Console vậy 
+* -> nền tảng tính toán khoa học mã nguồn mở ghép từ ba ngôn ngữ lập trình Julia, Python và R
+* -> cốt lõi là **Markdown** - đưa dữ liệu, code, hình ảnh, công thức, video,.. vào trong cùng một file; ta có thể vừa trình chiếu vừa chạy code để tương tác trên đó
 * => bạn có thể sử dụng để tạo, chia sẻ các tài liệu có chứa code trực tiếp, phương trình, trực quan hóa dữ liệu và văn bản tường thuật
 * => được coi là môi trường điện toán tương tác đa ngôn ngữ, hỗ trợ hơn 40 ngôn ngữ lập trình cho người dùng
 
