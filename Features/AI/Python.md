@@ -83,6 +83,7 @@ numpy==1.24.2
 
 ## Package Management
 * -> Python uses **`pip`** to install, remove, and manage packages from the **Python Package Index (PyPI)**
+* -> trong "C:\Users\Default\AppData\Local\Programs\Python\Python38-32\Scripts" ta có thể có nhiều pip khác nhau như pip.exe, pip3.exe, pip3.8exe; nhưng nếu ta thử check version (e.g., pip --version) thì nhiều khi chúng như nhau
 
 ```bash
 # Install a package:
