@@ -133,3 +133,18 @@ Matplotlib, and Scikit-learn, forming a robust ecosystem for data analysis and m
 
 ==============================================================================
 # Data visualization - Matplotlib & Seaborn
+
+==============================================================================
+# Installation - Cài python runtime rồi những kiểm tra thì Not Found
+* -> tình huống là sau khi cài đặt xong, ta vào thử cmd gõ "python" để check xem install success chưa nhưng nó báo "Pythong not found"
+* -> check lại đường dẫn ta chọn để install lúc chạy setup wizard
+* -> vô đường dẫn đó xem có file file python.exe không và chạy nó lên xem có code được không
+* -> nếu được thì rất có thể là do **PATH** Enviroment variable đang trỏ đến 1 thư mục khác cũng chưa file "python.exe", nhưng file này không chạy được
+* -> vào Enviroment variable -> trong "System variables" + click chọn "PATH" -> bấm "Edit" -> xóa đường dẫn đang trỏ sai, thêm đường dẫn đúng vào
+* -> mở cmd -> chạy lại "python" thử 
+
+# Lỗi khi install package
+* -> rất có thể do phiên bản chưa phù hợp để cài package này, ta có thể update pip version (hoặc tải python version cao hơn, nó sẽ có pip version cao hơn)
+```bash
+$ python -m pip install --upgrade pip
+```
