@@ -15,14 +15,6 @@ git config --global http.sslbackend schannel
 * filter bớt những trường không cần thiết, chỉ để 1 trường làm identity và 1 trường để hiển thị là đủ
 
 ==============================================================
-# Setting - Installation - Cài python runtime rồi những kiểm tra thì Not Found
-* -> tình huống là sau khi cài đặt xong, ta vào thử cmd gõ "python" để check xem install success chưa nhưng nó báo "Pythong not found"
-* -> check lại đường dẫn ta chọn để install lúc chạy setup wizard
-* -> vô đường dẫn đó xem có file file python.exe không và chạy nó lên xem có code được không
-* -> nếu được thì rất có thể là do **PATH** Enviroment variable đang trỏ đến 1 thư mục khác cũng chưa file "python.exe", nhưng file này không chạy được
-* -> vào Enviroment variable -> trong "System variables" + click chọn "PATH" -> bấm "Edit" -> xóa đường dẫn đang trỏ sai, thêm đường dẫn đúng vào
-* -> mở cmd -> chạy lại "python" thử 
-
 # Setting - Hosting xong trả về 404
 * thư mục **bin** không có gì cả
 
