@@ -35,7 +35,7 @@ $ pip3 install jupyter
 $ jupyter notebook
 ```
 
-* -> tạo 1 Notebook cơ bản: click "New" + chọn loại Notebook tài liệu (Python, Text file, Folder...)
+* -> tạo 1 Notebook cơ bản: click "New" + chọn loại Notebook tài liệu (Python - ipykernel, Text file, Folder...)
 * -> hoặc nếu muốn sử dụng 1 Notebook jupyter khác trên hệ thống thì nhấp "Upload" + điều hướng đến tệp đó
 * => Jupyter Notebook của ta sẽ được mở trong tab mới - 1 file **jSON** có extension là **`.jpynb`** (nhưng ta vẫn có thể xuất Notebook jupyter ở dạng khác như HTML)
 * => Notebook có biểu tượng màu xanh lá cây là đang chạy; còn màu xám là không chạy
