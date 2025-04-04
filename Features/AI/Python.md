@@ -148,3 +148,8 @@ Matplotlib, and Scikit-learn, forming a robust ecosystem for data analysis and m
 ```bash
 $ python -m pip install --upgrade pip
 ```
+
+# Đã install package nhưng không xài được
+* -> ví dụ "pip install jupyter" nhưng khi chạy "jupyter notebook" thì lại không được 
+* -> đây có thể là do không tìm thấy "jupyter.exe" trong "PATH" enviroment variable
+* -> ta cần đọc lại log trong quá trình install xem nó được install vô đâu và thêm path đó vào "PATH" là xong 
